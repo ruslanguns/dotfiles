@@ -1,3 +1,4 @@
+# Author: Ruslan Gonzalez!
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -81,6 +82,7 @@ plugins=(
   asdf
   ssh-agent
   gh
+  fzf
 )
 
 
@@ -174,3 +176,5 @@ if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
 
+source $HOME/.completions/fzf-tab-completion/zsh/fzf-zsh-completion.sh
+bindkey '^I' fzf_completion
