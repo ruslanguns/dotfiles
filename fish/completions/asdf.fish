@@ -1,1 +1,0 @@
-/home/rus/.asdf/completions/asdf.fish
