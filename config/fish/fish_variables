@@ -3,10 +3,14 @@
 SETUVAR __fish_initialized:3400
 SETUVAR _hydro_git_100795:\x1d
 SETUVAR _hydro_git_12996:TIAAS\x2d3315_nginx\x2didp\x2dto\x2duse\x2dbearer\x20
+SETUVAR _hydro_git_14764:main\u2022\x20\u21911\x20
+SETUVAR _hydro_git_3062:main\u2022\x20
 SETUVAR _hydro_git_37399:\x1d
-SETUVAR _hydro_git_4896:main\u2022\x20
 SETUVAR _hydro_git_491403:main\u2022\x20
+SETUVAR _hydro_git_8146:main\u2022\x20
+SETUVAR _hydro_git_8542:main\u2022\x20
 SETUVAR _hydro_git_97200:main\x20
+SETUVAR _hydro_git_9915:main\u2022\x20
 SETUVAR fish_color_autosuggestion:brblack
 SETUVAR fish_color_cancel:\x2dr
 SETUVAR fish_color_command:blue
