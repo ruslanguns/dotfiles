@@ -68,12 +68,6 @@
       videoDrivers = [ "nvidia" ];
 
       desktopManager.gnome.enable = true; 
-      desktopManager.gnome.extraGSettingsOverridePackages = [pkgs.gnome.mutter];
-      desktopManager.gnome.extraGSettingsOverrides = ''
-        [org.gnome.mutter]
-        experimental-features=['variable-refresh-rate', 'scale-monitor-framebuffer']
-      '';
-
       displayManager.gdm.enable = true;
       displayManager.gdm.wayland = false;
 
