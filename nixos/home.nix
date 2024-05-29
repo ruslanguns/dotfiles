@@ -99,17 +99,17 @@
 
     # electron software
     tela-circle-icon-theme
-    #vscode
-    (pkgs.writeShellApplication {
-      name = "code";
-      text = "${pkgs.vscode}/bin/code --use-gl=desktop";
-    })
-    (pkgs.makeDesktopItem {
-      name = "code";
-      exec = "code";
-      desktopName = "Visual Studio Code";
-      icon = "${pkgs.tela-circle-icon-theme}/share/icons/Tela-circle/scalable/apps/code.svg";
-    })
+    vscode
+    #(pkgs.writeShellApplication {
+    #  name = "code";
+    #  text = "${pkgs.vscode}/bin/code --use-gl=desktop";
+    #})
+    #(pkgs.makeDesktopItem {
+    #  name = "code";
+    #  exec = "code";
+    #  desktopName = "Visual Studio Code";
+    #  icon = "${pkgs.tela-circle-icon-theme}/share/icons/Tela-circle/scalable/apps/code.svg";
+    #})
     #slack
     (pkgs.writeShellApplication {
       name = "slack";

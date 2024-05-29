@@ -9,6 +9,15 @@
 -- * disable/enabled LazyVim plugins
 -- * override the configuration of LazyVim plugins
 return {
+  {
+    "rcarriga/nvim-notify",
+    opts = {
+      level = 3,
+      render = "minimal",
+      stages = "static",
+      top_down = false,
+    },
+  },
   -- add gruvbox
   { "ellisonleao/gruvbox.nvim" },
 
