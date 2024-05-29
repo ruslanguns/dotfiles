@@ -39,7 +39,16 @@
     powerManagement.finegrained = false;
     open = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.production;
+    prime = {
+      sync.enable = true;
+      offload = {
+        enable = false;
+        enableOffloadCmd = false;
+      };
+      intelBusId = "PCI:0:2:0"; # Fake bus ID, since I only have one GPU, is here because otherwise it won't work
+      nvidiaBusId = "PCI:1:0:0";
+    };
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
   
   # VIRTUALIZATION
@@ -60,6 +69,7 @@
 
       desktopManager.gnome.enable = true; 
       displayManager.gdm.enable = true;
+      displayManager.gdm.wayland = false;
 
       layout = "es";
       xkb = {
@@ -76,16 +86,8 @@
   };
 
   # Sound configuration with PipeWire
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    #jack.enable = true;
-    #wireplumber.enable = true;
-  };
+  sound.enable = true;
+  hardware.pulseaudio.enable = true;
 
   # User configuration
   users.users.rus = {
