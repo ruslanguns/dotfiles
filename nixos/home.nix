@@ -8,25 +8,21 @@
   home.username = "rus";
   home.homeDirectory = "/home/rus";
   home.packages = with pkgs; [
-    gnome3.gnome-shell
-    gnome3.gnome-weather
-
     # utils
     zip
     neofetch
-    xz
+    xz # A data compression tool
     unzip
     p7zip
-    ripgrep # recursively searches directories for a regex pattern
     jq # A lightweight and flexible command-line JSON processor
     yq-go # yaml processor https://github.com/mikefarah/yq
     eza # A modern replacement for ‘ls’
-    fzf # A command-line fuzzy finder
-    gnumake #  A utility for directing compilation
-    fd # A simple, fast and user-friendly alternative to 'find'
     wget # A network utility to retrieve files from the Web
     curl # A command line tool and library for transferring data with URL syntax
+    fd # A simple, fast and user-friendly alternative to 'find'
+    fzf # A command-line fuzzy finder
     bat # A cat(1) clone with wings
+    ripgrep # recursively searches directories for a regex pattern
     
     # networking tools
     mtr # A network diagnostic tool
@@ -45,7 +41,6 @@
     # system 
     glib
     gcc
-    asdf-vm
 
     # Fish
     oh-my-fish
@@ -67,18 +62,17 @@
     gawk
     zstd
     gnupg
+    gnumake
 
     # nix related
     nix-output-monitor
     home-manager
 
     # productivity
-    hugo # static site generator
-    glow # markdown previewer in terminal
     httpie  # A user-friendly cURL replacement
-    wl-clipboard
     lazygit # A simple terminal UI for git commands
     tmux
+    xclip # A command line interface to the X11 clipboard
 
     btop  # replacement of htop/nmon
     iotop # io monitoring
@@ -100,40 +94,11 @@
     # electron software
     tela-circle-icon-theme
     vscode
-    #(pkgs.writeShellApplication {
-    #  name = "code";
-    #  text = "${pkgs.vscode}/bin/code --use-gl=desktop";
-    #})
-    #(pkgs.makeDesktopItem {
-    #  name = "code";
-    #  exec = "code";
-    #  desktopName = "Visual Studio Code";
-    #  icon = "${pkgs.tela-circle-icon-theme}/share/icons/Tela-circle/scalable/apps/code.svg";
-    #})
-    #slack
-    (pkgs.writeShellApplication {
-      name = "slack";
-      text = "${pkgs.slack}/bin/slack --use-gl=desktop";
-    })
-    (pkgs.makeDesktopItem {
-      name = "slack";
-      exec = "slack";
-      desktopName = "Slack";
-      icon = "${pkgs.tela-circle-icon-theme}/share/icons/Tela-circle/scalable/apps/slack.svg";
-    })
-    # brave
-    (pkgs.writeShellApplication {
-      name = "brave";
-      text = "${pkgs.brave}/bin/brave --use-gl=desktop";
-    })
-    (pkgs.makeDesktopItem {
-      name = "brave";
-      exec = "brave";
-      desktopName = "Brave";
-      icon = "${pkgs.tela-circle-icon-theme}/share/icons/Tela-circle/scalable/apps/brave.svg";
-    })
+    slack
+    brave
 
     # programming langueges or interpreters or just utils
+    asdf-vm
     python3
     nodejs
     lua

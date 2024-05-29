@@ -11,11 +11,10 @@
   programs.fish.shellAliases = {
     kubectl = "kubecolor";
     k = "kubecolor";
-    ls = "ls --color=auto --hide=\\*~ --hide=lost+found";
-    ll = "ls -l";
-    la = "ls -A";
-    lla = "ls -lA";
-    nixos-rebuild = "nixos-rebuild --use-remote-sudo";
+    ll = "eza -l";
+    ls = "eza";
+    la = "eza -A";
+    lla = "eza -lA";
 
   };
 
