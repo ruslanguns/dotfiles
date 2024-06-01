@@ -70,8 +70,9 @@
       desktopManager.gnome.enable = true; 
       displayManager.gdm.enable = true;
       displayManager.gdm.wayland = false;
+     # displayManager.autoLogin.enable = true;
+     # displayManager.autoLogin.user = "rus";
 
-      layout = "es";
       xkb = {
         layout = "es";
         variant = "";
@@ -101,10 +102,6 @@
   nixpkgs = {
     config = {
       allowUnfree = true;
-      permittedInsecurePackages = [
-          "openssl-1.1.1v"
-          "python-2.7.18.7"
-      ];
     };
   };
   programs.fish.enable = true;
@@ -156,7 +153,9 @@
   };
 
   # System state version
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.05";
+  system.autoUpgrade.enable = true;
+  system.autoUpgrade.allowReboot = true;
   nix = {
     package = pkgs.nix;
     extraOptions = ''

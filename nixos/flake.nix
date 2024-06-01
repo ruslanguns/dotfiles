@@ -2,32 +2,15 @@
   description = "Flakes configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-23.11";
+      url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    
-    hyprland = {
-      url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
-    };
-
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, hyprland, ... }: {
-   # homeConfigurations = {
-   #   nixos = home-manager.lib.homeManagerConfiguration {
-   #     pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-   #     modules = [
-   #       hyprland.homeManagerModules.default
-   #       {wayland.windowManager.hyprland.enable = true;}
-   #     ];
-   #   };
-   # };
-   #
+  outputs = inputs@{ nixpkgs, home-manager, ... }: {
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -40,7 +23,6 @@
              home-manager.useUserPackages = true;
              home-manager.users.rus = import ./home.nix;
           }
-          #./hyprland.nix
 	      ];
       };
     };
