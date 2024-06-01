@@ -96,6 +96,9 @@
     vscode
     slack
     brave
+    gitg
+    element-desktop
+    # gitkraken # good for opensource projects, not for private projects
 
     # programming langueges or interpreters or just utils
     asdf-vm
