@@ -68,6 +68,7 @@
 
     # nix related
     nix-output-monitor
+    nix-your-shell
     home-manager
 
     # productivity
