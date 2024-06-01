@@ -23,6 +23,8 @@
     fzf # A command-line fuzzy finder
     bat # A cat(1) clone with wings
     ripgrep # recursively searches directories for a regex pattern
+    _1password
+    _1password-gui
     
     # networking tools
     mtr # A network diagnostic tool
@@ -82,6 +84,7 @@
     strace # system call monitoring
     ltrace # library call monitoring
     lsof # list open files
+    gdu # disk usage
 
     # system tools
     sysstat
@@ -92,12 +95,14 @@
     psensor # hardware monitoring tool
 
     # electron software
+    gnome3.gnome-tweaks
     tela-circle-icon-theme
     vscode
     slack
     brave
     gitg
     element-desktop
+    telegram-desktop
     # gitkraken # good for opensource projects, not for private projects
 
     # programming langueges or interpreters or just utils
