@@ -85,7 +85,8 @@
     strace # system call monitoring
     ltrace # library call monitoring
     lsof # list open files
-    gdu # disk usage
+    gdu # disk usage interactive
+    dust # disk usage statistics
 
     # system tools
     sysstat
@@ -104,7 +105,8 @@
     gitg
     element-desktop
     telegram-desktop
-    # gitkraken # good for opensource projects, not for private projects
+    mangohud
+    protonup 
 
     # programming langueges or interpreters or just utils
     asdf-vm
@@ -130,6 +132,10 @@
     fluxcd
   ];
 
-  home.stateVersion = "23.11";
+  home.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
+  };
+
+  home.stateVersion = "24.05";
   programs.home-manager.enable = true;
 }
