@@ -7,7 +7,6 @@
     ./kitty.nix
     ./neovim.nix
     ./starship.nix
-    ./ssh.nix
     ./tmux.nix
   ];
 }

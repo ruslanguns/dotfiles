@@ -74,6 +74,7 @@
     lazygit # A simple terminal UI for git commands
     tmux
     xclip # A command line interface to the X11 clipboard
+    pass
 
     btop  # replacement of htop/nmon
     iotop # io monitoring
@@ -93,6 +94,7 @@
     pciutils # lspci
     usbutils # lsusb
     psensor # hardware monitoring tool
+    speedtest-cli
 
     # electron software
     gnome3.gnome-tweaks
@@ -114,8 +116,6 @@
     stylua
     kubernetes
     kubecolor
-    podman
-    podman-tui
     kubernetes-helm
     docker-compose
     kind

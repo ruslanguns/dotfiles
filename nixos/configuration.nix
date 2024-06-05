@@ -55,10 +55,10 @@
   virtualisation = {
     containers.enable = true;
     libvirtd.enable = true;
-    podman = {
+    docker.enable = true;
+    docker.rootless = {
       enable = true;
-      dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = true;
+      setSocketVariable = true;
     };
   };
 
@@ -97,7 +97,7 @@
   users.users.rus = {
     isNormalUser = true;
     description = "Ruslan";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.fish;
   };
 
