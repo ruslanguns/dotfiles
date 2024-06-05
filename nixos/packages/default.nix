@@ -1,5 +1,6 @@
 {
   imports = [
+    ./_1password.nix
     ./alacritty.nix
     ./fish.nix
     ./fzf.nix

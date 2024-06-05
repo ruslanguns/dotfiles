@@ -23,9 +23,7 @@
     fzf # A command-line fuzzy finder
     bat # A cat(1) clone with wings
     ripgrep # recursively searches directories for a regex pattern
-    _1password
-    _1password-gui
-    
+
     # networking tools
     mtr # A network diagnostic tool
     iperf3
