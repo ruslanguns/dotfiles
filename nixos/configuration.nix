@@ -119,6 +119,12 @@
   programs.steam.gamescopeSession.enable = true;
   programs.gamemode.enable = true;
 
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "rus" ];
+  };
+
   environment.systemPackages = with pkgs; [
     git
     flatpak

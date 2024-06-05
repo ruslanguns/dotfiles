@@ -1,6 +1,5 @@
 {
   imports = [
-    ./_1password.nix
     ./alacritty.nix
     ./fish.nix
     ./fzf.nix
@@ -8,6 +7,7 @@
     ./kitty.nix
     ./neovim.nix
     ./starship.nix
+    ./ssh.nix
     ./tmux.nix
   ];
 }
