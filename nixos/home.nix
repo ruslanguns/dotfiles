@@ -10,6 +10,17 @@
     ./packages
   ];
 
+  nixpkgs = {
+    overlays = [
+      outputs.overlays.additions
+      outputs.overlays.modifications
+      outputs.overlays.unstable-packages
+    ];
+    config = {
+      allowUnfree = true;
+    };
+  };
+
   home.username = "rus";
   home.homeDirectory = "/home/rus";
   home.packages = with pkgs; [
@@ -104,7 +115,7 @@
     # electron software
     gnome3.gnome-tweaks
     tela-circle-icon-theme
-    pkgs.unstable.vscode
+    #vscode
     slack
     brave
     gitg
@@ -126,8 +137,7 @@
     kind
     go
     bun
-
-    krew # fixme: this should work with kubectl
+    krew
     kustomize
     kubeval
     k9s
@@ -139,6 +149,9 @@
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
   };
 
-  home.stateVersion = "24.05";
   programs.home-manager.enable = true;
+
+  systemd.user.startServices = "sd-switch";
+
+  home.stateVersion = "24.05";
 }
