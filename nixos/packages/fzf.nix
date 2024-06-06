@@ -4,4 +4,3 @@
     enableFishIntegration = true;
   };
 }
-

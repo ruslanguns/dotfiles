@@ -1,10 +1,11 @@
-{ config, pkgs, ... }:
-
 {
-  imports =
-    [
-      ./hardware-configuration.nix
-    ];
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader configuration
   boot.loader.systemd-boot.enable = true;
@@ -26,7 +27,7 @@
     AllowHybridSleep=no
     AllowSuspendThenHibernate=no
   '';
-  
+
   # VIDEO CONFIGURATION
   hardware.opengl = {
     enable = true;
@@ -50,7 +51,7 @@
     };
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
-  
+
   # VIRTUALIZATION
   virtualisation = {
     containers.enable = true;
@@ -65,24 +66,24 @@
   services = {
     xserver = {
       enable = true;
-      videoDrivers = [ "nvidia" ];
+      videoDrivers = ["nvidia"];
 
-      desktopManager.gnome.enable = true; 
+      desktopManager.gnome.enable = true;
       displayManager.gdm.enable = true;
       displayManager.gdm.wayland = false;
-     # displayManager.autoLogin.enable = true;
-     # displayManager.autoLogin.user = "rus";
+      # displayManager.autoLogin.enable = true;
+      # displayManager.autoLogin.user = "rus";
 
       xkb = {
         layout = "es";
         variant = "";
       };
     };
-  }; 
+  };
 
   # Desktop configuration
   xdg.portal.enable = true;
-  
+
   console = {
     packages = [pkgs.terminus_font];
     font = "${pkgs.terminus_font}/share/consolefonts/ter-i22b.psf.gz";
@@ -97,7 +98,7 @@
   users.users.rus = {
     isNormalUser = true;
     description = "Ruslan";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = ["networkmanager" "wheel" "docker"];
     shell = pkgs.fish;
   };
 
@@ -122,7 +123,7 @@
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;
-    polkitPolicyOwners = [ "rus" ];
+    polkitPolicyOwners = ["rus"];
   };
 
   environment.systemPackages = with pkgs; [
@@ -155,7 +156,7 @@
       source-han-sans
       source-han-serif-japanese
       source-han-sans-japanese
-      (nerdfonts.override { fonts = [ "CascadiaCode" "FiraCode" "DroidSansMono" "Meslo" ]; })
+      (nerdfonts.override {fonts = ["CascadiaCode" "FiraCode" "DroidSansMono" "Meslo"];})
     ];
     fontconfig = {
       enable = true;

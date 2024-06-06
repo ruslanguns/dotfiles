@@ -1,6 +1,11 @@
-{ inputs, outputs, lib, config, pkgs, ... }:
-
 {
+  inputs,
+  outputs,
+  lib,
+  config,
+  pkgs,
+  ...
+}: {
   programs.fish.enable = true;
   programs.fish.shellInit = ''
     set fish_greeting '''
