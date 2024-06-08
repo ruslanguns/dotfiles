@@ -4,7 +4,6 @@
     ./fish.nix
     ./fzf.nix
     ./git.nix
-    ./kitty.nix
     ./neovim.nix
     ./starship.nix
     ./tmux.nix
