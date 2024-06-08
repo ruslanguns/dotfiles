@@ -10,16 +10,16 @@
     ./packages
   ];
 
-  nixpkgs = {
-    overlays = [
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
-    ];
-    config = {
-      allowUnfree = true;
-    };
-  };
+  #nixpkgs = {
+  #  overlays = [
+  #    outputs.overlays.additions
+  #    outputs.overlays.modifications
+  #    outputs.overlays.unstable-packages
+  #  ];
+  #  config = {
+  #    allowUnfree = true;
+  #  };
+  #};
 
   home.username = "rus";
   home.homeDirectory = "/home/rus";
@@ -39,7 +39,7 @@
     fzf # A command-line fuzzy finder
     bat # A cat(1) clone with wings
     ripgrep # recursively searches directories for a regex pattern
-
+    tre-command # Tree command, improved
     # networking tools
     mtr # A network diagnostic tool
     iperf3
@@ -64,6 +64,7 @@
     fishPlugins.fzf-fish
     fishPlugins.forgit
     fishPlugins.hydro
+    fishPlugins.grc
     fzf
     fishPlugins.grc # Generic Colouriser
     grc # Generic Colouriser
@@ -115,7 +116,7 @@
     # electron software
     gnome3.gnome-tweaks
     tela-circle-icon-theme
-    #vscode
+    vscode
     slack
     brave
     gitg
@@ -123,6 +124,7 @@
     telegram-desktop
     mangohud
     protonup
+    rocketchat-desktop
 
     # programming langueges or interpreters or just utils
     asdf-vm

@@ -15,7 +15,9 @@
     if test -f ~/.alias
       source ~/.alias
     end
-  '';
+
+    abbr --add --global k kubectl
+    '';
 
   programs.fish.interactiveShellInit = ''
     if command -q nix-your-shell
@@ -25,7 +27,6 @@
 
   programs.fish.shellAliases = {
     kubectl = "kubecolor";
-    k = "kubecolor";
     ll = "eza -l";
     ls = "eza";
     la = "eza -A";
