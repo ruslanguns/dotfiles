@@ -92,6 +92,8 @@
     tmux
     xclip # A command line interface to the X11 clipboard
     pass
+    libreoffice
+    
 
     btop # replacement of htop/nmon
     iotop # io monitoring
@@ -125,6 +127,8 @@
     mangohud
     protonup
     rocketchat-desktop
+    obs-studio
+
 
     # programming langueges or interpreters or just utils
     asdf-vm
