@@ -24,10 +24,6 @@
   home.username = "rus";
   home.homeDirectory = "/home/rus";
   home.packages = with pkgs; [
-    python3
-    python3Packages.numpy
-    python3Packages.pip
-    python3Packages.virtualenv
     ffmpeg
     zip
     neofetch
