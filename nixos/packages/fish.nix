@@ -11,6 +11,7 @@
     set fish_greeting '''
     set EDITOR 'nvim'
     set -gx PATH $PATH $HOME/.krew/bin
+    set -gx PATH $PATH $HOME/.kubectl-plugin-completions
 
     if test -f ~/.alias
       source ~/.alias

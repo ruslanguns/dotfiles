@@ -4,10 +4,9 @@
     enableFishIntegration = true;
     settings = {
       add_newline = true;
-      line_break.disabled = true;
       kubernetes = {
-        symbol = "☸️ ";
-        style = "bold blue";
+        disabled = false;
+        format = "[ $symbol$user:[($namespace)](bold red)](dimmed blue) ";
       };
     };
   };

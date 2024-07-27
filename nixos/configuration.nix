@@ -49,7 +49,7 @@
       intelBusId = "PCI:0:2:0"; # Fake bus ID, since I only have one GPU, is here because otherwise it won't work
       nvidiaBusId = "PCI:1:0:0";
     };
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.latest;
   };
 
   # VIRTUALIZATION
@@ -108,6 +108,7 @@
       allowUnfree = true;
     };
   };
+
   programs.fish.enable = true;
   programs.firefox.enable = true;
   services.openssh.enable = true;

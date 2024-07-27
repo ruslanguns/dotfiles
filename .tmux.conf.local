@@ -456,6 +456,8 @@ set-option -g default-shell /usr/bin/fish
 
 set -as terminal-overrides ',*:indn@'
 
+set -g mouse on
+
 # to define a custom #{foo} variable, define a POSIX shell function between the
 # '# EOF' and the '# "$@"' lines. Please note that the opening brace { character
 # must be on the same line as the function name otherwise the parse won't detect

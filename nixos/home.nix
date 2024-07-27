@@ -24,7 +24,11 @@
   home.username = "rus";
   home.homeDirectory = "/home/rus";
   home.packages = with pkgs; [
-    # utils
+    python3
+    python3Packages.numpy
+    python3Packages.pip
+    python3Packages.virtualenv
+    ffmpeg
     zip
     neofetch
     xz # A data compression tool
@@ -40,6 +44,8 @@
     bat # A cat(1) clone with wings
     ripgrep # recursively searches directories for a regex pattern
     tre-command # Tree command, improved
+    zoxide # A fast cd command that learns your habits
+    zellij # A terminal workspace with batteries included
     # networking tools
     mtr # A network diagnostic tool
     iperf3
@@ -93,6 +99,9 @@
     xclip # A command line interface to the X11 clipboard
     pass
     libreoffice
+    kubeseal
+    stern
+    apacheHttpd
     
 
     btop # replacement of htop/nmon
@@ -134,6 +143,7 @@
     asdf-vm
     python3
     nodejs
+    nodePackages.pnpm
     lua
     stylua
     kubernetes
