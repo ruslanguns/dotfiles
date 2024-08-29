@@ -1,5 +1,4 @@
-{
-  inputs,
+{ inputs,
   outputs,
   lib,
   config,
@@ -98,6 +97,7 @@
     kubeseal
     stern
     apacheHttpd
+    sshpass
     
 
     btop # replacement of htop/nmon
@@ -133,11 +133,9 @@
     protonup
     rocketchat-desktop
     obs-studio
-
-
     # programming langueges or interpreters or just utils
+    openjdk17-bootstrap
     asdf-vm
-    python3
     nodejs
     nodePackages.pnpm
     lua

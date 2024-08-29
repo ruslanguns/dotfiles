@@ -63,6 +63,23 @@
     };
   };
 
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ "docker0" ];
+    allowedTCPPorts = [ 9081 8080 ];
+    extraCommands = ''
+      iptables -I INPUT -i docker0 -j ACCEPT
+      iptables -I FORWARD -i docker0 -j ACCEPT
+      iptables -I FORWARD -o docker0 -j ACCEPT
+    '';
+  };
+
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    glibc
+  ];
+
+
   services = {
     xserver = {
       enable = true;
@@ -128,8 +145,21 @@
   };
 
   environment.systemPackages = with pkgs; [
-    git
     flatpak
+    taglib
+    openssl
+    git
+    libxml2
+    libxslt
+    libzip
+    zlib
+    stdenv.cc.cc.lib
+    python312Full
+    python312Packages.ipykernel
+    python312Packages.jupyterlab
+    python312Packages.pyzmq    # Adding pyzmq explicitly
+    python312Packages.venvShellHook
+    python312Packages.pip
   ];
 
   # Locale settings
