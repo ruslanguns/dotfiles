@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Function to check if a file or directory is ignored by .gitignore
+is_ignored() {
+  local path="$1"
+  if [ -f .gitignore ]; then
+    grep -qxF "$path" .gitignore
+    return $?
+  fi
+  return 1
+}
+
+# Function to traverse the directory and print each file
+traverse_directory() {
+  local dir="$1"
+
+  # Print the directory structure up to 2 levels deep
+  echo "Directory structure ($dir):"
+  tree -L 2 "$dir"
+
+  # Iterate over each item in the directory
+  for entry in "$dir"/*; do
+    local base_entry=$(basename "$entry")
+
+    # Check if the entry is ignored
+    if is_ignored "$base_entry"; then
+      continue
+    fi
+
+    if [ -d "$entry" ]; then
+      # If it's a directory, recursively traverse it
+      traverse_directory "$entry"
+    elif [ -f "$entry" ]; then
+      # If it's a file, print its relative path and content
+      local relative_path=$(realpath --relative-to="." "$entry")
+      extension="${entry##*.}"
+      echo "File: $relative_path"
+      echo "\`\`\`$extension"
+      cat "$entry"
+      echo "\`\`\`"
+    fi
+  done
+}
+
+# Start the script from the current directory
+traverse_directory "."
