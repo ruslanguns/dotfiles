@@ -30,6 +30,7 @@ let
     wget
     zip
     k9s
+    kubernetes-helm
     krew
     deno
     kubectl
