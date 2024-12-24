@@ -221,12 +221,7 @@ in
 
         set -U fish_greeting
 
-        set kube_config "/home/${username}/.kube/config"
-        if not test -e $kube_config
-          printf 'apiVersion: v1\nclusters: null\ncontexts: null\ncurrent-context: ""\nkind: Config\npreferences: {}\nusers: null\n' > $kube_config
-        end
 
-        set -gx KUBECONFIG $kube_config:/home/${username}/.env/kube_config
         set -q KREW_ROOT
         set -gx PATH $PATH $KREW_ROOT/.krew/bin;
         set -gx PATH $PATH $HOME/.krew/bin

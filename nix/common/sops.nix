@@ -23,10 +23,16 @@
       #  mode = "0600";
       #  path = "/home/${username}/.ssh/id_ed25519";
       #};
-      "users/${username}/kube_config" = {
+      "users/${username}/kube_config_wob" = {
         owner = username;
         mode = "0600";
-        path = "/home/${username}/.env/kube_config";
+        path = "/home/${username}/.env/kube_config_wob";
+      };
+
+      "users/${username}/kube_config_rs" = {
+        owner = username;
+        mode = "0600";
+        path = "/home/${username}/.env/kube_config_rs";
       };
 
       "users/${username}/gpg_id" = {
