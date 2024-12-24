@@ -1,4 +1,3 @@
--- stylua: ignore
 local snacks = require("snacks")
 
 return {
@@ -8,6 +7,7 @@ return {
     notifier = {
       enabled = true,
       top_down = false,
+      style = "fancy",
     },
   },
 }
