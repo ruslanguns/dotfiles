@@ -1,0 +1,15 @@
+keys:
+  - &users
+    - &rus01 age1mwsp9vznduxqxwsvva45htct25wartlsj707qyuz3fydt9tjnqdq5zfucs
+    - &rus02 age1q0slmzl2tt9pv44f3pq5j5j3vnvgm2u5df3gzcrmsp77r69arpaskfz83s
+  - &hosts
+    - &desktop-wsl-01 age10sheugsj7txsnzv6j3yapstujrcde94ep9j82f3vtwx9z8aggfwsjtm9dm
+    - &desktop-wsl-02 age1euf3ypnxv99gd95yu2zwaugkczy90hnl9lv9n725vzy05r0w2c5q6ykswj
+creation_rules:
+  - path_regex: secrets.yaml$
+    key_groups:
+      - age:
+          - *rus01
+          - *rus02
+          - *desktop-wsl-01
+          - *desktop-wsl-02
