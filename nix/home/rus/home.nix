@@ -43,7 +43,7 @@ let
     fzf
     lua51Packages.luarocks-nix
     lua51Packages.lua
-    nodejs_22
+    fnm
   ];
 
   stable-packages = with pkgs; [
@@ -259,6 +259,10 @@ in
         if test -f $fish_config_file
           source $fish_config_file
         end
+
+        # fnm
+        set PATH "/home/${username}/.local/share/fnm" $PATH
+        fnm env | source
       '';
       functions = {
         refresh = "source $HOME/.config/fish/config.fish";
