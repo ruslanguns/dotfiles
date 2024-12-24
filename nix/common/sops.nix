@@ -42,6 +42,13 @@
         mode = "0600";
         path = "/home/${username}/.env/gpg_keys";
       };
+
+      "users/${username}/fish_config" = {
+        neededForUsers = true;
+        owner = username;
+        mode = "0600";
+        path = "/home/${username}/.env/fish_config.fish";
+      };
     };
   };
 

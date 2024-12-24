@@ -235,7 +235,6 @@ in
 
         set NIX_MSG ${username}
 
-
         set gpg_id_file "/home/${username}/.env/gpg_id"
         set gpg_keys_file "/home/${username}/.env/gpg_keys"
         set password_store_dir "/home/${username}/.password-store"
@@ -253,6 +252,12 @@ in
             if not test -e $password_store_dir/.gpg-id
                 pass init $gpg_id
             end
+        end
+
+        set fish_config_file "/home/${username}/.env/fish_config.fish"
+
+        if test -f $fish_config_file
+          source $fish_config_file
         end
       '';
       functions = {
