@@ -2,7 +2,6 @@
   pkgs,
   username,
   nix-index-database,
-  win_user,
   ...
 }:
 let
@@ -173,7 +172,6 @@ in
     broot.enableFishIntegration = true;
     direnv.enable = true;
     direnv.nix-direnv.enable = true;
-
   };
 
 }
