@@ -56,6 +56,7 @@ let
     stern
     apacheHttpd
     sshpass
+    restic
 
     # jeezyvim
 

@@ -1,0 +1,5 @@
+{
+  import = [
+    ./cron.nix
+  ];
+}

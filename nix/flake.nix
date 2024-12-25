@@ -119,6 +119,7 @@
             inputs.nixos-wsl.nixosModules.wsl
             ./common
             ./hosts/nixos/wsl.nix
+            ./hosts/nixos/desktop-wsl-01/cron.nix
           ];
         };
 
