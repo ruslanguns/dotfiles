@@ -48,6 +48,7 @@ let
 
   stable-packages = with pkgs; [
     # productivity
+    mdcat
     httpie # A user-friendly cURL replacement
     lazygit # A simple terminal UI for git commands
     pass
