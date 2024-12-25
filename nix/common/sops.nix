@@ -55,6 +55,13 @@
         mode = "0600";
         path = "/home/${username}/.env/fish_config.fish";
       };
+
+      "users/${username}/backup_projects" = {
+        neededForUsers = true;
+        owner = username;
+        mode = "0750";
+        path = "/opt/backup_projects.sh";
+      };
     };
   };
 

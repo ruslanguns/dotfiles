@@ -24,6 +24,9 @@
   environment.pathsToLink = [ "/share/fish" ];
   environment.shells = [ pkgs.fish ];
   environment.enableAllTerminfo = true;
+  environment.systemPackages = with pkgs; [
+    restic
+  ];
 
   security.sudo.wheelNeedsPassword = false;
 

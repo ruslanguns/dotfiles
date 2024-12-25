@@ -56,9 +56,6 @@ let
     stern
     apacheHttpd
     sshpass
-    restic
-
-    # jeezyvim
 
     # key tools
     gh # for bootstrapping
