@@ -77,7 +77,7 @@
       {
         k = "kubectl";
         kcu = "kubectl ctx -u";
-        kc = "kubectl ctx -u";
+        kc = "kubectl ctx";
       }
       // {
         gc = "nix-collect-garbage --delete-old";

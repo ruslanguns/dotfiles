@@ -92,6 +92,9 @@ let
     sqlfluff
     stylua
 
+    openssl
+    xmlsec
+    libxml2
     age.out
     ssh-to-age
     sops
