@@ -45,19 +45,15 @@ in
 {
   programs.tmux = {
     enable = true;
+    aggressiveResize = true;
     shortcut = "a";
-    # aggressiveResize = true; -- Disabled to be iTerm-friendly
     baseIndex = 1;
     newSession = true;
-    # Stop tmux+escape craziness.
-    escapeTime = 0;
+    escapeTime = 0; # Stop tmux+escape craziness.
     # Force tmux to use /tmp for sockets (WSL2 compat)
     secureSocket = false;
-
     terminal = "tmux-256color";
-
     historyLimit = 100000;
-
     plugins = with pkgs; [
       tmux-nvim
       tmuxPlugins.tmux-thumbs
@@ -127,6 +123,15 @@ in
       bind | split-window -h -c "#{pane_current_path}"
       bind - split-window -v -c "#{pane_current_path}"
 
+      # Redimensionar paneles usando Alt + h/j/k/l
+      bind -n C-M-h resize-pane -L 2
+      bind -n C-M-j resize-pane -D 2
+      bind -n C-M-k resize-pane -U 2
+      bind -n C-M-l resize-pane -R 2
+
+      # Unbind Ctrl + hjkl to avoid conflicts with nvim and SHELL
+      bind C-l send-keys 'C-l'
+
       # Use vim keybindings in copy mode
       set-window-option -g mode-keys vi
 
@@ -143,14 +148,8 @@ in
 
       set-option -g status-position top
 
-      # make Prefix p paste the buffer.
-      unbind p
-      bind p paste-buffer
-
-      # Bind Keys
-      bind-key -T prefix C-g split-window \
-        "$SHELL --login -i -c 'navi --print | head -c -1 | tmux load-buffer -b tmp - ; tmux paste-buffer -p -t {last} -b tmp -d'"
-      bind-key -T prefix C-l switch -t notes
+      bind-key -T prefix C-w switch -t work1
+      bind-key -T prefix C-r switch -t work2
       bind-key -T prefix C-d switch -t dotfiles
       bind-key e send-keys "tmux capture-pane -p -S - | nvim -c 'set buftype=nofile' +" Enter
     '';
