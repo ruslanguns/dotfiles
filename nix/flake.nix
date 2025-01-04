@@ -133,6 +133,15 @@
           ];
         };
 
+        "px1-103" = mkNixosConfiguration {
+          system = "x86_64-linux";
+          hostname = "px1-103";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/px1-103
+          ];
+        };
+
         "px1-104" = mkNixosConfiguration {
           system = "x86_64-linux";
           hostname = "px1-104";
