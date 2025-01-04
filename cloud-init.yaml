@@ -8,13 +8,14 @@ users:
     ssh_authorized_keys:
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKJr3PUC/j2x4C39GDBNLXPWebRiLf6AHY3VJ/4cTb0P wsl.rusodev-01-12-2024
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDRvSRvJCh61zz1VELIjQ0XhhTuRMWG37ByUAXTLSiojscanR3kiNssiNB8jeawiy0ut4wCfHiJUpR1+J6S5Pdf+mYXS9e41iCPZlP4Vyce/lRQLmjX3qWQv2fRqNoCfJTbOlqJwlN+HrX8adGSznFtXqOUsy/s/ycwzSb1TywqEIoi5YXzQz0wOXRe+MGa2RNGsWOwRKeA9JenbBg3cU0+bDv64SLkN2YFJTVXrQGUulCT9Qj4lw3C633ENpRzHmpO2M9q+/Hm0jOGanyFx9EI3ehExWSb93heW/v2gU9VqV0F3M2zrZO1XyDfVvkNVaufyMKL0Mx/q7VYDVKOxNSflHV8/cbsNZ2t5urZAcUcxNyUoa9wc2IRgXF/T7VpaXxdW/PYJ7fSa75wZP1SK4gOYzsApTE+8USxb31mcAtT/njXKcJsH5Hz38J8nPU2b7WEsygnquFDuSYTS6UmLinpsOWziLQgTtXKYSu0fvL+Qw/1dBMRNMxPc5RP+GimGbnPiCP9Cv38s7fWmI3+oHgP1DrWitUUwy1Y7XsqhXdcW9QuOLN1ctUcerxBNy/blGEdQYp5viZEQnQySUysGo7OtBSYvfh9oZVoNuzTXq7Wg5S4Q5JNMBEzirrbKLhXcYBCO3KPYMP+Sl8RABDHp6l4540zJu9j4uDVWyMEnOYNiQ== ruslanguns@gmail.com
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINuamihqruTuItFfvmn7NRoYSGpDQrDpzo02ezd9VHRj ruslanguns@gmail.com | (desktop-wsl-01) NixOS
 
 package_update: true
 package_upgrade: true
 
-packages:
-  - fail2ban
-  - ufw
+# packages:
+#   - fail2ban
+#   - ufw
 
 write_files:
   - path: /etc/motd
@@ -30,10 +31,10 @@ write_files:
       Welcome, Rus! 🚀
 
 runcmd:
-  - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
-  - systemctl enable fail2ban
-  - ufw allow OpenSSH
-  - ufw enable
+  # - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
+  # - systemctl enable fail2ban
+  # - ufw allow OpenSSH
+  # - ufw enable
   - sed -i -e '/^\(#\|\)PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
   - sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
   - sed -i -e '/^\(#\|\)KbdInteractiveAuthentication/s/^.*$/KbdInteractiveAuthentication no/' /etc/ssh/sshd_config

@@ -1,0 +1,7 @@
+{ ... }:
+{
+  import = [
+    ./../../common
+    ./configuration.nix
+  ];
+}

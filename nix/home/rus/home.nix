@@ -163,7 +163,6 @@ in
     nix-index.enableFishIntegration = true;
     nix-index-database.comma.enable = true;
 
-    # fzf.enable = true;
     fzf.enableFishIntegration = true;
     lsd.enable = true;
     lsd.enableAliases = true;
