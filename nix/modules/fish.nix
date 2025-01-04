@@ -22,7 +22,6 @@
 
       set -U fish_greeting
 
-
       set -q KREW_ROOT
       set -gx PATH $PATH $KREW_ROOT/.krew/bin;
       set -gx PATH $PATH $HOME/.krew/bin
@@ -30,25 +29,6 @@
       fish_add_path --append /mnt/c/Users/${win_user}/scoop/apps/win32yank/0.1.1
 
       set NIX_MSG ${username}
-
-      set gpg_id_file "/home/${username}/.env/gpg_id"
-      set gpg_keys_file "/home/${username}/.env/gpg_keys"
-      set password_store_dir "/home/${username}/.password-store"
-
-      if test -e $gpg_id_file
-          set gpg_id (cat $gpg_id_file | string trim)
-
-          if test -e $gpg_keys_file
-              gpg --list-secret-keys | grep -q "$gpg_id"
-              if test $status -ne 0
-                  gpg --import $gpg_keys_file
-              end
-          end
-
-          if not test -e $password_store_dir/.gpg-id
-              pass init $gpg_id
-          end
-      end
 
       set fish_config_file "/home/${username}/.env/fish_config.fish"
 
