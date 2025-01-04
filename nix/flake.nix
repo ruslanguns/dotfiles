@@ -22,7 +22,13 @@
       url = "github:mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-facter-modules = {
+      url = "github:numtide/nixos-facter-modules";
+    };
   };
 
   outputs =
@@ -33,6 +39,8 @@
       nur,
       nixpkgs-unstable,
       nix-index-database,
+      disko,
+      nixos-facter-modules,
       ...
     }@inputs:
     let
@@ -89,9 +97,9 @@
       mkNixosConfiguration =
         {
           system ? "x86_64-linux",
-          hostname,
-          username,
-          win_user,
+          hostname ? "nixos",
+          username ? "rus",
+          win_user ? "Usuario",
           args ? { },
           modules,
         }:
@@ -111,6 +119,16 @@
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
       nixosConfigurations = {
+        # nix run nixpkgs#nixos-anywhere -- --flake .#generic --generate-hardware-config nixos-generate-config ./hosts/nixos-anywhere/minimal/hardware-configuration.nix <hostname>
+        "generic" = mkNixosConfiguration {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/nixos-anywhere/minimal/configuration.nix
+            ./hosts/nixos-anywhere/minimal/hardware-configuration.nix
+          ];
+        };
+
         "desktop-wsl-01" = mkNixosConfiguration {
           hostname = "desktop-wsl-01";
           username = "rus";
