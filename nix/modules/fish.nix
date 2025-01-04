@@ -79,7 +79,10 @@
         kcu = "kubectl ctx -u";
         kc = "kubectl ctx";
       }
+      # nix shortcuts
       // {
+        nrp = "nix run nixpkgs#";
+        nrs = "sudo nixos-rebuild switch --flake ~/.dotfiles/nix/";
         gc = "nix-collect-garbage --delete-old";
       }
       # navigation shortcuts
