@@ -151,6 +151,15 @@
           ];
         };
 
+        "px1-105" = mkNixosConfiguration {
+          system = "x86_64-linux";
+          hostname = "px1-105";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/px1-105
+          ];
+        };
+
         "desktop-wsl-01" = mkNixosConfiguration {
           hostname = "desktop-wsl-01";
           modules = [
