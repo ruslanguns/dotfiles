@@ -45,6 +45,7 @@
       take = ''mkdir -p -- "$1" && cd -- "$1"'';
       ttake = "cd $(mktemp -d)";
       show_path = "echo $PATH | tr ' ' '\n'";
+      hello = "echo Hello, $USER";
       posix-source = ''
         for i in (cat $argv)
           set arr (echo $i |tr = \n)
