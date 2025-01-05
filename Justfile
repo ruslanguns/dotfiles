@@ -2,6 +2,9 @@ set shell := ["bash", "-c"]
 
 FLAKE := "~/.dotfiles/nix"
 
+_default:
+    @just --list
+
 # Rebuilds nix on the default host machine
 nix_rebuild:
     @just _local

@@ -53,6 +53,7 @@
         end
       '';
       kubectl = "kubecolor $argv";
+      justnix = "just -f ~/.dotfiles/Justfile $argv";
     };
     shellAbbrs =
       {
