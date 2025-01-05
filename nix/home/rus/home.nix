@@ -6,6 +6,7 @@
 }:
 let
   unstable-packages = with pkgs.unstable; [
+    # Utilities
     bat
     bottom
     coreutils
@@ -28,18 +29,22 @@ let
     vim
     wget
     zip
+
+    # Kubernetes
     k9s
     kubernetes-helm
     krew
-    deno
     kubectl
+    kustomize
+    kubecolor
+
+    # Development Tools
+    deno
     nixfmt-rfc-style
     neovim
     python3
     go
     bun
-    kustomize
-    kubecolor
     fzf
     lua51Packages.luarocks-nix
     lua51Packages.lua
@@ -47,51 +52,52 @@ let
   ];
 
   stable-packages = with pkgs; [
-    # productivity
+    # Productivity
     mdcat
-    httpie # A user-friendly cURL replacement
-    lazygit # A simple terminal UI for git commands
+    httpie
+    lazygit
     pass
     kubeseal
     stern
     apacheHttpd
     sshpass
 
-    # key tools
-    gh # for bootstrapping
+    # Key Tools
+    gh
     just
 
-    # core languages
+    # Core Languages
     rustup
 
-    # rust stuff
+    # Rust Tools
     cargo-cache
     cargo-expand
 
-    # local dev stuf
+    # Local Development
     mkcert
     httpie
 
-    # treesitter
+    # Treesitter
     tree-sitter
 
-    # language servers
-    nodePackages.vscode-langservers-extracted # html, css, json, eslint
+    # Language Servers
+    nodePackages.vscode-langservers-extracted
     nodePackages.yaml-language-server
-    nil # nix
+    nil
 
-    # formatters and linters
-    alejandra # nix
-    deadnix # nix
+    # Formatters and Linters
+    alejandra
+    deadnix
     nodePackages.prettier
     shellcheck
     shfmt
-    statix # nix
+    statix
     nixpkgs-fmt
     markdownlint-cli2
     sqlfluff
     stylua
 
+    # Security and Encryption
     openssl
     xmlsec
     libxml2
@@ -100,6 +106,18 @@ let
     sops
     fluxcd
     kind
+
+    # Network Tools
+    mtr
+    iperf3
+    dnsutils
+    ldns
+    aria2
+    socat
+    nmap
+    ipcalc
+
+    # Miscellaneous
     speedtest-cli
     gdu
     lsof
@@ -107,8 +125,6 @@ let
     strace
     btop
     iftop
-
-    # misc
     yq-go
     cowsay
     file
@@ -120,19 +136,9 @@ let
     gnupg
     gnumake
 
-    # system
+    # System Tools
     glib
     gcc
-
-    # networking tools
-    mtr # A network diagnostic tool
-    iperf3
-    dnsutils # `dig` + `nslookup`
-    ldns # replacement of `dig`, it provide the command `drill`
-    aria2 # A lightweight multi-protocol & multi-source command-line download utility
-    socat # replacement of openbsd-netcat
-    nmap # A utility for network discovery and security auditing
-    ipcalc # it is a calculator for the IPv4/v6 addresses
   ];
 in
 {
