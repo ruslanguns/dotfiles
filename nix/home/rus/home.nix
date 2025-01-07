@@ -37,6 +37,7 @@ let
     kubectl
     kustomize
     kubecolor
+    kubeval
 
     # Development Tools
     deno
