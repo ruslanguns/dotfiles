@@ -81,7 +81,7 @@ in
         plugin = tmuxPlugins.catppuccin;
         extraConfig = ''
           set -g @catppuccin_flavour 'frappe'
-          set -g @catppuccin_window_tabs_enabled on
+          set -g @catppuccin_window_tabs_enabled 'off'
           set -g @catppuccin_date_time "%H:%M"
         '';
       }
