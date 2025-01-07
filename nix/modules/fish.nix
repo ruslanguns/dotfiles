@@ -66,6 +66,7 @@
         nrp = "nix run nixpkgs#";
         nrs = "sudo nixos-rebuild switch --flake ~/.dotfiles/nix/";
         gc = "nix-collect-garbage --delete-old";
+        jn = "justnix nix_rebuild";
       }
       # navigation shortcuts
       // {
