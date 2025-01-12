@@ -12,6 +12,7 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ../../modules/kubernetes/master.nix
   ];
 
   time.timeZone = "Europe/Madrid";
@@ -22,16 +23,17 @@
   };
 
   programs.nix-ld.enable = true;
-  programs.fish.enable = true;
+  # programs.fish.enable = true;
 
   networking.hostName = hostname;
 
-  environment.pathsToLink = [ "/share/fish" ];
-  environment.shells = [ pkgs.fish ];
+  environment.pathsToLink = [ "/share/bash" ];
+  environment.shells = [ pkgs.bash ];
   environment.enableAllTerminfo = true;
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
     pkgs.gitMinimal
+    pkgs.k0sctl
   ];
 
   services.openssh = {
@@ -46,10 +48,9 @@
 
   users.users.${username} = {
     isNormalUser = true;
-    shell = pkgs.fish;
+    shell = pkgs.bash;
     extraGroups = [
       "wheel"
-      "docker"
     ];
     hashedPassword = "$y$j9T$sS8OCdNMTNR.Auy4MLVLZ0$lobIV1wwpAyOiUJ97RGstNWYiqnQRi8Az0QumufbLN5";
     openssh.authorizedKeys.keys = [
@@ -57,17 +58,17 @@
     ];
   };
 
-  home-manager.users.${username} = {
-    imports = [
-      ../../home/${username}/home.nix
-    ];
-  };
+  # home-manager.users.${username} = {
+  #   imports = [
+  #     ../../home/${username}/home.nix
+  #   ];
+  # };
 
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-    autoPrune.enable = true;
-  };
+  # virtualisation.docker = {
+  #   enable = true;
+  #   enableOnBoot = true;
+  #   autoPrune.enable = true;
+  # };
 
   system.stateVersion = "24.05";
 
