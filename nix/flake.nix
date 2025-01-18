@@ -177,6 +177,7 @@
         };
         "huawei-wsl-01" = mkNixosConfiguration {
           hostname = "huawei-wsl-01";
+          win_user = "Rus";
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
             ./hosts/huawei-wsl-01
