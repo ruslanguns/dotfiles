@@ -175,6 +175,13 @@
             ./hosts/desktop-wsl-02
           ];
         };
+        "huawei-wsl-01" = mkNixosConfiguration {
+          hostname = "huawei-wsl-01";
+          modules = [
+            inputs.nixos-wsl.nixosModules.wsl
+            ./hosts/huawei-wsl-01
+          ];
+        };
       };
     };
 }
