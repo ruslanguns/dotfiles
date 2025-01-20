@@ -20,6 +20,9 @@
       #     insteadOf = "https://gitlab.com";
       #   };
       # };
+      init = {
+        defaultBranch = "main";
+      };
       push = {
         default = "current";
         autoSetupRemote = true;
