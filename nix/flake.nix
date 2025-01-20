@@ -123,8 +123,6 @@
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
       nixosConfigurations = {
-        # cd into the directory where the flake.nix is located
-        # nix run github:nix-community/nixos-anywhere -- --flake ~/.dotfiles/nix#generic --generate-hardware-config nixos-generate-config ./hosts/nixos-anywhere/hardware-configuration.nix <hostname>
         "generic" = mkNixosConfiguration {
           system = "x86_64-linux";
           modules = [
