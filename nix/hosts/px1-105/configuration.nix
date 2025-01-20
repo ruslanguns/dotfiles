@@ -42,6 +42,10 @@
     '';
   };
 
+  services.xserver = {
+    xkb.layout = "es";
+  };
+
   security.sudo.wheelNeedsPassword = false;
   users.users.${username} = {
     isNormalUser = true;
