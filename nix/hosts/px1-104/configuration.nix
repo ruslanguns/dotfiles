@@ -1,7 +1,6 @@
 {
   modulesPath,
   lib,
-  username,
   hostname,
   pkgs,
   inputs,
@@ -12,6 +11,7 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disk-config.nix
+    ../../modules/kubernetes/node.nix
   ];
 
   time.timeZone = "Europe/Madrid";
@@ -22,12 +22,11 @@
   };
 
   programs.nix-ld.enable = true;
-  programs.fish.enable = true;
 
   networking.hostName = hostname;
 
-  environment.pathsToLink = [ "/share/fish" ];
-  environment.shells = [ pkgs.fish ];
+  environment.pathsToLink = [ "/share/bash" ];
+  environment.shells = [ pkgs.bash ];
   environment.enableAllTerminfo = true;
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
@@ -42,39 +41,18 @@
     '';
   };
 
-  security.sudo.wheelNeedsPassword = false;
-
-  users.users.${username} = {
-    isNormalUser = true;
-    shell = pkgs.fish;
-    extraGroups = [
-      "wheel"
-      "docker"
-    ];
+  users.users.root = {
+    shell = pkgs.bash;
     hashedPassword = "$y$j9T$sS8OCdNMTNR.Auy4MLVLZ0$lobIV1wwpAyOiUJ97RGstNWYiqnQRi8Az0QumufbLN5";
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINuamihqruTuItFfvmn7NRoYSGpDQrDpzo02ezd9VHRj ruslanguns@gmail.com | (desktop-wsl-01) NixOS"
     ];
   };
 
-  home-manager.users.${username} = {
-    imports = [
-      ../../home/${username}/home.nix
-    ];
-  };
-
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-    autoPrune.enable = true;
-  };
-
   system.stateVersion = "24.05";
 
   nix = {
     settings = {
-      trusted-users = [ username ];
-
       accept-flake-config = true;
       auto-optimise-store = true;
     };

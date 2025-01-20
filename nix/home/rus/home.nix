@@ -50,6 +50,7 @@ let
     lua51Packages.luarocks-nix
     lua51Packages.lua
     fnm
+    jdk
   ];
 
   stable-packages = with pkgs; [
@@ -117,6 +118,11 @@ let
     socat
     nmap
     ipcalc
+
+    # VPN Tools
+    openfortivpn
+    wireguard-tools
+    openvpn
 
     # Miscellaneous
     speedtest-cli
