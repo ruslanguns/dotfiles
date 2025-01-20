@@ -42,9 +42,7 @@
     '';
   };
 
-  services.xserver = {
-    xkb.layout = "es";
-  };
+  services.xserver.layout = "it";
 
   security.sudo.wheelNeedsPassword = false;
   users.users.${username} = {
