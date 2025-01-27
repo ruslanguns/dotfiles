@@ -72,6 +72,7 @@ let
 
     # Core Languages
     rustup
+    julia
 
     # Rust Tools
     cargo-cache
@@ -88,6 +89,7 @@ let
     nodePackages.vscode-langservers-extracted
     nodePackages.yaml-language-server
     nil
+    marksman
 
     # Formatters and Linters
     alejandra
