@@ -145,14 +145,24 @@ in
       # Easier reload of config
       bind r source-file ~/.config/tmux/tmux.conf
 
-      set-option -g status-position top
+      # Navegación inteligente entre panes con reconocimiento de Vim.
+      # Ver: https://github.com/christoomey/vim-tmux-navigator
+      is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
+          | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+      bind -n 'C-h' if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
+      bind -n 'C-j' if-shell "$is_vim" 'send-keys C-j' 'select-pane -D'
+      bind -n 'C-k' if-shell "$is_vim" 'send-keys C-k' 'select-pane -U'
+      bind -n 'C-l' if-shell "$is_vim" 'send-keys C-l' 'select-pane -R'
 
+      # Cambiar de ventana con Ctrl + h/j/k/l
       bind-key -T prefix C-w switch -t work1
       bind-key -T prefix C-r switch -t work2
       bind-key -T prefix C-d switch -t dotfiles
       bind-key e send-keys "tmux capture-pane -p -S - | nvim -c 'set buftype=nofile' +" Enter
-    '';
 
+      bind h display-popup -E
+      bind -T popup q detach-client
+    '';
   };
 
   programs.tmate = {
