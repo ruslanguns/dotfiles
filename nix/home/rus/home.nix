@@ -38,6 +38,8 @@ let
     kustomize
     kubecolor
     kubeval
+    operator-sdk
+    kubebuilder
 
     # Development Tools
     deno
