@@ -77,20 +77,31 @@ in
 
       tmuxPlugins.sensible
       # must be before continuum edits right status bar
-      {
-        plugin = tmuxPlugins.catppuccin;
-        extraConfig = ''
-          set -g @catppuccin_flavour 'frappe'
-          set -g @catppuccin_window_tabs_enabled 'off'
-          set -g @catppuccin_date_time "%H:%M"
-        '';
-      }
+      # {
+      #   plugin = tmuxPlugins.catppuccin;
+      #   extraConfig = ''
+      #     set -g @catppuccin_flavour 'frappe'
+      #     set -g @catppuccin_window_tabs_enabled 'off'
+      #     set -g @catppuccin_date_time "%H:%M"
+      #   '';
+      # }
       {
         plugin = tmuxPlugins.resurrect;
         extraConfig = ''
           set -g @resurrect-strategy-vim 'session'
           set -g @resurrect-strategy-nvim 'session'
           set -g @resurrect-capture-pane-contents 'on'
+        '';
+      }
+      {
+        plugin = tmuxPlugins.catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavour 'mocha'
+          set -g @catppuccin_window_status_style 'rounded'
+          set -g @catppuccin_status_left_separator ''
+          set -g @catppuccin_status_right_separator ''
+
+          set -g status-right "#{E:@catppuccin_status_user} #{E:@catppuccin_status_session} #{E:@catppuccin_status_directory} #{E:@catppuccin_status_battery} #{E:@catppuccin_status_date_time}"
         '';
       }
       {
@@ -116,6 +127,10 @@ in
       unbind-key C-b
       set-option -g prefix C-a
       bind-key C-a send-prefix
+
+      # Popup 
+      bind h display-popup -E
+      bind -T popup q detach-client
 
       # Change splits to match nvim and easier to remember
       bind | split-window -h -c "#{pane_current_path}"
@@ -156,11 +171,12 @@ in
       bind-key -T prefix C-d switch -t dotfiles
       bind-key e send-keys "tmux capture-pane -p -S - | nvim -c 'set buftype=nofile' +" Enter
 
-      bind h display-popup -E
-      bind -T popup q detach-client
+      # Detectar si estamos en un shell
+      is_shell="ps -o state= -o comm= -t '#{pane_tty}' \
+          | grep -iqE '^[^TXZ ]+ +(bash|fish|zsh|sh|ksh)$'"
 
-      # Bind Ctrl+l to clear the screen and reset shell
-      bind -n C-l send-keys C-l \; refresh-client
+      # Ctrl+l: Si estamos en shell, limpiar y refrescar; de lo contrario, enviar C-l
+      bind -n C-l if-shell "$is_shell" "send-keys C-l \; refresh-client" "send-keys C-l"
     '';
   };
 
