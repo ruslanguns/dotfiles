@@ -109,29 +109,23 @@ in
       set -g default-terminal "tmux-256color"
       set -ag terminal-overrides ",xterm-256color:RGB"
 
-      set-option -g prefix C-a
       set-option -g status-position top
-
-      unbind-key C-b
-      bind-key C-a send-prefix
 
       set -g mouse on
 
+      unbind-key C-b
+      set-option -g prefix C-a
+      bind-key C-a send-prefix
+
       # Change splits to match nvim and easier to remember
-      # Open new split at cwd of current split
-      # unbind %
-      # unbind '"'
       bind | split-window -h -c "#{pane_current_path}"
       bind - split-window -v -c "#{pane_current_path}"
 
-      # Redimensionar paneles usando Alt + h/j/k/l
-      bind -n C-M-h resize-pane -L 2
+      # Redimensionar paneles usando Ctrl+Alt+ h/j/k/l
       bind -n C-M-j resize-pane -D 2
       bind -n C-M-k resize-pane -U 2
       bind -n C-M-l resize-pane -R 2
-
-      # Unbind Ctrl + hjkl to avoid conflicts with nvim and SHELL
-      bind C-l send-keys 'C-l'
+      bind -n C-M-h resize-pane -L 2
 
       # Use vim keybindings in copy mode
       set-window-option -g mode-keys vi
@@ -164,6 +158,9 @@ in
 
       bind h display-popup -E
       bind -T popup q detach-client
+
+      # Bind Ctrl+l to clear the screen and reset shell
+      bind -n C-l send-keys C-l \; refresh-client
     '';
   };
 
