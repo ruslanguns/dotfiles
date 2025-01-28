@@ -110,6 +110,8 @@ in
       set -ag terminal-overrides ",xterm-256color:RGB"
 
       set-option -g prefix C-a
+      set-option -g status-position top
+
       unbind-key C-b
       bind-key C-a send-prefix
 
