@@ -11,15 +11,6 @@ let
       sha256 = "sha256-HN0hJeB31MvkD12dbnF2SjefkAVgtUmhah598zAlhQs=";
     };
   };
-  tmux-nvim = pkgs.tmuxPlugins.mkTmuxPlugin {
-    pluginName = "tmux.nvim";
-    version = "unstable-2023-01-06";
-    src = pkgs.fetchFromGitHub {
-      owner = "aserowy";
-      repo = "tmux.nvim/";
-      rev = "57220071739c723c3a318e9d529d3e5045f503b8";
-      sha256 = "sha256-zpg7XJky7PRa5sC7sPRsU2ZOjj0wcepITLAelPjEkSI=";
-    };
   };
   tmux-browser = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-browser";
@@ -55,7 +46,7 @@ in
     terminal = "tmux-256color";
     historyLimit = 100000;
     plugins = with pkgs; [
-      tmux-nvim
+      # tmux-nvim
       tmuxPlugins.tmux-thumbs
       {
         plugin = t-smart-manager;
@@ -86,22 +77,27 @@ in
       #   '';
       # }
       {
+        plugin = tmuxPlugins.catppuccin;
+        extraConfig = ''
+          set -g @catppuccin_flavour 'mocha'
+          set -g @catppuccin_window_status_style 'rounded'
+
+          set -g status-right-length 100
+          set -g status-left-length 100
+          set -g status-left ""
+          set -g status-right "#{E:@catppuccin_status_application}"
+          set -agF status-right "#{E:@catppuccin_status_cpu}"
+          set -ag status-right "#{E:@catppuccin_status_session}"
+          set -ag status-right "#{E:@catppuccin_status_uptime}"
+          set -agF status-right "#{E:@catppuccin_status_battery}"
+        '';
+      }
+      {
         plugin = tmuxPlugins.resurrect;
         extraConfig = ''
           set -g @resurrect-strategy-vim 'session'
           set -g @resurrect-strategy-nvim 'session'
           set -g @resurrect-capture-pane-contents 'on'
-        '';
-      }
-      {
-        plugin = tmuxPlugins.catppuccin;
-        extraConfig = ''
-          set -g @catppuccin_flavour 'mocha'
-          set -g @catppuccin_window_status_style 'rounded'
-          set -g @catppuccin_status_left_separator ''
-          set -g @catppuccin_status_right_separator ''
-
-          set -g status-right "#{E:@catppuccin_status_user} #{E:@catppuccin_status_session} #{E:@catppuccin_status_directory} #{E:@catppuccin_status_battery} #{E:@catppuccin_status_date_time}"
         '';
       }
       {
@@ -153,9 +149,6 @@ in
       # Escape turns on copy mode
       bind Escape copy-mode
 
-      # Easier reload of config
-      bind r source-file ~/.config/tmux/tmux.conf
-
       # Navegación inteligente entre panes con reconocimiento de Vim.
       # Ver: https://github.com/christoomey/vim-tmux-navigator
       is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
@@ -177,12 +170,21 @@ in
 
       # Ctrl+l: Si estamos en shell, limpiar y refrescar; de lo contrario, enviar C-l
       bind -n C-l if-shell "$is_shell" "send-keys C-l \; refresh-client" "send-keys C-l"
+
+      # plugins
+      run-shell ${pkgs.tmuxPlugins.cpu}/share/tmux-plugins/cpu/cpu.tmux
+
+      set-environment -g TMUX_PROGRAM "${pkgs.tmux}/bin/tmux"
+      set-environment -g TMUX_CONF "$HOME/.config/tmux/tmux.conf"
+      set-environment -g TMUX_SOCKET "/tmp/tmux-$USER/default"
+
+      # Relead config is not working
+      # bind r run "sh -c '\"$$TMUX_PROGRAM\" $${TMUX_SOCKET:+-S \"$$TMUX_SOCKET\"} source \"$$TMUX_CONF\"'" \; display "#{TMUX_CONF} sourced"
     '';
   };
 
   programs.tmate = {
     enable = true;
-    # FIXME: This causes tmate to hang.
     # extraConfig = config.xdg.configFile."tmux/tmux.conf".text;
   };
 
