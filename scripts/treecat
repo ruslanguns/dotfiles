@@ -1,16 +1,14 @@
-#!/usr/bin/env  bash
+#!/usr/bin/env bash
 
-# Function to check if a file or directory is ignored by .gitignore
+# Function that uses "git check-ignore" to determine if a file or directory should be ignored
 is_ignored() {
-  local path="$1"
-  if [ -f .gitignore ]; then
-    grep -qxF "$path" .gitignore
-    return $?
-  fi
-  return 1
+  local relative_path="$1"
+  # The -q flag makes git check-ignore run in quiet mode and -C sets the base directory
+  git -C "$BASE_DIR" check-ignore -q "$relative_path"
+  return $?
 }
 
-# Function to traverse the directory and print each file
+# Function to traverse the directory and process each entry
 traverse_directory() {
   local dir="$1"
 
@@ -18,22 +16,30 @@ traverse_directory() {
   echo "Directory structure ($dir):"
   tree -L 2 "$dir"
 
-  # Iterate over each item in the directory
+  # Iterate over each entry within the directory
   for entry in "$dir"/*; do
-    local base_entry=$(basename "$entry")
+    # If the entry does not exist (e.g., empty directory), skip it
+    [ -e "$entry" ] || continue
 
-    # Check if the entry is ignored
-    if is_ignored "$base_entry"; then
+    # Calculate the relative path to BASE_DIR so that git check-ignore can evaluate it correctly
+    local relative_path
+    relative_path=$(realpath --relative-to="$BASE_DIR" "$entry")
+
+    # Explicitly ignore the ".git" folder
+    if [ "$(basename "$entry")" = ".git" ]; then
+      continue
+    fi
+
+    # If the entry is ignored according to .gitignore, skip it
+    if is_ignored "$relative_path"; then
       continue
     fi
 
     if [ -d "$entry" ]; then
-      # If it's a directory, recursively traverse it
+      # If it's a directory, traverse it recursively
       traverse_directory "$entry"
     elif [ -f "$entry" ]; then
-      # If it's a file, print its relative path and content
-      local relative_path=$(realpath --relative-to="." "$entry")
-      extension="${entry##*.}"
+      local extension="${entry##*.}"
       echo "File: $relative_path"
       echo "\`\`\`$extension"
       cat "$entry"
@@ -42,5 +48,8 @@ traverse_directory() {
   done
 }
 
-# Start the script from the current directory
-traverse_directory "."
+# Set BASE_DIR to the first argument or default to the current directory (.)
+BASE_DIR="${1:-.}"
+
+# Start traversing from BASE_DIR
+traverse_directory "$BASE_DIR"
