@@ -1,9 +1,46 @@
 #!/usr/bin/env bash
+#
+# Treecat - A quick directory tree and file content display tool.
+#
+# Usage:
+#   treecat [-i ignore_pattern]... [BASE_DIR]
+#
+# Description:
+#   Recursively prints a directory tree (up to 2 levels deep) and shows file contents in markdown format.
+#   It automatically ignores the ".git" folder and files/directories specified in the project's .gitignore.
+#   Use the -i flag (multiple times if needed) to ignore additional patterns.
+#
+# Example:
+#   treecat -i "bin/*" -i "tmp" ~/Projects/ExampleProject/
+#
+
+# Array to store additional ignore paths specified via the -i flag
+EXTRA_IGNORES=()
+
+# Parse command-line options: -i for additional paths to ignore
+while getopts ":i:" opt; do
+  case "$opt" in
+  i)
+    EXTRA_IGNORES+=("$OPTARG")
+    ;;
+  \?)
+    echo "Invalid option: -$OPTARG" >&2
+    exit 1
+    ;;
+  :)
+    echo "Option -$OPTARG requires an argument." >&2
+    exit 1
+    ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+# Set BASE_DIR to the first positional argument or default to the current directory (.)
+BASE_DIR="${1:-.}"
 
 # Function that uses "git check-ignore" to determine if a file or directory should be ignored
 is_ignored() {
   local relative_path="$1"
-  # The -q flag makes git check-ignore run in quiet mode and -C sets the base directory
   git -C "$BASE_DIR" check-ignore -q "$relative_path"
   return $?
 }
@@ -12,16 +49,13 @@ is_ignored() {
 traverse_directory() {
   local dir="$1"
 
-  # Print the directory structure up to 2 levels deep
   echo "Directory structure ($dir):"
   tree -L 2 "$dir"
 
   # Iterate over each entry within the directory
   for entry in "$dir"/*; do
-    # If the entry does not exist (e.g., empty directory), skip it
     [ -e "$entry" ] || continue
 
-    # Calculate the relative path to BASE_DIR so that git check-ignore can evaluate it correctly
     local relative_path
     relative_path=$(realpath --relative-to="$BASE_DIR" "$entry")
 
@@ -30,13 +64,19 @@ traverse_directory() {
       continue
     fi
 
-    # If the entry is ignored according to .gitignore, skip it
+    # Skip if the entry matches any extra ignore patterns
+    for ignore in "${EXTRA_IGNORES[@]}"; do
+      if [[ "$relative_path" == $ignore ]]; then
+        continue 2
+      fi
+    done
+
+    # Skip if the entry is ignored according to .gitignore
     if is_ignored "$relative_path"; then
       continue
     fi
 
     if [ -d "$entry" ]; then
-      # If it's a directory, traverse it recursively
       traverse_directory "$entry"
     elif [ -f "$entry" ]; then
       local extension="${entry##*.}"
@@ -47,9 +87,6 @@ traverse_directory() {
     fi
   done
 }
-
-# Set BASE_DIR to the first argument or default to the current directory (.)
-BASE_DIR="${1:-.}"
 
 # Start traversing from BASE_DIR
 traverse_directory "$BASE_DIR"
