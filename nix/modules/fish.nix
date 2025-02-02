@@ -2,8 +2,14 @@
   pkgs,
   win_user,
   username,
+  lib,
+  isWSL,
   ...
 }:
+let
+  isLinux = pkgs.stdenv.isLinux && !isWSL;
+  isMac = pkgs.stdenv.isDarwin;
+in
 {
   programs.fish = {
     enable = true;
@@ -26,12 +32,19 @@
       set -gx PATH $PATH $KREW_ROOT/.krew/bin;
       set -gx PATH $PATH $HOME/.krew/bin
 
-      fish_add_path --append /mnt/c/Users/${win_user}/scoop/apps/win32yank/0.1.1
+      if test -d ~/.dotfiles/scripts/
+        set -gx PATH $PATH $HOME/.dotfiles/scripts
+      end
+
+      # if we are on windows then load the following script path:
+      if test -d /mnt/c/Users/
+        fish_add_path --append /mnt/c/Users/${win_user}/scoop/apps/win32yank/current
+      end
 
       set NIX_MSG ${username}
 
+      # load dynamic settings
       set fish_config_file "/home/${username}/.env/fish_config.fish"
-
       if test -f $fish_config_file
         source $fish_config_file
       end
@@ -41,11 +54,10 @@
       fnm env | source
     '';
     functions = {
-      refresh = "source $HOME/.config/fish/config.fish";
+      refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
       take = ''mkdir -p -- "$1" && cd -- "$1"'';
       ttake = "cd $(mktemp -d)";
       show_path = "echo $PATH | tr ' ' '\n'";
-      hello = "echo Hello, $USER";
       posix-source = ''
         for i in (cat $argv)
           set arr (echo $i |tr = \n)
@@ -67,6 +79,10 @@
         nrs = "sudo nixos-rebuild switch --flake ~/.dotfiles/nix/";
         gc = "nix-collect-garbage --delete-old";
         jn = "justnix nix_rebuild";
+        pos = "posix-source";
+        t = "take";
+        tt = "ttake";
+        r = "refresh";
       }
       # navigation shortcuts
       // {
@@ -91,14 +107,31 @@
         gsa = "git stash apply stash^{/";
         gsl = "git stash list";
       };
-    shellAliases = {
-      xcopy = "/mnt/c/Windows/System32/clip.exe";
-      xpaste = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -command 'Get-Clipboard'";
-      explorer = "/mnt/c/Windows/explorer.exe";
-      code = "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin/code";
-      vim = "nvim";
-      vi = "nvim";
-    };
+
+    shellAliases = lib.mkMerge [
+      {
+        vim = "nvim";
+        vi = "nvim";
+      }
+      (lib.mkIf isWSL {
+        xcopy = "/mnt/c/Windows/System32/clip.exe";
+        xpaste = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -command 'Get-Clipboard'";
+        explorer = "/mnt/c/Windows/explorer.exe";
+        code = "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin/code";
+      })
+      (lib.mkIf isLinux {
+        xcopy = "xclip -selection clipboard";
+        xpaste = "xclip -o -selection clipboard";
+        code = "code";
+      })
+      (lib.mkIf isMac {
+        xcopy = "pbcopy";
+        xpaste = "pbpaste";
+        explorer = "open";
+        code = "code";
+      })
+    ];
+
     plugins = [
       {
         inherit (pkgs.fishPlugins.autopair) src;

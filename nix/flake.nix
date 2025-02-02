@@ -104,11 +104,22 @@
           hostname ? "nixos",
           username ? "rus",
           win_user ? "Usuario",
+          isWSL ? false,
           args ? { },
           modules,
         }:
         let
-          specialArgs = argDefaults // { inherit hostname username win_user; } // args;
+          specialArgs =
+            argDefaults
+            // {
+              inherit
+                hostname
+                username
+                isWSL
+                win_user
+                ;
+            }
+            // args;
         in
         nixpkgs.lib.nixosSystem {
           inherit system specialArgs;
@@ -160,6 +171,7 @@
 
         "desktop-wsl-01" = mkNixosConfiguration {
           hostname = "desktop-wsl-01";
+          isWSL = true;
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
             ./hosts/desktop-wsl-01
@@ -168,6 +180,7 @@
 
         "desktop-wsl-02" = mkNixosConfiguration {
           hostname = "desktop-wsl-02";
+          isWSL = true;
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
             ./hosts/desktop-wsl-02
@@ -175,6 +188,7 @@
         };
         "huawei-wsl-01" = mkNixosConfiguration {
           hostname = "huawei-wsl-01";
+          isWSL = true;
           win_user = "Rus";
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
