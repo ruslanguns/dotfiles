@@ -11,7 +11,6 @@ let
       sha256 = "sha256-HN0hJeB31MvkD12dbnF2SjefkAVgtUmhah598zAlhQs=";
     };
   };
-  };
   tmux-browser = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-browser";
     version = "unstable-2023-01-06";
