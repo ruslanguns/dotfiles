@@ -35,6 +35,12 @@
         path = "/home/${username}/.env/kube_config_rs";
       };
 
+      "users/${username}/kube_config_rus" = {
+        owner = username;
+        mode = "0600";
+        path = "/home/${username}/.env/kube_config_rus";
+      };
+
       "users/${username}/gpg_id" = {
         neededForUsers = true;
         owner = username;
