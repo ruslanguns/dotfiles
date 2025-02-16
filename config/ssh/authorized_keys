@@ -1,0 +1,3 @@
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKJr3PUC/j2x4C39GDBNLXPWebRiLf6AHY3VJ/4cTb0P wsl.rusodev-01-12-2024
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINuamihqruTuItFfvmn7NRoYSGpDQrDpzo02ezd9VHRj ruslanguns@gmail.com | (desktop-wsl-01) NixOS
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMJ1HLduJD+xCSVOnF8b9DrLp/DwHx9bxsoyGWdduJid ruslanguns@gmail.com | (huawei-wsl-01) NixOs

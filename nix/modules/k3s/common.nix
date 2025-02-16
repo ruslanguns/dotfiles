@@ -1,17 +1,19 @@
 {
-  modulesPath,
-  lib,
+  pkgs,
   username,
   hostname,
-  pkgs,
+  modulesPath,
+  lib,
   ...
 }:
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
-    ./../../modules/px-disk-config.nix
-    ./../../modules/users.nix
+    ./../px-disk-config.nix
+    ./../nix-common.nix
+    ./../users.nix
+    ./../age-setup.nix
   ];
 
   time.timeZone = "Europe/Madrid";
@@ -21,9 +23,16 @@
     efiInstallAsRemovable = true;
   };
 
-  programs.nix-ld.enable = true;
-
   networking.hostName = hostname;
+  networking.firewall.allowedTCPPorts = [
+    6443
+  ];
+  networking.firewall.allowedUDPPorts = [
+    8472 # k3s, flannel: required if using multi-node for inter-node networking
+  ];
+  networking.enableIPv6 = false;
+
+  programs.nix-ld.enable = true;
 
   environment.pathsToLink = [ "/share/bash" ];
   environment.shells = [ pkgs.bash ];
@@ -31,7 +40,17 @@
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
     pkgs.gitMinimal
+    pkgs.yq-go
+    pkgs.jq
   ];
+
+  security.sudo.wheelNeedsPassword = false;
+
+  home-manager.users.${username} = {
+    imports = [
+      ../../home/${username}/home-minimal.nix
+    ];
+  };
 
   services.openssh = {
     enable = true;
@@ -39,11 +58,5 @@
     extraConfig = ''
       PrintLastLog no
     '';
-  };
-
-  home-manager.users.${username} = {
-    imports = [
-      ../../../home/${username}/home.nix
-    ];
   };
 }
