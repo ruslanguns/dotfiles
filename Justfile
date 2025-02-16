@@ -6,8 +6,17 @@ _default:
     @just --list
 
 # Check Nix Flake syntax before rebuilding
-nix_flake_check:
-    @just _flake_check
+nix_check:
+    set -e
+    echo "Checking Nix Flake syntax..."
+    nix flake check {{FLAKE}} --show-trace
+    echo "Nix Flake check passed!"
+# Formats Nix files in the flake
+nix_format:
+    set -e
+    echo "Formatting Nix files in {{FLAKE}}..."
+    nixpkgs-fmt {{FLAKE}}
+    echo "Nix files formatted successfully!"
 # Rebuilds nix on the default host machine
 nix_rebuild:
     @just _local
@@ -40,10 +49,3 @@ _local:
 
 _local_with_host HOST:
   sudo nixos-rebuild switch --flake {{FLAKE}}#{{HOST}}
-
-# Validates the Nix Flake syntax before any rebuild
-_flake_check:
-    set -e
-    echo "Checking Nix Flake syntax..."
-    nix flake check --show-trace
-    echo "Nix Flake check passed!"

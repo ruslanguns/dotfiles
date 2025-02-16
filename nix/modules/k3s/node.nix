@@ -1,11 +1,19 @@
 { serverAddr, tokenFile, ... }:
+let
+  tokenExists = builtins.pathExists tokenFile;
+  _ =
+    if !tokenExists then
+      builtins.trace "⚠️  K3s will not be installed because the token file is missing."
+    else
+      null;
+in
 {
   imports = [
     ./common.nix
   ];
 
   services.k3s = {
-    enable = false;
+    enable = tokenExists;
     role = "agent";
     serverAddr = serverAddr;
     tokenFile = tokenFile;

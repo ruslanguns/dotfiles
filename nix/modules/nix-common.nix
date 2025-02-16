@@ -1,10 +1,40 @@
 {
   pkgs,
+  lib,
   inputs,
   username,
+  hostname,
   ...
 }:
 {
+  time.timeZone = "Europe/Madrid";
+
+  boot.loader.grub = {
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+  };
+
+  programs.nix-ld.enable = true;
+
+  networking.hostName = hostname;
+
+  environment.pathsToLink = [ "/share/bash" ];
+  environment.shells = [ pkgs.bash ];
+  environment.enableAllTerminfo = true;
+  environment.systemPackages = with pkgs; [
+    curl
+    gitMinimal
+    age.out
+    ssh-to-age
+  ];
+
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    extraConfig = ''
+      PrintLastLog no
+    '';
+  };
   system.stateVersion = "24.05";
 
   nix = {

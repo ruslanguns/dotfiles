@@ -29,8 +29,6 @@ let
     ldns
     aria2
     nmap
-    age.out
-    ssh-to-age
   ];
 in
 {

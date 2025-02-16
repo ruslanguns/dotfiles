@@ -1,5 +1,6 @@
+{ username, ... }:
 let
-  tokenFile = "";
+  tokenFile = "/home/${username}/.env/k3s_token";
 in
 {
   imports = [

@@ -5,11 +5,17 @@ keys:
   - &hosts
     - &desktop-wsl-01 age10sheugsj7txsnzv6j3yapstujrcde94ep9j82f3vtwx9z8aggfwsjtm9dm
     - &desktop-wsl-02 age1euf3ypnxv99gd95yu2zwaugkczy90hnl9lv9n725vzy05r0w2c5q6ykswj
+    - &px1-103 age16vhlpegmmfqefcsqcdzf6zfndlary3hspsnzynv4q0xtgde0pclq5nav88
 creation_rules:
-  - path_regex: secrets.yaml$
+  - path_regex: ^secrets.yaml$
     key_groups:
       - age:
           - *rus01
           - *rus02
           - *desktop-wsl-01
           - *desktop-wsl-02
+  - path_regex: ^modules/k3s/k3s-secrets\.yaml$
+    key_groups:
+      - age:
+          - *rus01
+          - *px1-103
