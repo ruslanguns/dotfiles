@@ -105,6 +105,7 @@
           username ? "rus",
           win_user ? "Usuario",
           isWSL ? false,
+          shell ? "fish",
           args ? { },
           modules,
         }:
@@ -116,6 +117,7 @@
                 hostname
                 username
                 isWSL
+                shell
                 win_user
                 ;
             }
@@ -145,6 +147,7 @@
         "px1-103" = mkNixosConfiguration {
           system = "x86_64-linux";
           hostname = "px1-103";
+          shell = "bash";
           modules = [
             disko.nixosModules.disko
             ./hosts/px1-103
@@ -154,6 +157,7 @@
         "px1-104" = mkNixosConfiguration {
           system = "x86_64-linux";
           hostname = "px1-104";
+          shell = "bash";
           modules = [
             disko.nixosModules.disko
             ./hosts/px1-104

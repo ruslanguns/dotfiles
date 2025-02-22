@@ -2,6 +2,7 @@
   pkgs,
   username,
   nix-index-database,
+  shell,
   ...
 }:
 let
@@ -169,7 +170,7 @@ in
     homeDirectory = "/home/${username}";
 
     sessionVariables.EDITOR = "nvim";
-    sessionVariables.SHELL = "/etc/profiles/per-user/${username}/bin/fish";
+    sessionVariables.SHELL = "/etc/profiles/per-user/${username}/bin/${shell}";
   };
 
   home.packages = stable-packages ++ unstable-packages;
@@ -179,7 +180,6 @@ in
     nix-index.enable = true;
     nix-index.enableFishIntegration = true;
     nix-index-database.comma.enable = true;
-
     fzf.enableFishIntegration = true;
     lsd.enable = true;
     lsd.enableAliases = true;

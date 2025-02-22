@@ -1,9 +1,9 @@
 {
   pkgs,
-  lib,
   inputs,
   username,
   hostname,
+  shell,
   ...
 }:
 {
@@ -18,8 +18,8 @@
 
   networking.hostName = hostname;
 
-  environment.pathsToLink = [ "/share/bash" ];
-  environment.shells = [ pkgs.bash ];
+  environment.pathsToLink = [ "/share/${shell}" ];
+  environment.shells = [ pkgs.${shell} ];
   environment.enableAllTerminfo = true;
   environment.systemPackages = with pkgs; [
     curl

@@ -2,16 +2,22 @@
   pkgs,
   lib,
   username,
+  shell,
   ...
 }:
 {
+  programs = lib.optionalAttrs (shell != "bash") {
+    ${shell}.enable = true;
+  };
+
   security.sudo.wheelNeedsPassword = false;
 
   users.users.${username} = {
     isNormalUser = true;
-    shell = pkgs.bash;
+    shell = pkgs.${shell};
     extraGroups = [
       "wheel"
+      "docker"
     ];
 
     openssh.authorizedKeys.keys =
