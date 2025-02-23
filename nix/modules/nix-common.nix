@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   inputs,
   username,
   hostname,
@@ -16,6 +17,14 @@
 
   programs.nix-ld.enable = true;
 
+  # Enable QEMU Guest for Proxmox
+  services.qemuGuest.enable = lib.mkDefault true;
+
+  # Use the boot drive for grub
+  boot.loader.grub.enable = lib.mkDefault true;
+  boot.loader.grub.devices = [ "nodev" ];
+  # boot.growPartition = lib.mkDefault true;
+
   networking.hostName = hostname;
 
   environment.pathsToLink = [ "/share/${shell}" ];
@@ -24,24 +33,31 @@
   environment.systemPackages = with pkgs; [
     curl
     gitMinimal
-    age.out
+    age
     ssh-to-age
+    neovim
+    restic
   ];
 
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
     extraConfig = ''
       PrintLastLog no
     '';
   };
-  system.stateVersion = "24.05";
+  system.stateVersion = lib.mkDefault "24.11";
 
   nix = {
     settings = {
       trusted-users = [ username ];
       accept-flake-config = true;
       auto-optimise-store = true;
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
 
     registry = {
@@ -56,8 +72,7 @@
       "/nix/var/nix/profiles/per-user/root/channels"
     ];
 
-    package = pkgs.nixFlakes;
-    extraOptions = ''experimental-features = nix-command flakes'';
+    package = pkgs.nixVersions.stable;
 
     gc = {
       automatic = true;

@@ -41,6 +41,9 @@ let
     kubeval
     operator-sdk
     kubebuilder
+    fluxcd
+    kind
+    cilium-cli
 
     # Development Tools
     deno
@@ -108,11 +111,9 @@ let
     openssl
     xmlsec
     libxml2
-    age.out
+    age
     ssh-to-age
     sops
-    fluxcd
-    kind
 
     # Network Tools
     mtr
@@ -163,7 +164,7 @@ in
     ../../modules/fish.nix
   ];
 
-  home.stateVersion = "22.11";
+  home.stateVersion = "24.11";
 
   home = {
     username = "${username}";
@@ -180,6 +181,7 @@ in
     nix-index.enable = true;
     nix-index.enableFishIntegration = true;
     nix-index-database.comma.enable = true;
+
     fzf.enableFishIntegration = true;
     lsd.enable = true;
     lsd.enableAliases = true;

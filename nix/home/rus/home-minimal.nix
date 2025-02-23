@@ -29,6 +29,8 @@ let
     ldns
     aria2
     nmap
+    kubernetes-helm
+    cilium-cli
   ];
 in
 {
@@ -36,7 +38,7 @@ in
     nix-index-database.hmModules.nix-index
   ];
 
-  home.stateVersion = "22.11";
+  home.stateVersion = "24.11";
 
   home = {
     username = "${username}";

@@ -2,7 +2,7 @@
   description = "NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
 
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -11,7 +11,7 @@
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -150,7 +150,7 @@
           shell = "bash";
           modules = [
             disko.nixosModules.disko
-            ./hosts/px1-103
+            ./hosts/px-k8s-master
           ];
         };
 
@@ -160,7 +160,7 @@
           shell = "bash";
           modules = [
             disko.nixosModules.disko
-            ./hosts/px1-104
+            ./hosts/px-k8s-node
           ];
         };
 
@@ -170,6 +170,15 @@
           modules = [
             disko.nixosModules.disko
             ./hosts/px1-105
+          ];
+        };
+
+        "px2-210" = mkNixosConfiguration {
+          system = "x86_64-linux";
+          hostname = "px2-210";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/px-k8s-node
           ];
         };
 

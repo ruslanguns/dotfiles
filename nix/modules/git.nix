@@ -33,6 +33,9 @@
       diff = {
         colorMoved = "default";
       };
+      pull = {
+        rebase = true;
+      };
     };
   };
 }
