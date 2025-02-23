@@ -8,6 +8,7 @@ keys:
     - &px1-103 age12h20x9k4wa6wplkcq343wc9s0k6fy2e9x7waxtjp4m4p2tfwea2qzh8vjn
     - &px1-104 age1yff3unlvgplks8psmmmu7fheny5jy3tgex07e6jnq3tjvp6cwskqtjslm0
     - &px2-210 age158kkq6d8svznjstshwuchvnmsdlzh3dq8zny3fedvhgxxlyctp6qus0l5r
+    - &huawei-wsl-01 age1z92j693tdjkegz2wkxg3q3nfrhl8t4v43vmaeca3fxdwncrqe4uq226jzz
 creation_rules:
   - path_regex: ^secrets.yaml$
     key_groups:
@@ -16,6 +17,7 @@ creation_rules:
           - *rus02
           - *desktop-wsl-01
           - *desktop-wsl-02
+          - *huawei-wsl-01
   - path_regex: ^modules/k3s/k3s-secrets\.yaml$
     key_groups:
       - age:
