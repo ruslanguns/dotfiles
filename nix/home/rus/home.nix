@@ -69,6 +69,7 @@ let
     stern
     apacheHttpd
     sshpass
+    _1password-cli
 
     # Key Tools
     gh

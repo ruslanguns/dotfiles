@@ -104,6 +104,7 @@
           hostname ? "nixos",
           username ? "rus",
           win_user ? "Usuario",
+          serverIp ? "",
           isWSL ? false,
           shell ? "fish",
           args ? { },
@@ -118,6 +119,7 @@
                 username
                 isWSL
                 shell
+                serverIp
                 win_user
                 ;
             }
@@ -147,6 +149,7 @@
         "px1-103" = mkNixosConfiguration {
           system = "x86_64-linux";
           hostname = "px1-103";
+          serverIp = "192.168.1.103";
           shell = "bash";
           modules = [
             disko.nixosModules.disko
@@ -157,6 +160,7 @@
         "px1-104" = mkNixosConfiguration {
           system = "x86_64-linux";
           hostname = "px1-104";
+          serverIp = "192.168.1.103";
           shell = "bash";
           modules = [
             disko.nixosModules.disko
@@ -176,6 +180,7 @@
         "px2-210" = mkNixosConfiguration {
           system = "x86_64-linux";
           hostname = "px2-210";
+          serverIp = "192.168.1.103";
           modules = [
             disko.nixosModules.disko
             ./hosts/px-k8s-node

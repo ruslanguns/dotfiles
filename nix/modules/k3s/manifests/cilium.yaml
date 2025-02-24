@@ -9,17 +9,28 @@ spec:
   version: "1.17.1"
   targetNamespace: kube-system
   valuesContent: |-
+    bpf:
+      lbExternalClusterIP: true
+      masquerade: true
+      vlanBypass:
+        - ""
+    envoy:
+      enabled: false
+    externalIPs:
+      enabled: false
+    hubble:
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+    ingressController:
+      enabled: false
+      loadbalancerMode: dedicated
     ipam:
-      mode: "kubernetes"
-
-    kubeProxyReplacement: "strict"
-    k8sServiceHost: "192.168.1.103"
-    k8sServicePort: 6443
-
-    tunnel: "disabled"
-
-    ipv4NativeRoutingCIDR: "10.42.0.0/16"
-
-    cni:
-      binPath: "/var/lib/rancher/k3s/data/current/bin"
-      confPath: "/var/lib/rancher/k3s/agent/etc/cni/net.d"
+      mode: kubernetes
+      operator:
+        clusterPoolIPv4PodCIDRList: 10.42.0.0/16
+    nodePort:
+      enabled: true
+    socketLB:
+      enabled: true

@@ -1,5 +1,7 @@
 {
+  pkgs,
   username,
+  hostname,
   modulesPath,
   ...
 }:
@@ -12,6 +14,13 @@
     ./../users.nix
     ./sops.nix
   ];
+
+  environment.systemPackages = with pkgs; [
+    openiscsi
+  ];
+
+  services.openiscsi.enable = true;
+  services.openiscsi.name = "iqn.2025-02.ruso.dev:${hostname}";
 
   # networking.firewall = {
   #   enable = true;
