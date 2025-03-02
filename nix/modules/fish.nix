@@ -114,7 +114,7 @@ in
         vi = "nvim";
       }
       (lib.mkIf isWSL {
-        xcopy = "/mnt/c/Windows/System32/clip.exe";
+        xcopy = "iconv -f UTF-8 -t UTF-16LE | /mnt/c/Windows/System32/clip.exe";
         xpaste = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -command 'Get-Clipboard'";
         explorer = "/mnt/c/Windows/explorer.exe";
         code = "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin/code";
