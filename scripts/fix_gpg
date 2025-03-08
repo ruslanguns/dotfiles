@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+echo "🔍 Checking for GPG locks..."
+
+# Find the process holding the lock
+GPG_PID=$(pgrep gpg-agent)
+
+if [ -n "$GPG_PID" ]; then
+  echo "⚠️ GPG agent is running (PID: $GPG_PID). Killing it..."
+  kill -9 "$GPG_PID"
+else
+  echo "✅ No active GPG agent found."
+fi
+
+# Remove potential lock files
+echo "🧹 Removing lock files..."
+rm -f ~/.gnupg/*.lock
+rm -f ~/.gnupg/S.gpg-agent*
+
+# Restart GPG agent
+echo "🔄 Restarting gpg-agent..."
+gpgconf --kill gpg-agent
+gpgconf --launch gpg-agent
+
+# Verify GPG functionality
+echo "🔍 Checking if GPG works..."
+
+if ! gpg --list-keys; then
+  echo "❌ GPG still has issues. You may need to manually reset ~/.gnupg."
+  exit 1
+fi
+
+# Set trust level for all keys
+echo "🔐 Updating trust level for all keys..."
+gpg --list-keys --with-colons | awk -F: '/^pub/ {print $5}' | while read -r KEY; do
+  if [ -n "$KEY" ]; then
+    echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "$KEY" trust
+    echo "✅ Set key $KEY as fully trusted."
+  fi
+done
+
+echo "🎉 GPG keys are now fully trusted and ready to use!"
