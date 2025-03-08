@@ -122,13 +122,11 @@ in
       (lib.mkIf isLinux {
         xcopy = "xclip -selection clipboard";
         xpaste = "xclip -o -selection clipboard";
-        code = "code";
       })
       (lib.mkIf isMac {
         xcopy = "pbcopy";
         xpaste = "pbpaste";
         explorer = "open";
-        code = "code";
       })
     ];
 

@@ -34,6 +34,16 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    vscode-server = {
+      url = "github:nix-community/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-ld-rs = {
+      url = "github:nix-community/nix-ld-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -46,6 +56,7 @@
       nix-index-database,
       disko,
       nixos-facter-modules,
+      vscode-server,
       ...
     }@inputs:
     let
@@ -192,6 +203,7 @@
           isWSL = true;
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
+            vscode-server.nixosModules.default
             ./hosts/desktop-wsl-01
           ];
         };
