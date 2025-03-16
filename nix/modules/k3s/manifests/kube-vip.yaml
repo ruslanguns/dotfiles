@@ -6,18 +6,18 @@ metadata:
 spec:
   repo: https://kube-vip.github.io/helm-charts
   chart: kube-vip
-  version: "0.6.6"
+  version: 0.6.6
   targetNamespace: kube-system
   valuesContent: |-
     config:
-      address: "192.168.1.224"
+      address: 192.168.1.224
     env:
-      vip_interface: ens18         # Ajusta según tu interfaz real
-      vip_arp: "true"              # Habilitado, recomendado para entornos L2
-      lb_enable: "true"            # Desactivado (Cilium maneja balanceo interno)
-      lb_port: "6443"              # Irrelevante al desactivar lb_enable
-      vip_cidr: "29"               # Máscara adecuada para IP única
-      cp_enable: "true"            # Alta disponibilidad para API Server
-      svc_enable: "true"           # Activado para gestionar VIPs de servicios
-      svc_election: "true"         # Elección de líder para servicios
-      vip_leaderelection: "false"  # Alta disponibilidad del plano de control
+      vip_interface: ens18
+      vip_arp: true
+      lb_enable: true
+      lb_port: 6443
+      vip_cidr: 29
+      cp_enable: true
+      svc_enable: true
+      svc_election: true
+      vip_leaderelection: false
