@@ -40,11 +40,6 @@
         target = "sealed-secrets.yaml";
         source = ./manifests/sealed-secrets.yaml;
       };
-      longhornAddNixOsPath = {
-        enable = true;
-        target = "longhorn-add-nixos-path.yaml";
-        source = ./manifests/longhorn-add-nixos-path.yaml;
-      };
       kubeVip = {
         enable = true;
         target = "kube-vip.yaml";
