@@ -34,17 +34,16 @@
         target = "kyverno.yaml";
         source = ./manifests/kyverno.yaml;
       };
-      mutateLonghornNixosEnv = {
-        enable = true;
-        target = "mutate-longhorn-nixos-env.yaml";
-        source = ./manifests/mutate-longhorn-nixos-env.yaml;
-      };
       sealedSecrets = {
         enable = true;
         target = "sealed-secrets.yaml";
         source = ./manifests/sealed-secrets.yaml;
       };
+      longhornAddNixOsPath = {
+        enable = true;
+        target = "longhorn-add-nixos-path.yaml";
+        source = ./manifests/longhorn-add-nixos-path.yaml;
+      };
     };
   };
-
 }
