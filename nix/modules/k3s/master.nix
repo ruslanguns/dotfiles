@@ -15,8 +15,9 @@
     extraFlags = toString [
       "--flannel-backend=none"
       "--disable-network-policy"
+      "--disable-kube-proxy"
+      "--disable=traefik"
       "--disable=servicelb"
-      # "--disable=traefik"
     ];
     manifests = {
       cilium = {
@@ -43,6 +44,16 @@
         enable = true;
         target = "longhorn-add-nixos-path.yaml";
         source = ./manifests/longhorn-add-nixos-path.yaml;
+      };
+      kubeVip = {
+        enable = true;
+        target = "kube-vip.yaml";
+        source = ./manifests/kube-vip.yaml;
+      };
+      ddns = {
+        enable = true;
+        target = "ddns.yaml";
+        source = ./manifests/ddns.yaml;
       };
     };
   };

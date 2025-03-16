@@ -9,28 +9,30 @@ spec:
   version: "1.17.1"
   targetNamespace: kube-system
   valuesContent: |-
-    bpf:
-      lbExternalClusterIP: true
-      masquerade: true
-      vlanBypass:
-        - ""
+    kubeProxyReplacement: true
+    ipam:
+      operator:
+        clusterPoolIPv4PodCIDRList: 10.42.0.0/16
+    socketLB:
+      enabled: false
     envoy:
       enabled: false
     externalIPs:
       enabled: false
+    gatewayAPI:
+      enabled: false
     hubble:
       relay:
-        enabled: true
+        enabled: false
       ui:
-        enabled: true
-    ingressController:
-      enabled: false
-      loadbalancerMode: dedicated
-    ipam:
-      mode: kubernetes
-      operator:
-        clusterPoolIPv4PodCIDRList: 10.42.0.0/16
+        enabled: false
     nodePort:
       enabled: true
-    socketLB:
-      enabled: true
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: lb-pool
+spec:
+  blocks:
+    - cidr: 192.168.1.224/29
