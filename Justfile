@@ -38,6 +38,9 @@ nix_rebuild_px1-105:
 # Rebuilds nix on the remote machine 'px2-210' with target host: 'rus@192.168.1.210'
 nix_rebuild_px2-210:
     @just _remote px2-210 rus@192.168.1.210
+# Rebuilds nix on the remote machine 'px2-211' with target host: 'rus@192.168.1.211'
+nix_rebuild_px2-211:
+    @just _remote px2-211 rus@192.168.1.211
 # Installs NixOS on the remote maching for first time
 setup_nixos HOST TARGET_HOST:
   nix run github:nix-community/nixos-anywhere -- --flake {{FLAKE}}#{{HOST}} --target-host {{TARGET_HOST}}

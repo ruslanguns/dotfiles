@@ -198,6 +198,16 @@
           ];
         };
 
+        "px2-211" = mkNixosConfiguration {
+          system = "x86_64-linux";
+          hostname = "px2-211";
+          serverIp = "192.168.1.103";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/px-k8s-node
+          ];
+        };
+
         "desktop-wsl-01" = mkNixosConfiguration {
           hostname = "desktop-wsl-01";
           isWSL = true;
