@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   username,
   hostname,
@@ -9,37 +10,10 @@
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
-    ./../px-disk-config.nix
     ./../nix-common.nix
     ./../users.nix
     ./sops.nix
   ];
-
-  environment.systemPackages = with pkgs; [
-    openiscsi
-  ];
-
-  services.openiscsi.enable = true;
-  services.openiscsi.name = "iqn.2025-02.ruso.dev:${hostname}";
-
-  # networking.firewall = {
-  #   enable = true;
-  #   allowedTCPPorts = [
-  #     6443 # k3s API
-  #     4240 # Cilium health checks
-  #     4222 # Cilium hubble relay
-  #     4244 # Hubble relay
-  #     4245 # Hubble peer service
-  #     9962 # Cilium agent prometheus metrics
-  #     9963 # Cilium operator prometheus metrics
-  #     9961 # Cilium hubble prometheus metrics
-  #   ];
-  #   allowedUDPPorts = [
-  #     8472 # VXLAN
-  #   ];
-  # };
-  #
-
   networking.enableIPv6 = false;
   networking.firewall.enable = false;
 
@@ -47,6 +21,87 @@
     imports = [
       ../../home/${username}/home-minimal.nix
     ];
+  };
+
+  environment.systemPackages = with pkgs; [
+    openiscsi
+    parted
+  ];
+
+  services.openiscsi.enable = true;
+  services.openiscsi.name = "iqn.2025-02.ruso.dev:${hostname}";
+
+  disko.devices = {
+    disk.disk1 = {
+      device = lib.mkDefault "/dev/sda";
+      type = "disk";
+      content = {
+        type = "gpt";
+        partitions = {
+          boot = {
+            name = "boot";
+            size = "1M";
+            type = "EF02";
+          };
+          esp = {
+            name = "ESP";
+            size = "500M";
+            type = "EF00";
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+            };
+          };
+          root = {
+            name = "root";
+            size = "100%";
+            content = {
+              type = "lvm_pv";
+              vg = "pool";
+            };
+          };
+        };
+      };
+    };
+    disk.disk2 = {
+      device = "/dev/sdb";
+      type = "disk";
+      content = {
+        type = "gpt";
+        partitions = {
+          longhorn = {
+            name = "longhorn";
+            size = "100%";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/var/lib/longhorn";
+              mountOptions = [ "defaults" ];
+            };
+          };
+        };
+      };
+    };
+
+    lvm_vg = {
+      pool = {
+        type = "lvm_vg";
+        lvs = {
+          root = {
+            size = "100%FREE";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/";
+              mountOptions = [
+                "defaults"
+              ];
+            };
+          };
+        };
+      };
+    };
   };
 
 }
