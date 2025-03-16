@@ -218,14 +218,6 @@
           ];
         };
 
-        "desktop-wsl-02" = mkNixosConfiguration {
-          hostname = "desktop-wsl-02";
-          isWSL = true;
-          modules = [
-            inputs.nixos-wsl.nixosModules.wsl
-            ./hosts/desktop-wsl-02
-          ];
-        };
         "huawei-wsl-01" = mkNixosConfiguration {
           hostname = "huawei-wsl-01";
           isWSL = true;
