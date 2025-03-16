@@ -11,16 +11,6 @@ let
       sha256 = "sha256-HN0hJeB31MvkD12dbnF2SjefkAVgtUmhah598zAlhQs=";
     };
   };
-  tmux-browser = pkgs.tmuxPlugins.mkTmuxPlugin {
-    pluginName = "tmux-browser";
-    version = "unstable-2023-01-06";
-    src = pkgs.fetchFromGitHub {
-      owner = "ofirgall";
-      repo = "tmux-browser";
-      rev = "c3e115f9ebc5ec6646d563abccc6cf89a0feadb8";
-      sha256 = "sha256-ngYZDzXjm4Ne0yO6pI+C2uGO/zFDptdcpkL847P+HCI=";
-    };
-  };
   tmux-super-fingers = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-super-fingers";
     version = "unstable-2023-01-06";
@@ -58,13 +48,6 @@ in
         plugin = tmux-super-fingers;
         extraConfig = "set -g @super-fingers-key f";
       }
-      {
-        plugin = tmux-browser;
-        extraConfig = ''
-          set -g @browser_close_on_deattach '1'
-        '';
-      }
-
       tmuxPlugins.sensible
       # must be before continuum edits right status bar
       # {
