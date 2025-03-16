@@ -50,6 +50,11 @@
         target = "ddns.yaml";
         source = ./manifests/ddns.yaml;
       };
+      ingress = {
+        enable = true;
+        target = "ingress.yaml";
+        source = ./manifests/ingress.yaml;
+      };
     };
   };
 }
