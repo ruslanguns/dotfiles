@@ -232,6 +232,7 @@
           win_user = "Rus";
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
+            vscode-server.nixosModules.default
             ./hosts/huawei-wsl-01
           ];
         };
