@@ -5,9 +5,9 @@ keys:
   - &hosts
     - &desktop-wsl-01 age1jq5ghxcvfwfezgu72wtf6msqncw9kug0gu7mvkdnmlc59zqt0f4st0j7vp
     - &desktop-wsl-02 age1euf3ypnxv99gd95yu2zwaugkczy90hnl9lv9n725vzy05r0w2c5q6ykswj
-    - &px1-103 age12h20x9k4wa6wplkcq343wc9s0k6fy2e9x7waxtjp4m4p2tfwea2qzh8vjn
-    - &px1-104 age1yff3unlvgplks8psmmmu7fheny5jy3tgex07e6jnq3tjvp6cwskqtjslm0
-    - &px2-210 age158kkq6d8svznjstshwuchvnmsdlzh3dq8zny3fedvhgxxlyctp6qus0l5r
+    - &px1-103 age1lpcsj5dtud3lj3n2hmhlzncqadqq7tr8pqdhax345gvgqf5sh4rq0ws55h
+    - &px1-104 age10dspaveqslprje85a9w8py5s83vh4thk7pu02lp345umps8ekv2stmhrql
+    - &px2-210 age1py04z7esn60auu9g3vxl3hxuvepd8409y9epvtvhzuw7djqmsy9q9z7gme
     - &huawei-wsl-01 age1z92j693tdjkegz2wkxg3q3nfrhl8t4v43vmaeca3fxdwncrqe4uq226jzz
 creation_rules:
   - path_regex: ^secrets.yaml$
