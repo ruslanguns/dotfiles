@@ -4,6 +4,11 @@ metadata:
   name: longhorn-system
 
 ---
+# We need to first install the Longhorn Helm chart manually first, because HelmChart CRDs requrie a CSI driver to be installed first.
+# then we can configure the Longhorn Helm chart to use this approach
+# helm repo add longhorn https://charts.longhorn.io
+# helm repo update
+# helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.8.1
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
@@ -12,5 +17,5 @@ metadata:
 spec:
   repo: https://charts.longhorn.io
   chart: longhorn
-  version: 1.8.0
+  version: 1.8.1
   targetNamespace: longhorn-system
