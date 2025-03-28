@@ -44,6 +44,7 @@ let
     fluxcd
     kind
     cilium-cli
+    tenv
 
     # Development Tools
     deno

@@ -24,5 +24,4 @@
 
   services.vscode-server.enable = true;
   networking.firewall.checkReversePath = "loose";
-
 }
