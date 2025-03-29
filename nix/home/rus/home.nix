@@ -58,6 +58,9 @@ let
     lua51Packages.lua
     fnm
     jdk
+    esptool
+    picocom
+    mpremote
   ];
 
   stable-packages = with pkgs; [
