@@ -57,10 +57,15 @@ let
     lua51Packages.luarocks-nix
     lua51Packages.lua
     fnm
+    biome
     jdk
     esptool
     picocom
     mpremote
+    libusbp
+    openocd
+    cmake
+    ninja
   ];
 
   stable-packages = with pkgs; [

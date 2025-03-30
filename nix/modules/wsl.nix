@@ -22,6 +22,15 @@
     package = pkgs.nix-ld-rs;
   };
 
+  programs.nix-ld.libraries = with pkgs; [
+    libusb1
+    zlib
+    libftdi
+    libudev0-shim
+    libtool
+    libusb-compat-0_1
+  ];
+
   services.vscode-server.enable = true;
   networking.firewall.checkReversePath = "loose";
 }
