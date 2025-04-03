@@ -30,6 +30,7 @@ let
     vim
     wget
     zip
+    json-schema-for-humans
 
     # Kubernetes
     k9s
@@ -44,7 +45,10 @@ let
     fluxcd
     kind
     cilium-cli
-    tenv
+    terragrunt
+    opentofu
+    terraform
+    terraformer
 
     # Development Tools
     deno
