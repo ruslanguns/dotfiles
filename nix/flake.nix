@@ -40,10 +40,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-ld-rs = {
-      url = "github:nix-community/nix-ld-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nix-ld-rs.url = "github:nix-community/nix-ld-rs";
+
+    # flox = {
+    #   url = "github:flox/flox/v1.4.4";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
   outputs =
