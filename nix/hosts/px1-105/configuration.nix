@@ -17,4 +17,6 @@
       ../../home/${username}/home.nix
     ];
   };
+
+  networking.firewall.enable = false;
 }
