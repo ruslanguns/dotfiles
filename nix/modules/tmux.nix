@@ -150,8 +150,11 @@ in
       is_shell="ps -o state= -o comm= -t '#{pane_tty}' \
           | grep -iqE '^[^TXZ ]+ +(bash|fish|zsh|sh|ksh)$'"
 
-      # Ctrl+l: Si estamos en shell, limpiar y refrescar; de lo contrario, enviar C-l
-      bind -n C-l if-shell "$is_shell" "send-keys C-l \; refresh-client" "send-keys C-l"
+      # # Ctrl+l: Si estamos en shell, limpiar y refrescar; de lo contrario, enviar C-l
+      # bind -n C-l if-shell "$is_shell" "send-keys C-l \; refresh-client" "send-keys C-l"
+
+      # Alt+l: si estamos en shell, limpiar y refrescar; de lo contrario, enviar C-l
+      bind -n M-l if-shell "$is_shell" "send-keys C-l \; refresh-client" "send-keys C-l"
 
       # plugins
       run-shell ${pkgs.tmuxPlugins.cpu}/share/tmux-plugins/cpu/cpu.tmux
