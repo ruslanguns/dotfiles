@@ -86,10 +86,12 @@ let
     apacheHttpd
     sshpass
     _1password-cli
+    aichat
 
     # Key Tools
     gh
     just
+    argc
 
     # Core Languages
     rustup
