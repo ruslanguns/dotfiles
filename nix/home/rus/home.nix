@@ -70,6 +70,9 @@ let
     openocd
     cmake
     ninja
+    osmium-tool
+    tilemaker
+    osmctools
   ];
 
   stable-packages = with pkgs; [
