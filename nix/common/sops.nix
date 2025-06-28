@@ -68,6 +68,19 @@
         mode = "0750";
         path = "/opt/backup_projects.sh";
       };
+
+      "users/${username}/ssh_config" = {
+        owner = username;
+        mode = "0600";
+        path = "/home/${username}/.ssh/config";
+      };
+      #
+      # "users/${username}/restic.env" = {
+      #   neededforusers = true;
+      #   owner = username;
+      #   mode = "0750";
+      #   # path = "/opt/backup_projects.sh";
+      # };
     };
   };
 
@@ -81,6 +94,7 @@
     in
     ''
       chown -R ${user}:${group} /home/${username}/.config
+      chown -R ${user}:${group} /home/${username}/.ssh/config
       chown -R ${user}:${group} /home/${username}/.env
       chown -R ${user}:${group} /run/secrets-for-users/users/${username}
     '';
