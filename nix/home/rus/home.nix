@@ -31,6 +31,8 @@ let
     wget
     zip
     json-schema-for-humans
+    xclip
+    xorg.xauth
 
     # Kubernetes
     k9s
