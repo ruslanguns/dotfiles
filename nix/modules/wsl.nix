@@ -1,4 +1,9 @@
-{ pkgs, username, ... }:
+{
+  pkgs,
+  username,
+  win_user,
+  ...
+}:
 {
 
   wsl = {
@@ -31,6 +36,10 @@
     libusb-compat-0_1
   ];
 
-  services.vscode-server.enable = true;
+  environment.variables.PATH = [
+    "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin"
+  ];
+
+  # services.vscode-server.enable = true;
   networking.firewall.checkReversePath = "loose";
 }

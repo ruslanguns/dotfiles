@@ -36,11 +36,6 @@ in
         set -gx PATH $PATH $HOME/.dotfiles/scripts
       end
 
-      # if we are on windows then load the following script path:
-      if test -d /mnt/c/Users/
-        fish_add_path --append /mnt/c/Users/${win_user}/scoop/apps/win32yank/current
-      end
-
       set NIX_MSG ${username}
 
       # load dynamic settings
@@ -58,54 +53,57 @@ in
       type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
       type -q ensure_nodejs; and ensure_nodejs 2>/dev/null
     '';
-    functions = {
-      refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
-      take = ''mkdir -p -- "$1" && cd -- "$1"'';
-      ttake = "cd $(mktemp -d)";
-      show_path = "echo $PATH | tr ' ' '\n'";
-      posix-source = ''
-        for i in (cat $argv)
-          set arr (echo $i |tr = \n)
-          set -gx $arr[1] $arr[2]
-        end
-      '';
-      kubectl = "kubecolor $argv";
-      justnix = "just -f ~/.dotfiles/Justfile $argv";
-      ensure_nodejs = ''
-        if not fnm list | grep -q "v22.17.0"
-            echo "📦 [fnm] Installing Node.js v22.17.0"
-            fnm install 22.17.0
-            echo "✅ [fnm] Node.js v22.17.0 is already installed"
-        end
+    functions = lib.mkMerge [
+      {
+        refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
+        take = ''mkdir -p -- "$1" && cd -- "$1"'';
+        ttake = "cd $(mktemp -d)";
+        show_path = "echo $PATH | tr ' ' '\n'";
+        posix-source = ''
+          for i in (cat $argv)
+            set arr (echo $i |tr = \n)
+            set -gx $arr[1] $arr[2]
+          end
+        '';
+        kubectl = "kubecolor $argv";
+        justnix = "just -f ~/.dotfiles/Justfile $argv";
+        ensure_nodejs = ''
+          if not fnm list | grep -q "v22.17.0"
+              echo "📦 [fnm] Installing Node.js v22.17.0"
+              fnm install 22.17.0
+              echo "✅ [fnm] Node.js v22.17.0 is already installed"
+          end
 
-        if not test (fnm current) = "v22.17.0"
-            echo "🔧 Setting Node.js v22.17.0 as default"
-            fnm default 22.17.0
-        end
-      '';
-      ensure_krew_plugins = ''
-        set plugins ns ctx foreach apidocs argo-apps-viz cilium count ctr df-pv kyverno kubescape resource-capacity stern view-utilization view-quotas modify-secret view-secret unused-volumes
-        set installed 0
+          if not test (fnm current) = "v22.17.0"
+              echo "🔧 Setting Node.js v22.17.0 as default"
+              fnm default 22.17.0
+          end
+        '';
+        ensure_krew_plugins = ''
+          set plugins ns ctx foreach apidocs argo-apps-viz cilium count ctr df-pv kyverno kubescape resource-capacity stern view-utilization view-quotas modify-secret view-secret unused-volumes
+          set installed 0
 
-        for plugin in $plugins
-            set escaped (string escape --style=regex -- $plugin)
-            set pattern "^$escaped\$"
+          for plugin in $plugins
+              set escaped (string escape --style=regex -- $plugin)
+              set pattern "^$escaped\$"
 
-            if not krew list | grep -q $pattern
-                echo "📦 [krew] installing plugin: $plugin"
-                if krew install $plugin > /dev/null 2>&1
-                    set installed (math $installed + 1)
-                else
-                    echo "[krew] failed to install plugin: $plugin" >&2
-                end
-            end
-        end
+              if not krew list | grep -q $pattern
+                  echo "📦 [krew] installing plugin: $plugin"
+                  if krew install $plugin > /dev/null 2>&1
+                      set installed (math $installed + 1)
+                  else
+                      echo "[krew] failed to install plugin: $plugin" >&2
+                  end
+              end
+          end
 
-        if test $installed -gt 0
-            echo "✅ [krew] $installed plugin(s) installed."
-        end
-      '';
-    };
+          if test $installed -gt 0
+              echo "✅ [krew] $installed plugin(s) installed."
+          end
+        '';
+      }
+    ];
+
     shellAbbrs =
       {
         k = "kubectl";
@@ -156,7 +154,6 @@ in
         xcopy = "xclip -selection clipboard";
         xpaste = "xclip -o -selection clipboard";
         explorer = "/mnt/c/Windows/explorer.exe";
-        code = "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin/code";
       })
       (lib.mkIf isLinux {
         xcopy = "xclip -selection clipboard";
