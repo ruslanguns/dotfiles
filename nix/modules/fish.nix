@@ -105,7 +105,17 @@ in
     ];
 
     shellAbbrs =
+      # tmux
       {
+        tsd = "tmux switch-client -t dotfiles";
+        tsw = "tmux switch-client -t work1";
+        tsr = "tmux switch-client -t work2";
+        ttd = "tmux a -t dotfiles";
+        ttw = "tmux a -t work1";
+        ttr = "tmux a -t work2";
+      }
+      # kubernetes
+      // {
         k = "kubectl";
         kcu = "kubectl ctx -u";
         kc = "kubectl ctx";
