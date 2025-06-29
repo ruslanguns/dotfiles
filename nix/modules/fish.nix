@@ -52,6 +52,11 @@ in
       # fnm
       set PATH "/home/${username}/.local/share/fnm" $PATH
       fnm env | source
+
+      set -gx PATH $PATH (fnm env --shell=fish | source)
+
+      type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
+      type -q ensure_nodejs; and ensure_nodejs 2>/dev/null
     '';
     functions = {
       refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
@@ -66,6 +71,40 @@ in
       '';
       kubectl = "kubecolor $argv";
       justnix = "just -f ~/.dotfiles/Justfile $argv";
+      ensure_nodejs = ''
+        if not fnm list | grep -q "v22.17.0"
+            echo "📦 [fnm] Installing Node.js v22.17.0"
+            fnm install 22.17.0
+            echo "✅ [fnm] Node.js v22.17.0 is already installed"
+        end
+
+        if not test (fnm current) = "v22.17.0"
+            echo "🔧 Setting Node.js v22.17.0 as default"
+            fnm default 22.17.0
+        end
+      '';
+      ensure_krew_plugins = ''
+        set plugins ns ctx foreach apidocs argo-apps-viz cilium count ctr df-pv kyverno kubescape resource-capacity stern view-utilization view-quotas modify-secret view-secret unused-volumes
+        set installed 0
+
+        for plugin in $plugins
+            set escaped (string escape --style=regex -- $plugin)
+            set pattern "^$escaped\$"
+
+            if not krew list | grep -q $pattern
+                echo "📦 [krew] installing plugin: $plugin"
+                if krew install $plugin > /dev/null 2>&1
+                    set installed (math $installed + 1)
+                else
+                    echo "[krew] failed to install plugin: $plugin" >&2
+                end
+            end
+        end
+
+        if test $installed -gt 0
+            echo "✅ [krew] $installed plugin(s) installed."
+        end
+      '';
     };
     shellAbbrs =
       {
@@ -114,8 +153,8 @@ in
         vi = "nvim";
       }
       (lib.mkIf isWSL {
-        xcopy = "iconv -f UTF-8 -t UTF-16LE | /mnt/c/Windows/System32/clip.exe";
-        xpaste = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -command 'Get-Clipboard'";
+        xcopy = "xclip -selection clipboard";
+        xpaste = "xclip -o -selection clipboard";
         explorer = "/mnt/c/Windows/explorer.exe";
         code = "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin/code";
       })
