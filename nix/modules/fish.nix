@@ -159,6 +159,7 @@ in
       {
         vim = "nvim";
         vi = "nvim";
+        ai = "aichat";
       }
       (lib.mkIf isWSL {
         xcopy = "xclip -selection clipboard";
