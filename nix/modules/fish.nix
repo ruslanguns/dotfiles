@@ -101,7 +101,22 @@ in
               echo "✅ [krew] $installed plugin(s) installed."
           end
         '';
+        check_dns = ''
+          set domain $argv[1]
+          if test -z "$domain"
+              echo "❌ Usage: check_dns <domain>"
+              return 1
+          end
+
+          set output (nslookup $domain 2>&1)
+          if echo $output | grep -q "can't find\|NXDOMAIN\|No answer"
+              echo "❌ $domain"
+          else
+              echo "✅ $domain"
+          end
+        '';
       }
+
     ];
 
     shellAbbrs =
