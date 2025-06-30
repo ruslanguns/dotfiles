@@ -1,6 +1,7 @@
 {
   modulesPath,
   username,
+  config,
   ...
 }:
 {
@@ -11,6 +12,9 @@
     ./../../modules/nix-common.nix
     ./../../modules/px-disk-config.nix
   ];
+
+  users.mutableUsers = false;
+  users.users.${username}.hashedPasswordFile = config.sops.secrets."users/${username}/password".path;
 
   home-manager.users.${username} = {
     imports = [
