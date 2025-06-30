@@ -40,6 +40,6 @@
     "/mnt/c/Users/${win_user}/scoop/apps/vscode/current/bin"
   ];
 
-  # services.vscode-server.enable = true;
+  services.vscode-server.enable = true;
   networking.firewall.checkReversePath = "loose";
 }

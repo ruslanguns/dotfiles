@@ -35,10 +35,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # vscode-server = {
-    #   url = "github:nix-community/nixos-vscode-server";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    vscode-server = {
+      url = "github:nix-community/nixos-vscode-server";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-ld-rs.url = "github:nix-community/nix-ld-rs";
 
@@ -48,7 +48,6 @@
     # };
   };
 
-  # vscode-server,
   outputs =
     {
       self,
@@ -59,6 +58,7 @@
       nix-index-database,
       disko,
       nixos-facter-modules,
+      vscode-server,
       ...
     }@inputs:
     let
@@ -216,7 +216,7 @@
           win_user = "rusla";
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
-            # vscode-server.nixosModules.default
+            vscode-server.nixosModules.default
             ./hosts/desktop-wsl-01
           ];
         };
@@ -226,7 +226,7 @@
           isWSL = true;
           modules = [
             inputs.nixos-wsl.nixosModules.wsl
-            # vscode-server.nixosModules.default
+            vscode-server.nixosModules.default
             ./hosts/huawei-wsl-01
           ];
         };
