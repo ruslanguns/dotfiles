@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# @describe OAuth2 token fetcher
+# @option -u --base-url <URL>      Base URL of OIDC provider
+# @option -r --realm <REALM>       Realm name
+# @option -c --client-id <ID>      Client ID
+# @option -s --client-secret <SECRET>  Client secret
+# @option -n --username <USER>     Username
+# @option -p --password <PASS>     Password
+# @option -g --grant-type <TYPE>   Grant type [default: password]
+# @option -t --token-type <TYPE>   Token type to extract [default: access_token]
+# @option -o --scope <SCOPE...>    Extra scopes (space-separated), e.g. "openid offline_access"
+# @flag   --password-stdin         Read password from stdin
+# @flag   --debug                  Show debug information
+# @flag   --interactive            Force interactive mode
+# @flag   -h --help                Print help
+
+set -euo pipefail
+
+need() { command -v "$1" >/dev/null 2>&1 || {
+  echo "Error: '$1' not found." >&2
+  exit 1
+}; }
+need argc jq
+
+eval "$(argc --argc-eval "$0" "$@")"
+
+check_gum() {
+  command -v gum >/dev/null 2>&1 || {
+    echo "Error: 'gum' is required for interactive mode." >&2
+    exit 1
+  }
+}
+
+prompt_interactive() {
+  check_gum
+  [ -z "${argc_base_url:-}" ] && argc_base_url=$(gum input --placeholder "Base URL")
+  [ -z "${argc_realm:-}" ] && argc_realm=$(gum input --placeholder "Realm")
+  [ -z "${argc_client_id:-}" ] && argc_client_id=$(gum input --placeholder "Client ID")
+  [ -z "${argc_client_secret:-}" ] && argc_client_secret=$(gum input --placeholder "Client secret (optional)" --password)
+  [ -z "${argc_username:-}" ] && argc_username=$(gum input --placeholder "Username")
+  if [ -z "${argc_password:-}" ] && [ "${argc_password_stdin:-}" != "1" ]; then
+    argc_password=$(gum input --placeholder "Password" --password)
+  fi
+  [ -z "${argc_grant_type:-}" ] && argc_grant_type=$(gum choose --selected="password" "password" "client_credentials" "authorization_code")
+  [ -z "${argc_token_type:-}" ] && argc_token_type=$(gum choose --selected="access_token" "access_token" "refresh_token" "id_token")
+  [ -z "${argc_scope:-}" ] && argc_scope=$(gum input --placeholder "Extra scopes (optional, space-separated)")
+}
+
+if [ "${argc_password_stdin:-}" = "1" ]; then
+  argc_password=$(cat)
+fi
+
+need_interactive=false
+if [ "${argc_interactive:-}" = "1" ] ||
+  [ -z "${argc_base_url:-}" ] ||
+  [ -z "${argc_realm:-}" ] ||
+  [ -z "${argc_client_id:-}" ] ||
+  [ -z "${argc_username:-}" ]; then
+  if [ -z "${argc_password:-}" ] && [ "${argc_password_stdin:-}" != "1" ]; then
+    need_interactive=true
+  fi
+fi
+$need_interactive && prompt_interactive
+
+require() { [ -n "${!1:-}" ] || {
+  echo "Error: missing argument $2" >&2
+  exit 1
+}; }
+require argc_base_url --base-url
+require argc_realm --realm
+require argc_client_id --client-id
+require argc_username --username
+require argc_password --password
+
+GRANT_TYPE=${argc_grant_type:-password}
+TOKEN_TYPE=${argc_token_type:-access_token}
+CLIENT_SECRET=${argc_client_secret:-}
+SCOPE=${argc_scope:-}
+
+TOKEN_URL="${argc_base_url}/realms/${argc_realm}/protocol/openid-connect/token"
+
+[ "${argc_debug:-0}" = "1" ] && {
+  echo "TOKEN_URL=$TOKEN_URL" >&2
+  echo "CLIENT_ID=$argc_client_id" >&2
+  echo "USERNAME=$argc_username" >&2
+  echo "SCOPE='$SCOPE'" >&2
+}
+
+post=(
+  -d "grant_type=$GRANT_TYPE"
+  -d "client_id=$argc_client_id"
+  -d "client_secret=$CLIENT_SECRET"
+  -d "username=$argc_username"
+  -d "password=$argc_password"
+)
+[ -n "$SCOPE" ] && post+=(-d "scope=$SCOPE")
+
+response=$(curl -s -w "HTTPCODE:%{http_code}" -X POST "$TOKEN_URL" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  "${post[@]}")
+
+http_code=$(printf '%s' "$response" | grep -o "HTTPCODE:[0-9]*" | cut -d: -f2)
+body=$(printf '%s' "$response" | sed 's/HTTPCODE:[0-9]*$//')
+
+if [ "$http_code" -ge 400 ]; then
+  echo "Error: HTTP $http_code" >&2
+  echo "$body" >&2
+  exit 1
+fi
+
+token=$(printf '%s' "$body" | jq -r ".${TOKEN_TYPE} // empty")
+
+if [ -n "$token" ] && [ "$token" != "null" ]; then
+  printf '%s\n' "$token"
+else
+  echo "Error: could not extract $TOKEN_TYPE" >&2
+  exit 1
+fi
