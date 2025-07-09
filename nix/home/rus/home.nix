@@ -112,6 +112,7 @@ let
     gh
     just
     argc
+    gum
 
     # Core Languages
     rustup
