@@ -1,1 +1,0 @@
-../fish-kubecolor-completions/completions/kubecolor.fish
