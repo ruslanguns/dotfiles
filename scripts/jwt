@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+# @describe JWT swiss-army knife – JSON output + signature verification
+# @arg token                 JWT (omit to read from --file or stdin)
+# @option -f --file <FILE>   Read token from file
+# @flag   -H --header        Print header JSON
+# @flag   -p --payload       Print payload JSON (default action)
+# @flag   -s --summary       Print JSON summary (alg, times, …)
+# @option -c --claim <NAME>  Extract one claim (JSON value)
+# @flag      --verify        Verify signature
+# @option     --secret <STR> Shared secret for HS256/384/512
+# @option     --pubkey <PEM> Public key for RS*/PS*/ES*
+# @flag      --raw           Compact JSON
+# @flag      --unix          Times as epoch (default ISO-8601)
+# @flag      --debug         Verbose diagnostics
+# @flag   -h --help          Show help and exit
+
+set -euo pipefail
+
+need() { command -v "$1" >/dev/null 2>&1 || {
+  echo "{\"error\":\"'$1' not found\"}" >&2
+  exit 1
+}; }
+need argc jq date openssl mktemp
+
+eval "$(argc --argc-eval "$0" "$@")"
+[ "${argc_header:-}" = 1 ] || [ "${argc_summary:-}" = 1 ] ||
+  [ -n "${argc_claim:-}" ] || [ "${argc_verify:-}" = 1 ] ||
+  argc_payload=1 # acción por defecto
+
+if [ -n "${argc_file:-}" ]; then
+  TOKEN=$(<"$argc_file")
+elif [ $# -ge 1 ]; then
+  [ "$1" = "-" ] && TOKEN=$(cat) || TOKEN="$1"
+elif [ ! -t 0 ]; then
+  TOKEN=$(cat)
+else
+  "$0" --help
+  exit 1
+fi
+TOKEN=${TOKEN//[$'\t\r\n ']/} # trim
+
+IFS='.' read -r -a PARTS <<<"$TOKEN"
+((${#PARTS[@]} >= 2)) || {
+  echo '{"error":"invalid JWT"}' >&2
+  exit 1
+}
+B64_HDR=${PARTS[0]} B64_PAY=${PARTS[1]} B64_SIG=${PARTS[2]:-}
+
+b64u2bin() { # base64url → binary
+  local s=${1//-/+}
+  s=${s//_/\/}
+  printf '%s' "$s" | base64 -d 2>/dev/null
+}
+b64u2json() { b64u2bin "$1" | jq ${argc_raw:+-c} .; }
+iso() { date -d "@$1" +%Y-%m-%dT%H:%M:%S%z 2>/dev/null || date -r "$1" +%Y-%m-%dT%H:%M:%S%z; }
+json_ts() { [ -z "$1" ] && echo null || { [ "${argc_unix:-0}" = 1 ] && echo "$1" || printf '"%s"' "$(iso "$1")"; }; }
+
+if [ "${argc_debug:-0}" = 1 ]; then
+  {
+    echo "HDR=$B64_HDR"
+    echo "PAY=$B64_PAY"
+    echo "SIG=${B64_SIG:0:16}…"
+  } >&2
+fi
+
+[ "${argc_header:-0}" = 1 ] && b64u2json "$B64_HDR"
+[ "${argc_payload:-0}" = 1 ] && b64u2json "$B64_PAY"
+
+if [ -n "${argc_claim:-}" ]; then
+  v=$(b64u2bin "$B64_PAY" | jq -r --arg k "$argc_claim" '.[$k] // empty')
+  [ -z "$v" ] && {
+    echo "{\"error\":\"claim '$argc_claim' not found\"}"
+    exit 1
+  }
+  printf '%s\n' "$v" | jq ${argc_raw:+-c} .
+fi
+
+if [ "${argc_summary:-0}" = 1 ]; then
+  hdr=$(b64u2bin "$B64_HDR")
+  pay=$(b64u2bin "$B64_PAY")
+  alg=$(jq -r '.alg // ""' <<<"$hdr")
+  typ=$(jq -r '.typ // ""' <<<"$hdr")
+  kid=$(jq -r '.kid // ""' <<<"$hdr")
+  scope=$(jq -r '.scope // ""' <<<"$pay")
+  iss=$(jq -r '.iss // ""' <<<"$pay")
+  sub=$(jq -r '.sub // ""' <<<"$pay")
+  aud=$(jq -rc '.aud // ""' <<<"$pay")
+  iat=$(jq -r '.iat // empty' <<<"$pay")
+  nbf=$(jq -r '.nbf // empty' <<<"$pay")
+  exp=$(jq -r '.exp // empty' <<<"$pay")
+  expired=false
+  [ -n "$exp" ] && (($(date +%s) >= exp)) && expired=true
+
+  jq -n \
+    --arg alg "$alg" --arg typ "$typ" --arg kid "$kid" --arg scope "$scope" \
+    --arg iss "$iss" --arg sub "$sub" --argjson aud "$aud" \
+    --argjson iat "$(json_ts "$iat")" --argjson nbf "$(json_ts "$nbf")" --argjson exp "$(json_ts "$exp")" \
+    --arg expired "$expired" '
+    def nn(x): if x=="" then null else x end;
+    {
+      alg: nn($alg), typ: nn($typ), kid: nn($kid), scope: nn($scope),
+      iss: nn($iss), sub: nn($sub), aud: nn($aud),
+      iat: $iat, nbf: $nbf, exp: $exp,
+      expired: ($expired=="true")
+    }' | jq ${argc_raw:+-c} .
+fi
+
+if [ "${argc_verify:-0}" = 1 ]; then
+  ALG=$(b64u2bin "$B64_HDR" | jq -r '.alg // empty')
+  [ -z "$ALG" ] || [ -z "$B64_SIG" ] && {
+    echo '{"verified":false,"error":"no alg or signature"}'
+    exit 1
+  }
+
+  DATA="${B64_HDR}.${B64_PAY}"
+  tmp_dat=$(mktemp)
+  printf '%s' "$DATA" >"$tmp_dat"
+  tmp_sig=$(mktemp)
+
+  ok=false
+  err="unsupported alg"
+  case "$ALG" in
+  HS256 | HS384 | HS512)
+    [ -z "${argc_secret:-}" ] && err="--secret required" || {
+      dig="sha${ALG#HS}"
+      calc=$(openssl dgst -"$dig" -mac HMAC -macopt key:"$argc_secret" -binary <"$tmp_dat" |
+        base64 | tr '+/' '-_' | tr -d '=')
+      [ "$calc" = "$B64_SIG" ] && ok=true || err="signature mismatch"
+    }
+    ;;
+  RS256 | RS384 | RS512)
+    [ -z "${argc_pubkey:-}" ] && err="--pubkey required" || {
+      dig="sha${ALG#RS}"
+      b64u2bin "$B64_SIG" >"$tmp_sig"
+      openssl dgst -"$dig" -verify "$argc_pubkey" -signature "$tmp_sig" "$tmp_dat" >/dev/null 2>&1 &&
+        ok=true || err="signature mismatch"
+    }
+    ;;
+  PS256 | PS384 | PS512)
+    [ -z "${argc_pubkey:-}" ] && err="--pubkey required" || {
+      dig="sha${ALG#PS}"
+      b64u2bin "$B64_SIG" >"$tmp_sig"
+      openssl dgst -"$dig" -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 \
+        -verify "$argc_pubkey" -signature "$tmp_sig" "$tmp_dat" >/dev/null 2>&1 &&
+        ok=true || err="signature mismatch"
+    }
+    ;;
+  ES256 | ES384 | ES512)
+    [ -z "${argc_pubkey:-}" ] && err="--pubkey required" || {
+      need python3
+      case "$ALG" in ES256) clen=32 ;; ES384) clen=48 ;; ES512) clen=66 ;; esac
+      # Convert R‖S (raw) a DER
+      python3 - "$B64_SIG" "$clen" <<'EOF' >"$tmp_sig"
+import sys,base64,struct
+b64sig,clen=sys.argv[1],int(sys.argv[2])
+raw=base64.urlsafe_b64decode(b64sig+'='*(-len(b64sig)%4))
+assert len(raw)==2*clen, "bad length"
+r,s=raw[:clen],raw[clen:]
+def der_int(i):
+    i=i.lstrip(b'\0') or b'\0'
+    if i[0]&0x80:
+        i=b'\0'+i
+    return b'\x02'+bytes([len(i)])+i
+ri,si=der_int(r),der_int(s)
+der=b'\x30'+bytes([len(ri)+len(si)])+ri+si
+sys.stdout.buffer.write(der)
+EOF
+      dig="sha${ALG#ES}"
+      openssl dgst -"$dig" -verify "$argc_pubkey" -signature "$tmp_sig" "$tmp_dat" >/dev/null 2>&1 &&
+        ok=true || err="signature mismatch"
+    }
+    ;;
+  esac
+  rm -f "$tmp_sig" "$tmp_dat"
+
+  $ok && jq -n --arg alg "$ALG" '{alg:$alg,verified:true}' \  ||
+    jq -n --arg e "$err" --arg alg "$ALG" '{alg:$alg,verified:false,error:$e}' && exit 1
+fi
