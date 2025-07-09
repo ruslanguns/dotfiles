@@ -113,13 +113,13 @@
 
       mkNixosConfiguration =
         {
-          system ? "x86_64-linux",
-          hostname ? "nixos",
-          username ? "rus",
-          win_user ? "Usuario",
+          system ? variables.default_system,
+          hostname ? variables.default_hostname,
+          username ? variables.default_username,
+          win_user ? variables.default_win_user,
+          shell ? variables.default_shell,
           serverIp ? "",
           isWSL ? false,
-          shell ? "fish",
           args ? { },
           modules,
         }:
@@ -152,7 +152,6 @@
 
       nixosConfigurations = {
         "generic" = mkNixosConfiguration {
-          system = "x86_64-linux";
           modules = [
             disko.nixosModules.disko
             ./hosts/generic
@@ -160,7 +159,6 @@
         };
 
         "px1-103" = mkNixosConfiguration {
-          system = "x86_64-linux";
           hostname = "px1-103";
           serverIp = "192.168.1.103";
           shell = "bash";
@@ -171,7 +169,6 @@
         };
 
         "px1-104" = mkNixosConfiguration {
-          system = "x86_64-linux";
           hostname = "px1-104";
           serverIp = "192.168.1.103";
           shell = "bash";
@@ -182,7 +179,6 @@
         };
 
         "px1-105" = mkNixosConfiguration {
-          system = "x86_64-linux";
           hostname = "px1-105";
           modules = [
             disko.nixosModules.disko
@@ -191,7 +187,6 @@
         };
 
         "px2-210" = mkNixosConfiguration {
-          system = "x86_64-linux";
           hostname = "px2-210";
           serverIp = "192.168.1.103";
           modules = [
@@ -201,7 +196,6 @@
         };
 
         "px2-211" = mkNixosConfiguration {
-          system = "x86_64-linux";
           hostname = "px2-211";
           serverIp = "192.168.1.103";
           modules = [

@@ -1,3 +1,7 @@
 {
-  "hello": "world"
+  "default_system": "x86_64-linux",
+  "default_hostname": "nixos",
+  "default_username": "rus",
+  "default_win_user": "Usuario",
+  "default_shell": "fish"
 }
