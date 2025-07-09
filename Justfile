@@ -23,9 +23,6 @@ nix_rebuild:
 # Rebuilds nix on the specified host 'desktop-wsl-01'
 nix_rebuild_wsl-01:
     @just _local_with_host desktop-wsl-01
-# Rebuilds nix on the specified host 'desktop-wsl-02'
-nix_rebuild_wsl-02:
-    @just _local_with_host desktop-wsl-02
 # Rebuilds nix on the remote machine 'px1-103' with target host: 'rus@192.168.1.103'
 nix_rebuild_px1-103:
     @just _remote px1-103 rus@192.168.1.103
