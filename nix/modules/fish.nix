@@ -32,8 +32,10 @@ in
       set -gx PATH $PATH $KREW_ROOT/.krew/bin;
       set -gx PATH $PATH $HOME/.krew/bin
 
-      if test -d ~/.dotfiles/scripts/
-        set -gx PATH $PATH $HOME/.dotfiles/scripts
+      set dotfiles_script_path "$HOME/.dotfiles/scripts"
+      if test -d $dotfiles_script_path
+        set -gx PATH $PATH $dotfiles_script_path
+        chmod +x $dotfiles_script_path/*
       end
 
       set NIX_MSG ${username}
@@ -52,6 +54,9 @@ in
 
       type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
       type -q ensure_nodejs; and ensure_nodejs 2>/dev/null
+
+      # argc based script completion
+      argc --argc-completions fish oauth2 | source
     '';
     functions = lib.mkMerge [
       {
