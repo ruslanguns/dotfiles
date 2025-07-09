@@ -36,6 +36,9 @@
       pull = {
         rebase = true;
       };
+      core = {
+        autocrlf = "input";
+      };
     };
   };
 }
