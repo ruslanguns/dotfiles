@@ -85,7 +85,25 @@ in
           end
         '';
         ensure_krew_plugins = ''
-          set plugins ns ctx foreach apidocs argo-apps-viz cilium count ctr df-pv kyverno kubescape resource-capacity stern view-utilization view-quotas modify-secret view-secret unused-volumes
+          set plugins \
+            ns \
+            ctx \
+            foreach \
+            apidocs \
+            argo-apps-viz \
+            cilium \
+            count \
+            ctr \
+            df-pv \
+            kyverno \
+            kubescape \
+            resource-capacity \
+            stern \
+            view-utilization \
+            view-quotas \
+            modify-secret \
+            view-secret \
+            unused-volumes
           set installed 0
 
           for plugin in $plugins
