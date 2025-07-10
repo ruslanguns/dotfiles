@@ -52,8 +52,9 @@ in
 
       set -gx PATH $PATH (fnm env --shell=fish | source)
 
-      type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
       type -q ensure_nodejs; and ensure_nodejs 2>/dev/null
+      type -q ensure_npm_packages; and ensure_npm_packages 2>/dev/null
+      type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
 
       # argc based script completion
       argc --argc-completions fish oauth2 | source
@@ -84,6 +85,38 @@ in
               fnm default 22.17.0
           end
         '';
+        ensure_npm_packages = ''
+          set packages \
+            @google/gemini-cli \
+            @angular/cli \
+            @nestjs/cli
+
+          set installed 0
+
+          if not type -q npm
+              echo "❌ [npm] npm is not installed. Please install Node.js first."
+              return 1
+          end
+
+          for package in $packages
+              set package_name (string split '@' $package)[1]
+              set package_version (string split '@' $package)[2]
+              set pattern "$package_name"
+
+              if test -n "$package_version"
+                  set pattern "$pattern@$package_version"
+              end
+
+              if not npm list -g --depth=0 | grep -q $pattern
+                  echo "📦 [npm] installing package: $package"
+                  if npm install -g $package > /dev/null 2>&1
+                      set installed (math $installed + 1)
+                  else
+                      echo "[npm] failed to install package: $package" >&2
+                  end
+              end
+          end
+        '';
         ensure_krew_plugins = ''
           set plugins \
             ns \
@@ -104,6 +137,7 @@ in
             modify-secret \
             view-secret \
             unused-volumes
+
           set installed 0
 
           for plugin in $plugins
