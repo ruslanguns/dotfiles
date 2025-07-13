@@ -86,39 +86,63 @@ in
           end
         '';
         ensure_npm_packages = ''
-          set packages \
-            @google/gemini-cli \
-            @angular/cli \
-            @nestjs/cli
+          set required_packages \
+            @google/gemini-cli
 
-          set installed 0
+          # Packages to ignore during cleanup. They will be neither installed nor uninstalled.
+          set ignored_packages \
+            npm \
+            corepack
+
+          set installed_count 0
+          set uninstalled_count 0
 
           if not type -q npm
               echo "❌ [npm] npm is not installed. Please install Node.js first."
               return 1
           end
 
-          for package in $packages
-              set package_name (string split '@' $package)[1]
-              set package_version (string split '@' $package)[2]
-              set pattern "$package_name"
-
-              if test -n "$package_version"
-                  set pattern "$pattern@$package_version"
-              end
-
-              if not npm list -g --depth=0 | grep -q $pattern
+          # --- Installation Phase ---
+          for package in $required_packages
+              if not npm list -g --depth=0 | grep -q "$package"
                   echo "📦 [npm] installing package: $package"
                   if npm install -g $package > /dev/null 2>&1
-                      set installed (math $installed + 1)
+                      set installed_count (math $installed_count + 1)
                   else
-                      echo "[npm] failed to install package: $package" >&2
+                      echo "❌ [npm] failed to install package: $package" >&2
                   end
               end
           end
+
+          # --- Cleanup Phase ---
+          set installed_packages (npm list -g --depth=0 | grep -E '^[└├]' | cut -d' ' -f2 | sed 's/@.*//')
+
+          for package in $installed_packages
+              if test -z "$package"
+                  continue
+              end
+              if contains -- "$package" $required_packages || contains -- "$package" $ignored_packages
+                  continue
+              end
+
+              echo "🗑️ [npm] uninstalling extraneous package: $package"
+              if npm uninstall -g $package > /dev/null 2>&1
+                set uninstalled_count (math $uninstalled_count + 1)
+              else
+                echo "❌ [npm] failed to uninstall package: $package" >&2
+              end
+          end
+
+          if test $installed_count -gt 0
+              echo "✅ [npm] $installed_count package(s) installed."
+          end
+          if test $uninstalled_count -gt 0
+              echo "✅ [npm] $uninstalled_count extraneous package(s) uninstalled."
+          end
         '';
         ensure_krew_plugins = ''
-          set plugins \
+          set required_plugins \
+            krew \
             ns \
             ctx \
             foreach \
@@ -138,24 +162,48 @@ in
             view-secret \
             unused-volumes
 
-          set installed 0
+          # Plugins to ignore during cleanup. They will be neither installed nor uninstalled.
+          set ignored_plugins \
+            rise/accio-token
 
-          for plugin in $plugins
-              set escaped (string escape --style=regex -- $plugin)
-              set pattern "^$escaped\$"
+          set installed_count 0
+          set uninstalled_count 0
 
-              if not krew list | grep -q $pattern
+          # --- Installation Phase ---
+          for plugin in $required_plugins
+              if not krew list | grep -q "^$plugin"'$'
                   echo "📦 [krew] installing plugin: $plugin"
                   if krew install $plugin > /dev/null 2>&1
-                      set installed (math $installed + 1)
+                      set installed_count (math $installed_count + 1)
                   else
-                      echo "[krew] failed to install plugin: $plugin" >&2
+                      echo "❌ [krew] failed to install plugin: $plugin" >&2
                   end
               end
           end
 
-          if test $installed -gt 0
-              echo "✅ [krew] $installed plugin(s) installed."
+          # --- Cleanup Phase ---
+          set installed_plugins (krew list)
+          for plugin in $installed_plugins
+              if test -z "$plugin"
+                  continue
+              end
+              if contains -- "$plugin" $required_plugins || contains -- "$plugin" $ignored_plugins
+                  continue
+              end
+
+              echo "🗑️ [krew] uninstalling extraneous plugin: $plugin"
+              if krew uninstall $plugin > /dev/null 2>&1
+                set uninstalled_count (math $uninstalled_count + 1)
+              else
+                echo "❌ [krew] failed to uninstall plugin: $plugin" >&2
+              end
+          end
+
+          if test $installed_count -gt 0
+              echo "✅ [krew] $installed_count plugin(s) installed."
+          end
+          if test $uninstalled_count -gt 0
+              echo "✅ [krew] $uninstalled_count extraneous plugin(s) uninstalled."
           end
         '';
         check_dns = ''
@@ -266,3 +314,4 @@ in
   };
 
 }
+
