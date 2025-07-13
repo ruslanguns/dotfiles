@@ -5,10 +5,11 @@
   username,
   hostname,
   shell,
+  variables,
   ...
 }:
 {
-  time.timeZone = "Europe/Madrid";
+  time.timeZone = variables.time_zone;
 
   boot.loader.grub = {
     efiSupport = true;

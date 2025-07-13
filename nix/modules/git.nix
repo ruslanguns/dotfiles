@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, variables, ... }:
 {
   programs.git = {
     enable = true;
@@ -9,8 +9,8 @@
       side-by-side = true;
       navigate = true;
     };
-    userEmail = "ruslanguns@gmail.com";
-    userName = "Ruslan Gonzalez";
+    userEmail = variables.git_user_email;
+    userName = variables.git_user_full_name;
     extraConfig = {
       # url = {
       #   "https://oauth2:${secrets.github_token}@github.com" = {

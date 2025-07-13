@@ -3,5 +3,8 @@
   "default_hostname": "nixos",
   "default_username": "rus",
   "default_win_user": "Usuario",
-  "default_shell": "fish"
+  "default_shell": "fish",
+  "git_user_email": "ruslanguns@gmail.com",
+  "git_user_full_name": "Ruslan Gonzalez",
+  "time_zone": "Europe/Madrid"
 }
