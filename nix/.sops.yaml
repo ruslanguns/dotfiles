@@ -4,7 +4,6 @@ keys:
     - &rus02 age1q0slmzl2tt9pv44f3pq5j5j3vnvgm2u5df3gzcrmsp77r69arpaskfz83s
   - &hosts
     - &desktop-wsl-01 age1jq5ghxcvfwfezgu72wtf6msqncw9kug0gu7mvkdnmlc59zqt0f4st0j7vp
-    - &desktop-wsl-02 age1euf3ypnxv99gd95yu2zwaugkczy90hnl9lv9n725vzy05r0w2c5q6ykswj
     - &px1-103 age1lpcsj5dtud3lj3n2hmhlzncqadqq7tr8pqdhax345gvgqf5sh4rq0ws55h
     - &px1-104 age10dspaveqslprje85a9w8py5s83vh4thk7pu02lp345umps8ekv2stmhrql
     - &px2-210 age1py04z7esn60auu9g3vxl3hxuvepd8409y9epvtvhzuw7djqmsy9q9z7gme
@@ -16,7 +15,6 @@ creation_rules:
           - *rus01
           - *rus02
           - *desktop-wsl-01
-          - *desktop-wsl-02
           - *huawei-wsl-01
   - path_regex: ^modules/k3s/k3s-secrets\.yaml$
     key_groups:
