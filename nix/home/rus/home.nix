@@ -109,6 +109,7 @@ let
     apacheHttpd
     sshpass
     _1password-cli
+    bitwarden-cli
     aichat
 
     # Key Tools
