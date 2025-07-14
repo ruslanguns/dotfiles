@@ -55,6 +55,7 @@ in
       type -q ensure_nodejs; and ensure_nodejs 2>/dev/null
       type -q ensure_npm_packages; and ensure_npm_packages 2>/dev/null
       type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
+      type -q ensure_rust_toolchain; and ensure_rust_toolchain 2>/dev/null
 
       # argc based script completion
       argc --argc-completions fish oauth2 | source
@@ -73,6 +74,22 @@ in
         '';
         kubectl = "kubecolor $argv";
         justnix = "just -f ~/.dotfiles/Justfile $argv";
+        ensure_rust_toolchain = ''
+          if not type -q rustup
+            echo "❌ [rustup] rustup is not installed. Please install rustup first."
+            return 1
+          end
+
+          if not rustup toolchain list | grep -q "stable"
+            echo "📦 [rustup] installing stable toolchain"
+            rustup toolchain install stable
+          end
+
+          if not rustup default | grep -q "stable"
+            echo "🔧 [rustup] setting stable as default toolchain"
+            rustup default stable
+          end
+        '';
         ensure_nodejs = ''
           if not fnm list | grep -q "v22.17.0"
               echo "📦 [fnm] Installing Node.js v22.17.0"
@@ -87,7 +104,9 @@ in
         '';
         ensure_npm_packages = ''
           set required_packages \
-            @google/gemini-cli
+            @google/gemini-cli \
+            markdown-toc \
+            @biomejs/biome
 
           # Packages to ignore during cleanup. They will be neither installed nor uninstalled.
           set ignored_packages \
@@ -314,4 +333,3 @@ in
   };
 
 }
-
