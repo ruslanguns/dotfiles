@@ -56,6 +56,7 @@ in
       type -q ensure_npm_packages; and ensure_npm_packages 2>/dev/null
       type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
       type -q ensure_rust_toolchain; and ensure_rust_toolchain 2>/dev/null
+      type -q ensure_luarocks_packages; and ensure_luarocks_packages 2>/dev/null
 
       # argc based script completion
       argc --argc-completions fish oauth2 | source
@@ -74,6 +75,62 @@ in
         '';
         kubectl = "kubecolor $argv";
         justnix = "just -f ~/.dotfiles/Justfile $argv";
+        ensure_luarocks_packages = ''
+          set required_packages \
+            tiktoken_core
+
+          set ignored_packages
+
+          set installed_count 0
+          set uninstalled_count 0
+
+          if not type -q luarocks
+              echo "❌ [luarocks] luarocks is not installed. Please install luarocks first."
+              return 1
+          end
+
+          set -l current_value (luarocks config local_by_default | string trim)
+          if test "$current_value" != "true"
+              echo "🔧 [luarocks] setting local_by_default to true"
+              luarocks config local_by_default true
+          end
+
+          for package in $required_packages
+              if not luarocks list --porcelain | grep -q "^$package\s"
+                  echo "📦 [luarocks] installing package: $package"
+                  if luarocks install $package > /dev/null 2>&1
+                      set installed_count (math $installed_count + 1)
+                  else
+                      echo "❌ [luarocks] failed to install package: $package" >&2
+                  end
+              end
+          end
+
+          set installed_packages (luarocks list --porcelain | cut -f1 | uniq)
+
+          for package in $installed_packages
+              if test -z "$package"
+                  continue
+              end
+              if contains -- "$package" $required_packages || contains -- "$package" $ignored_packages
+                  continue
+              end
+
+              echo "🗑️ [luarocks] uninstalling extraneous package: $package"
+              if luarocks remove --force $package > /dev/null 2>&1
+                set uninstalled_count (math $uninstalled_count + 1)
+              else
+                echo "❌ [luarocks] failed to uninstall package: $package" >&2
+              end
+          end
+
+          if test $installed_count -gt 0
+              echo "✅ [luarocks] $installed_count package(s) installed."
+          end
+          if test $uninstalled_count -gt 0
+              echo "✅ [luarocks] $uninstalled_count extraneous package(s) uninstalled."
+          end
+        '';
         ensure_rust_toolchain = ''
           if not type -q rustup
             echo "❌ [rustup] rustup is not installed. Please install rustup first."
@@ -108,7 +165,6 @@ in
             markdown-toc \
             @biomejs/biome
 
-          # Packages to ignore during cleanup. They will be neither installed nor uninstalled.
           set ignored_packages \
             npm \
             corepack
@@ -121,7 +177,6 @@ in
               return 1
           end
 
-          # --- Installation Phase ---
           for package in $required_packages
               if not npm list -g --depth=0 | grep -q "$package"
                   echo "📦 [npm] installing package: $package"
@@ -133,7 +188,6 @@ in
               end
           end
 
-          # --- Cleanup Phase ---
           set installed_packages (npm list -g --depth=0 | grep -E '^[└├]' | cut -d' ' -f2 | sed 's/@.*//')
 
           for package in $installed_packages
@@ -181,14 +235,12 @@ in
             view-secret \
             unused-volumes
 
-          # Plugins to ignore during cleanup. They will be neither installed nor uninstalled.
           set ignored_plugins \
             rise/accio-token
 
           set installed_count 0
           set uninstalled_count 0
 
-          # --- Installation Phase ---
           for plugin in $required_plugins
               if not krew list | grep -q "^$plugin"'$'
                   echo "📦 [krew] installing plugin: $plugin"
@@ -200,7 +252,6 @@ in
               end
           end
 
-          # --- Cleanup Phase ---
           set installed_plugins (krew list)
           for plugin in $installed_plugins
               if test -z "$plugin"
