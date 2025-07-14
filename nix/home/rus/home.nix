@@ -75,10 +75,13 @@ let
     python313Packages.polars
     python313Packages.deltalake
     python313Packages.python-keycloak
+    python313Packages.markdown-it-py
+    python313Packages.pylatexenc
     go
     bun
     fzf
     lua51Packages.luarocks-nix
+    lua51Packages.tiktoken_core
     lua51Packages.lua
     fnm
     biome
@@ -117,6 +120,9 @@ let
     # Core Languages
     rustup
     julia
+    ruby
+    php
+    php84Packages.composer
 
     # Rust Tools
     cargo-cache
@@ -134,6 +140,7 @@ let
     nodePackages.yaml-language-server
     nil
     marksman
+    markdownlint-cli2
 
     # Formatters and Linters
     alejandra
@@ -146,6 +153,10 @@ let
     markdownlint-cli2
     sqlfluff
     stylua
+    gofumpt
+    gosimports
+    sql-formatter
+    ast-grep
 
     # Security and Encryption
     openssl
@@ -189,6 +200,14 @@ let
     gnupg
     gnumake
     gettext
+    viu
+    chafa
+    ueberzugpp
+    imagemagick
+    ghostscript
+    tectonic
+    mermaid-cli
+    lynx
 
     # System Tools
     glib
