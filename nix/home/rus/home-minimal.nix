@@ -53,7 +53,7 @@ in
     nix-index-database.comma.enable = true;
     bash.enable = true;
     lsd.enable = true;
-    lsd.enableAliases = true;
+    lsd.enableFishIntegration = true;
     zoxide.enable = true;
     zoxide.enableBashIntegration = true;
     zoxide.options = [ "--cmd cd" ];
