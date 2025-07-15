@@ -57,25 +57,8 @@ let
     nixfmt-rfc-style
     neovim
     python313
-    python313Packages.notebook
-    python313Packages.ipython
-    python313Packages.ipykernel
-    python313Packages.jupyter
-    python313Packages.jupyterlab
-    python313Packages.jupyter-lsp
-    python313Packages.jupyter-core
-    python313Packages.jupyterlab-lsp
-    python313Packages.jupyterlab-git
-    python313Packages.jupyterlab-widgets
-    python313Packages.pip
-    python313Packages.numpy
-    python313Packages.pandas
-    python313Packages.matplotlib
-    python313Packages.cookiecutter
-    python313Packages.polars
-    python313Packages.deltalake
-    python313Packages.python-keycloak
     python313Packages.markdown-it-py
+    python313Packages.ipython
     python313Packages.pylatexenc
     go
     bun
@@ -245,7 +228,7 @@ in
 
     fzf.enableFishIntegration = true;
     lsd.enable = true;
-    lsd.enableAliases = true;
+    lsd.enableFishIntegration = true;
     zoxide.enable = true;
     zoxide.enableFishIntegration = true;
     zoxide.options = [ "--cmd cd" ];
