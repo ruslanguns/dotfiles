@@ -5,10 +5,10 @@
 }:
 {
   imports = [
-    ../../common
     ./../../modules/nix-common.nix
     ./../../modules/users.nix
     ./../../modules/wsl.nix
+    ./../../modules/sops.nix
   ];
 
   users.mutableUsers = false;
