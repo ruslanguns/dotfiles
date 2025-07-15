@@ -200,7 +200,7 @@ let
 in
 {
   imports = [
-    nix-index-database.hmModules.nix-index
+    nix-index-database.homeModules.nix-index
     ../../modules/zellij.nix
     ../../modules/starship.nix
     ../../modules/tmux.nix
