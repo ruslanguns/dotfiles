@@ -1,6 +1,5 @@
 {
   pkgs,
-  win_user,
   username,
   lib,
   isWSL,
