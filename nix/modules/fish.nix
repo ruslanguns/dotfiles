@@ -67,7 +67,7 @@ in
           set lock_dir "/tmp/fish_packages_check.lock"
           set log_file "/tmp/fish_packages_check.log"
 
-          if not mkdir "$lock_dir"
+          if not mkdir "$lock_dir" >/dev/null 2>&1
             return 0 # Another check is already running, exit silently.
           end
 
