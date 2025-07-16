@@ -50,19 +50,43 @@ in
       set PATH "/home/${username}/.local/share/fnm" $PATH
       fnm env | source
 
-      set -gx PATH $PATH (fnm env --shell=fish | source)
-
-      type -q ensure_nodejs; and ensure_nodejs 2>/dev/null
-      type -q ensure_npm_packages; and ensure_npm_packages 2>/dev/null
-      type -q ensure_krew_plugins; and ensure_krew_plugins 2>/dev/null
-      type -q ensure_rust_toolchain; and ensure_rust_toolchain 2>/dev/null
-      type -q ensure_luarocks_packages; and ensure_luarocks_packages 2>/dev/null
-
       # argc based script completion
       argc --argc-completions fish oauth2 | source
+
+      function run_package_check_once --on-event fish_prompt
+          if not set -q __fish_package_check_started
+              set -g __fish_package_check_started
+              fish -c "ensure_all_packages_background" &; disown
+          end
+          functions --erase run_package_check_once
+      end
     '';
     functions = lib.mkMerge [
       {
+        ensure_all_packages_background = ''
+          set lock_dir "/tmp/fish_packages_check.lock"
+          set log_file "/tmp/fish_packages_check.log"
+
+          if not mkdir "$lock_dir"
+            return 0 # Another check is already running, exit silently.
+          end
+
+          begin
+            echo "🚀 Starting background package check at $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "---"
+
+            type -q ensure_nodejs; and ensure_nodejs
+            type -q ensure_npm_packages; and ensure_npm_packages
+            type -q ensure_krew_plugins; and ensure_krew_plugins
+            type -q ensure_rust_toolchain; and ensure_rust_toolchain
+            type -q ensure_luarocks_packages; and ensure_luarocks_packages
+
+            echo "---"
+            echo "✅ Background package check finished at $(date '+%Y-%m-%d %H:%M:%S')"
+          end > "$log_file"
+
+          rmdir "$lock_dir"
+        '';
         refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
         take = ''mkdir -p -- "$1" && cd -- "$1"'';
         ttake = "cd $(mktemp -d)";
@@ -98,10 +122,10 @@ in
           for package in $required_packages
               if not luarocks list --porcelain | grep -q "^$package\s"
                   echo "📦 [luarocks] installing package: $package"
-                  if luarocks install $package > /dev/null 2>&1
+                  if luarocks install $package
                       set installed_count (math $installed_count + 1)
                   else
-                      echo "❌ [luarocks] failed to install package: $package" >&2
+                      echo "❌ [luarocks] failed to install package: $package"
                   end
               end
           end
@@ -117,10 +141,10 @@ in
               end
 
               echo "🗑️ [luarocks] uninstalling extraneous package: $package"
-              if luarocks remove --force $package > /dev/null 2>&1
+              if luarocks remove --force $package
                 set uninstalled_count (math $uninstalled_count + 1)
               else
-                echo "❌ [luarocks] failed to uninstall package: $package" >&2
+                echo "❌ [luarocks] failed to uninstall package: $package"
               end
           end
 
@@ -183,12 +207,12 @@ in
                   if npm install -g $package > /dev/null 2>&1
                       set installed_count (math $installed_count + 1)
                   else
-                      echo "❌ [npm] failed to install package: $package" >&2
+                      echo "❌ [npm] failed to install package: $package"
                   end
               end
           end
 
-          set installed_packages (npm list -g --depth=0 | grep -E '^[└├]' | cut -d' ' -f2 | sed 's/@.*//')
+          set installed_packages (npm list -g --depth=0 | grep -E '^[└├]' | sed -e 's/^.*── //' -e 's/ @[0-9][^ ]*$//' -e 's/@[0-9][^ ]*$//' | string trim)
 
           for package in $installed_packages
               if test -z "$package"
@@ -202,7 +226,7 @@ in
               if npm uninstall -g $package > /dev/null 2>&1
                 set uninstalled_count (math $uninstalled_count + 1)
               else
-                echo "❌ [npm] failed to uninstall package: $package" >&2
+                echo "❌ [npm] failed to uninstall package: $package"
               end
           end
 
@@ -247,7 +271,7 @@ in
                   if krew install $plugin > /dev/null 2>&1
                       set installed_count (math $installed_count + 1)
                   else
-                      echo "❌ [krew] failed to install plugin: $plugin" >&2
+                      echo "❌ [krew] failed to install plugin: $plugin"
                   end
               end
           end
@@ -265,7 +289,7 @@ in
               if krew uninstall $plugin > /dev/null 2>&1
                 set uninstalled_count (math $uninstalled_count + 1)
               else
-                echo "❌ [krew] failed to uninstall plugin: $plugin" >&2
+                echo "❌ [krew] failed to uninstall plugin: $plugin"
               end
           end
 
