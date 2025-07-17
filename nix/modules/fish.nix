@@ -62,6 +62,7 @@ in
     '';
     functions = lib.mkMerge [
       {
+        # Orchestrator function that handles shell context
         ensure_all_packages_background = ''
           set lock_dir "/tmp/fish_packages_check.lock"
           set log_file "/tmp/fish_packages_check.log"
@@ -70,22 +71,34 @@ in
             return 0 # Another check is already running, exit silently.
           end
 
+          # Use a subshell to redirect all output to the log file
           begin
             echo "🚀 Starting background package check at $(date '+%Y-%m-%d %H:%M:%S')"
             echo "---"
 
-            type -q ensure_nodejs; and ensure_nodejs
-            type -q ensure_npm_packages; and ensure_npm_packages
-            type -q ensure_krew_plugins; and ensure_krew_plugins
-            type -q ensure_rust_toolchain; and ensure_rust_toolchain
-            type -q ensure_luarocks_packages; and ensure_luarocks_packages
+            # Step 1: Ensure Node.js version is installed via the bash script
+            command -v ensure-nodejs &> /dev/null; and ensure-nodejs
+
+            # Step 2: IMPORTANT - Source fnm into the CURRENT fish context
+            # This makes 'npm' available for subsequent scripts.
+            if command -v fnm &> /dev/null
+              fnm env | source
+            end
+
+            # Step 3: Now run the other scripts that depend on the context
+            command -v ensure-npm-packages &> /dev/null; and ensure-npm-packages
+            command -v ensure-krew-plugins &> /dev/null; and ensure-krew-plugins
+            command -v ensure-rust-toolchain &> /dev/null; and ensure-rust-toolchain
+            command -v ensure-luarocks-packages &> /dev/null; and ensure-luarocks-packages
 
             echo "---"
             echo "✅ Background package check finished at $(date '+%Y-%m-%d %H:%M:%S')"
-          end > "$log_file"
+          end > "$log_file" 2>&1
 
           rmdir "$lock_dir"
         '';
+
+        # Utility functions that MUST remain as fish functions
         refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
         take = ''mkdir -p -- "$1" && cd -- "$1"'';
         ttake = "cd $(mktemp -d)";
@@ -98,223 +111,7 @@ in
         '';
         kubectl = "kubecolor $argv";
         justnix = "just -f ~/.dotfiles/Justfile $argv";
-        ensure_luarocks_packages = ''
-          set required_packages \
-            tiktoken_core
-
-          set ignored_packages
-
-          set installed_count 0
-          set uninstalled_count 0
-
-          if not type -q luarocks
-              echo "❌ [luarocks] luarocks is not installed. Please install luarocks first."
-              return 1
-          end
-
-          set -l current_value (luarocks config local_by_default | string trim)
-          if test "$current_value" != "true"
-              echo "🔧 [luarocks] setting local_by_default to true"
-              luarocks config local_by_default true
-          end
-
-          for package in $required_packages
-              if not luarocks list --porcelain | grep -q "^$package\s"
-                  echo "📦 [luarocks] installing package: $package"
-                  if luarocks install $package
-                      set installed_count (math $installed_count + 1)
-                  else
-                      echo "❌ [luarocks] failed to install package: $package"
-                  end
-              end
-          end
-
-          set installed_packages (luarocks list --porcelain | cut -f1 | uniq)
-
-          for package in $installed_packages
-              if test -z "$package"
-                  continue
-              end
-              if contains -- "$package" $required_packages || contains -- "$package" $ignored_packages
-                  continue
-              end
-
-              echo "🗑️ [luarocks] uninstalling extraneous package: $package"
-              if luarocks remove --force $package
-                set uninstalled_count (math $uninstalled_count + 1)
-              else
-                echo "❌ [luarocks] failed to uninstall package: $package"
-              end
-          end
-
-          if test $installed_count -gt 0
-              echo "✅ [luarocks] $installed_count package(s) installed."
-          end
-          if test $uninstalled_count -gt 0
-              echo "✅ [luarocks] $uninstalled_count extraneous package(s) uninstalled."
-          end
-        '';
-        ensure_rust_toolchain = ''
-          if not type -q rustup
-            echo "❌ [rustup] rustup is not installed. Please install rustup first."
-            return 1
-          end
-
-          if not rustup toolchain list | grep -q "stable"
-            echo "📦 [rustup] installing stable toolchain"
-            rustup toolchain install stable
-          end
-
-          if not rustup default | grep -q "stable"
-            echo "🔧 [rustup] setting stable as default toolchain"
-            rustup default stable
-          end
-        '';
-        ensure_nodejs = ''
-          if not fnm list | grep -q "v22.17.0"
-              echo "📦 [fnm] Installing Node.js v22.17.0"
-              fnm install 22.17.0
-              echo "✅ [fnm] Node.js v22.17.0 is already installed"
-          end
-
-          if not test (fnm current) = "v22.17.0"
-              echo "🔧 Setting Node.js v22.17.0 as default"
-              fnm default 22.17.0
-          end
-        '';
-        ensure_npm_packages = ''
-          set required_packages \
-            @google/gemini-cli \
-            markdown-toc \
-            @biomejs/biome
-
-          set ignored_packages \
-            npm \
-            corepack
-
-          set installed_count 0
-          set uninstalled_count 0
-
-          if not type -q npm
-              echo "❌ [npm] npm is not installed. Please install Node.js first."
-              return 1
-          end
-
-          for package in $required_packages
-              if not npm list -g --depth=0 | grep -q "$package"
-                  echo "📦 [npm] installing package: $package"
-                  if npm install -g $package > /dev/null 2>&1
-                      set installed_count (math $installed_count + 1)
-                  else
-                      echo "❌ [npm] failed to install package: $package"
-                  end
-              end
-          end
-
-          set installed_packages (npm list -g --depth=0 | grep -E '^[└├]' | sed -e 's/^.*── //' -e 's/ @[0-9][^ ]*$//' -e 's/@[0-9][^ ]*$//' | string trim)
-
-          for package in $installed_packages
-              if test -z "$package"
-                  continue
-              end
-              if contains -- "$package" $required_packages || contains -- "$package" $ignored_packages
-                  continue
-              end
-
-              echo "🗑️ [npm] uninstalling extraneous package: $package"
-              if npm uninstall -g $package > /dev/null 2>&1
-                set uninstalled_count (math $uninstalled_count + 1)
-              else
-                echo "❌ [npm] failed to uninstall package: $package"
-              end
-          end
-
-          if test $installed_count -gt 0
-              echo "✅ [npm] $installed_count package(s) installed."
-          end
-          if test $uninstalled_count -gt 0
-              echo "✅ [npm] $uninstalled_count extraneous package(s) uninstalled."
-          end
-        '';
-        ensure_krew_plugins = ''
-          set required_plugins \
-            krew \
-            ns \
-            ctx \
-            foreach \
-            apidocs \
-            argo-apps-viz \
-            cilium \
-            count \
-            ctr \
-            df-pv \
-            kyverno \
-            kubescape \
-            resource-capacity \
-            stern \
-            view-utilization \
-            view-quotas \
-            modify-secret \
-            view-secret \
-            unused-volumes
-
-          set ignored_plugins \
-            rise/accio-token
-
-          set installed_count 0
-          set uninstalled_count 0
-
-          for plugin in $required_plugins
-              if not krew list | grep -q "^$plugin"'$'
-                  echo "📦 [krew] installing plugin: $plugin"
-                  if krew install $plugin > /dev/null 2>&1
-                      set installed_count (math $installed_count + 1)
-                  else
-                      echo "❌ [krew] failed to install plugin: $plugin"
-                  end
-              end
-          end
-
-          set installed_plugins (krew list)
-          for plugin in $installed_plugins
-              if test -z "$plugin"
-                  continue
-              end
-              if contains -- "$plugin" $required_plugins || contains -- "$plugin" $ignored_plugins
-                  continue
-              end
-
-              echo "🗑️ [krew] uninstalling extraneous plugin: $plugin"
-              if krew uninstall $plugin > /dev/null 2>&1
-                set uninstalled_count (math $uninstalled_count + 1)
-              else
-                echo "❌ [krew] failed to uninstall plugin: $plugin"
-              end
-          end
-
-          if test $installed_count -gt 0
-              echo "✅ [krew] $installed_count plugin(s) installed."
-          end
-          if test $uninstalled_count -gt 0
-              echo "✅ [krew] $uninstalled_count extraneous plugin(s) uninstalled."
-          end
-        '';
-        check_dns = ''
-          set domain $argv[1]
-          if test -z "$domain"
-              echo "❌ Usage: check_dns <domain>"
-              return 1
-          end
-
-          set output (nslookup $domain 2>&1)
-          if echo $output | grep -q "can't find\|NXDOMAIN\|No answer"
-              echo "❌ $domain"
-          else
-              echo "✅ $domain"
-          end
-        '';
       }
-
     ];
 
     shellAbbrs =

@@ -207,6 +207,7 @@ in
     ../../modules/tmux.nix
     ../../modules/git.nix
     ../../modules/fish.nix
+    ../../packages
   ];
 
   home.stateVersion = "25.05";
