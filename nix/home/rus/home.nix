@@ -159,6 +159,7 @@ let
     socat
     nmap
     ipcalc
+    traceroute
 
     # VPN Tools
     openfortivpn
