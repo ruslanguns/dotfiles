@@ -229,13 +229,13 @@ in
   # Add a 'pux' command to the environment.
   # This script uses zoxide to find a project directory and attaches to a
   # tmux session named after that project, creating it if it doesn't exist.
-  home.packages = [
-    (pkgs.writeShellApplication {
+  home.packages = with pkgs; [
+    (writeShellApplication {
       name = "pux";
       runtimeInputs = [
-        pkgs.tmux
-        pkgs.zoxide
-        pkgs.coreutils
+        tmux
+        zoxide
+        coreutils
       ];
       text = ''
         PRJ="$(zoxide query -i)"
@@ -248,6 +248,49 @@ in
         SOCKET_PATH="/tmp/tmux-$(echo -n "$PRJ" | md5sum | cut -d' ' -f1)"
         # Attach to the session, creating it if it doesn't exist.
         cd "$PRJ" && exec tmux -S "$SOCKET_PATH" new-session -A -s "$(basename "$PRJ")"
+      '';
+    })
+    (writeShellApplication {
+      name = "psw";
+      runtimeInputs = [
+        tmux
+        fzf
+        findutils
+        gawk
+      ];
+      text = ''
+        # Find all tmux sockets in /tmp, excluding the default tmate socket.
+        # Redirect stderr to /dev/null to suppress permission errors for sockets owned by other users.
+        SOCKETS=$(find /tmp -name "tmux-*" -type s -not -path "*tmate*" 2>/dev/null)
+        if [ -z "$SOCKETS" ]; then
+            tmux display-message "No other tmux sessions found"
+            exit 0
+        fi
+
+        # List all sessions from all sockets, formatted for fzf.
+        SESSIONS=$(for s in $SOCKETS; do
+            # Format: "session_name (socket_name)"
+            # The tmux command already redirects stderr, so it won't fail on sockets it can't access.
+            tmux -S "$s" list-sessions -F "#{session_name} (#{socket_path}:#{session_id})" 2>/dev/null | awk -v socket="$s" '{print $0 "	" socket}'
+        done)
+
+        # Let the user choose a session via fzf.
+        CHOICE=$(echo -e "$SESSIONS" | fzf --prompt="Switch Session> ")
+        if [ -z "$CHOICE" ]; then
+            exit 0
+        fi
+
+        # Extract the session ID and the socket path from the choice.
+        SOCKET_PATH=$(echo "$CHOICE" | cut -f2)
+        SESSION_PART=$(echo "$CHOICE" | cut -f1)
+        SESSION_ID=$(echo "$SESSION_PART" | sed -E 's/.*:(\$[^)]*)\).*/\1/')
+
+        # Switch the client to the selected session.
+        if [ -n "$SESSION_ID" ] && [ -n "$SOCKET_PATH" ]; then
+            tmux -S "$SOCKET_PATH" switch-client -t "$SESSION_ID"
+        else
+            tmux display-message "Error: Could not parse session details."
+        fi
       '';
     })
   ];
