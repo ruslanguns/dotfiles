@@ -7,7 +7,7 @@
 }:
 let
   unstable-packages = with pkgs.unstable; [
-    # Utilities
+    # CLI Utilities
     bat
     bottom
     coreutils
@@ -16,6 +16,7 @@ let
     fd
     findutils
     fx
+    fzf
     git
     git-crypt
     htop
@@ -30,173 +31,175 @@ let
     vim
     wget
     zip
-    json-schema-for-humans
     xclip
     xorg.xauth
 
-    # Kubernetes
+    # Kubernetes & Cloud
+    cilium-cli
+    fluxcd
     k9s
-    kubernetes-helm
-    krew
+    kind
+    kubebuilder
+    kubecolor
     kubectl
     kustomize
-    kubecolor
     kubeval
+    kubernetes-helm
+    krew
     operator-sdk
-    kubebuilder
-    fluxcd
-    kind
-    cilium-cli
-    terragrunt
     opentofu
+    terragrunt
     terraform
     terraformer
 
-    # Development Tools
-    deno
-    nixfmt-rfc-style
-    neovim
-    python313
-    python313Packages.markdown-it-py
-    python313Packages.ipython
-    python313Packages.pylatexenc
-    go
+    # Development
+    biome
     bun
-    fzf
+    deno
+    fnm
+    go
+    jdk
+    neovim
+    nixfmt-rfc-style
+    python313
+    python313Packages.ipython
+    python313Packages.markdown-it-py
+    python313Packages.pylatexenc
     lua51Packages.luarocks-nix
     lua51Packages.tiktoken_core
     lua51Packages.lua
-    fnm
-    biome
-    jdk
-    esptool
-    picocom
-    mpremote
-    libusbp
-    openocd
+
+    # Build Tools
     cmake
     ninja
+
+    # Hardware & Embedded
+    esptool
+    libusbp
+    mpremote
+    openocd
+    picocom
+
+    # GIS
     osmium-tool
-    tilemaker
     osmctools
+    tilemaker
+
+    # Documents
+    json-schema-for-humans
   ];
 
   stable-packages = with pkgs; [
-    # Productivity
-    mdcat
-    httpie
-    lazygit
-    pass
-    kubeseal
-    stern
-    apacheHttpd
-    sshpass
+    # CLI Utilities & Productivity
     _1password-cli
-    bitwarden-cli
     aichat
-
-    # Key Tools
-    gh
-    just
     argc
+    bitwarden-cli
+    btop
+    cowsay
+    file
+    gawk
+    gdu
+    gettext
+    gh
+    gnumake
+    gnupg
+    gnused
+    gnutar
     gum
+    httpie
+    iftop
+    just
+    lazygit
+    lsof
+    ltrace
+    lynx
+    mdcat
+    pass
+    speedtest-cli
+    sshpass
+    stern
+    strace
+    which
+    yq-go
+    zstd
 
-    # Core Languages
-    rustup
+    # Development
+    # Languages
     julia
-    ruby
     php
     php84Packages.composer
-
+    ruby
+    rustup
     # Rust Tools
     cargo-cache
     cargo-expand
-
-    # Local Development
+    # Local Dev
     mkcert
-    httpie
-
-    # Treesitter
-    tree-sitter
-
-    # Language Servers
+    # Language Servers & Tooling
+    marksman
+    nil
     nodePackages.vscode-langservers-extracted
     nodePackages.yaml-language-server
-    nil
-    marksman
-    markdownlint-cli2
-
-    # Formatters and Linters
+    tree-sitter
+    # Formatters & Linters
     alejandra
+    ast-grep
     deadnix
+    gofumpt
+    gosimports
+    markdownlint-cli2
+    nixpkgs-fmt
     nodePackages.prettier
     shellcheck
     shfmt
-    statix
-    nixpkgs-fmt
-    markdownlint-cli2
-    sqlfluff
-    stylua
-    gofumpt
-    gosimports
     sql-formatter
-    ast-grep
+    sqlfluff
+    statix
+    stylua
 
-    # Security and Encryption
-    openssl
-    xmlsec
-    libxml2
-    age
-    ssh-to-age
-    sops
+    # Kubernetes
+    kubeseal
 
-    # Network Tools
-    mtr
-    iperf3
-    dnsutils
-    ldns
+    # Networking
+    apacheHttpd
     aria2
-    socat
-    nmap
+    dnsutils
     ipcalc
+    iperf3
+    ldns
+    mtr
+    nmap
+    socat
     traceroute
 
-    # VPN Tools
+    # VPN
     openfortivpn
-    wireguard-tools
     openvpn
+    wireguard-tools
 
-    # Miscellaneous
-    speedtest-cli
-    gdu
-    lsof
-    ltrace
-    strace
-    btop
-    iftop
-    yq-go
-    cowsay
-    file
-    which
-    gnused
-    gnutar
-    gawk
-    zstd
-    gnupg
-    gnumake
-    gettext
-    viu
+    # Security
+    age
+    libxml2
+    openssl
+    sops
+    ssh-to-age
+    xmlsec
+
+    # Media & Images
     chafa
-    ueberzugpp
-    imagemagick
     ghostscript
-    tectonic
-    mermaid-cli
-    lynx
+    imagemagick
+    ueberzugpp
+    viu
 
-    # System Tools
-    glib
+    # Documents
+    mermaid-cli
+    tectonic
+
+    # System
     gcc
+    glib
   ];
 in
 {
