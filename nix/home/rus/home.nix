@@ -177,6 +177,7 @@ let
     openfortivpn
     openvpn
     wireguard-tools
+    tailscale
 
     # Security
     age
