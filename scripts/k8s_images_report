@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# Collect all outputs and format the table
+{
+  # Print the headers
+  echo -e "Type\tName\tReplicas\tContainer\tImage Registry\tImage Version"
+
+  # Function to process containers
+  process_container() {
+    local type=$1
+    kubectl get "$type" -o json | jq -r --arg type "$type" '
+      .items[] |
+      if $type == "CronJob" then
+        {
+          type: $type,
+          name: .metadata.name,
+          replicas: 1,
+          containers: .spec.jobTemplate.spec.template.spec.containers
+        }
+      else
+        {
+          type: $type,
+          name: .metadata.name,
+          replicas: (.spec.replicas // 1),
+          containers: .spec.template.spec.containers
+        }
+      end |
+      .containers[] as $container |
+      (
+        $container.image | capture("^(?<registry>[^@:]+)([:@](?<version>.*))?$")
+      ) as $img |
+      {
+        type: .type,
+        name: .name,
+        replicas: (.replicas | tostring),
+        container: $container.name,
+        image_registry: $img.registry,
+        image_version: ($img.version // "latest")
+      } |
+      [
+        .type,
+        .name,
+        .replicas,
+        .container,
+        .image_registry,
+        .image_version
+      ] |
+      @tsv'
+  }
+
+  # Call the function for each container type
+  process_container "Deployment"
+  process_container "StatefulSet"
+  process_container "DaemonSet"
+  process_container "CronJob"
+} | column -t -s $'\t'

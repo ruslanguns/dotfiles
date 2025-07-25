@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# Collect all outputs and format the table
+{
+  # Print the headers
+  echo -e "Type\tName\tReplicas\tContainer\tCPU (R)\tMemory (R)\tCPU (L)\tMemory (L)"
+
+  # Function to process containers
+  process_container() {
+    local type=$1
+    kubectl get "$type" -o json | jq -r --arg type "$type" '
+        .items[] |
+        if $type == "CronJob" then
+            {
+                type: $type,
+                name: .metadata.name,
+                replicas: 1,
+                containers: .spec.jobTemplate.spec.template.spec.containers
+            }
+        else
+            {
+                type: $type,
+                name: .metadata.name,
+                replicas: (if .spec.replicas then .spec.replicas else 1 end),
+                containers: .spec.template.spec.containers
+            }
+        end |
+        .containers[] as $container |
+        {
+            type: .type,
+            name: .name,
+            replicas: (.replicas | tostring),
+            container: $container.name,
+            cpu_requested: (if $container.resources.requests.cpu then $container.resources.requests.cpu else "N/A" end),
+            memory_requested: (if $container.resources.requests.memory then $container.resources.requests.memory else "N/A" end),
+            cpu_limit: (if $container.resources.limits.cpu then $container.resources.limits.cpu else "N/A" end),
+            memory_limit: (if $container.resources.limits.memory then $container.resources.limits.memory else "N/A" end)
+        } |
+        [
+            .type,
+            .name,
+            .replicas,
+            .container,
+            .cpu_requested,
+            .memory_requested,
+            .cpu_limit,
+            .memory_limit
+        ] |
+        @tsv'
+  }
+
+  # Call the function for each container type
+  process_container "Deployment"
+  process_container "StatefulSet"
+  process_container "DaemonSet"
+  process_container "CronJob"
+} | column -t -s $'\t'
