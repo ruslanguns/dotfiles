@@ -186,5 +186,34 @@ The Fish shell is configured for a productive environment, integrating tightly w
 
 **Aliases and Abbreviations:**
 
-- A rich set of abbreviations (`abbr`) are defined for common commands (e.g., `git`, `tmux`, navigation).
+- A rich set of abbreviations (`abbr`) are defined for common commands (e.g., `tmux`, navigation).
 - Platform-specific aliases are provided for clipboard utilities (`xcopy`/`xpaste`) and file explorers.
+
+**Git Shortcuts:**
+
+| Abbr    | Command                               | Description                                                 |
+| :------ | :------------------------------------ | :---------------------------------------------------------- |
+| `ga`    | `git add`                             | Add file contents to the index.                             |
+| `gaa`   | `git add --all`                       | Add all changes to the index.                               |
+| `gapa`  | `git add --patch`                     | Interactively stage hunks of code.                          |
+| `gc`    | `git commit`                          | Record changes to the repository.                           |
+| `gcmsg` | `git commit -m`                       | Commit with an inline message.                              |
+| `gca`   | `git commit --amend --no-edit`        | Amend the last commit without changing the message.         |
+| `gco`   | `git checkout`                        | Switch branches or restore working tree files.              |
+| `gcob`  | `git checkout -b`                     | Create and switch to a new branch.                          |
+| `gcom`  | `git checkout master`                 | Switch to the `master` branch.                              |
+| `gcod`  | `git checkout develop`                | Switch to the `develop` branch.                             |
+| `gdh`   | `git diff HEAD`                       | Show changes since the last commit.                         |
+| `glog`  | `git log --oneline --graph --decorate`| Display a compact, graphical log.                           |
+| `gp`    | `git push`                            | Update remote refs along with associated objects.           |
+| `gph`   | `git push -u origin HEAD`             | Push the current branch and set it as upstream.             |
+| `gpl`   | `git pull`                            | Fetch from and integrate with another repository.           |
+| `grpa`  | `git reset --patch`                   | Interactively unstage hunks of code.                        |
+| `grs1`  | `git reset --soft HEAD~`              | Uncommit changes, keeping them staged.                      |
+| `grm1`  | `git reset HEAD~`                     | Uncommit changes, leaving them in the working directory.    |
+| `grh1`  | `git reset --hard HEAD~`              | **Destructive:** Discard all changes from the last commit.  |
+| `gsa`   | `git stash apply stash^{/`            | Apply the most recent stash.                                |
+| `gsl`   | `git stash list`                      | List all stashed changes.                                   |
+| `gsp`   | `git stash push -m`                   | Stash changes with a message.                               |
+| `gst`   | `git status`                          | Show the working tree status.                               |
+

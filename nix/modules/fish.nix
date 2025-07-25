@@ -351,22 +351,33 @@ in
         "...." = "cd ../../../";
         "....." = "cd ../../../../";
       }
-      # git shortcuts
-      // {
-        gapa = "git add --patch";
-        grpa = "git reset --patch";
-        gst = "git status";
-        gdh = "git diff HEAD";
-        gp = "git push";
-        gph = "git push -u origin HEAD";
-        gco = "git checkout";
-        gcob = "git checkout -b";
-        gcm = "git checkout master";
-        gcd = "git checkout develop";
-        gsp = "git stash push -m";
-        gsa = "git stash apply stash^{/";
-        gsl = "git stash list";
-      };
+      //
+        # git shortcuts
+        {
+          ga = "git add";
+          gaa = "git add --all";
+          gapa = "git add --patch";
+          gc = "git commit";
+          gcmsg = "git commit -m";
+          gca = "git commit --amend --no-edit";
+          gco = "git checkout";
+          gcob = "git checkout -b";
+          gcom = "git checkout master";
+          gcod = "git checkout develop";
+          gdh = "git diff HEAD";
+          glog = "git log --oneline --graph --decorate";
+          gp = "git push";
+          gph = "git push -u origin HEAD";
+          gpl = "git pull";
+          grpa = "git reset --patch";
+          grs1 = "git reset --soft HEAD~";
+          grm1 = "git reset HEAD~";
+          grh1 = "git reset --hard HEAD~";
+          gsa = "git stash apply stash^{/";
+          gsl = "git stash list";
+          gsp = "git stash push -m";
+          gst = "git status";
+        };
 
     shellAliases = lib.mkMerge [
       {
