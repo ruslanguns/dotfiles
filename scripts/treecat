@@ -15,6 +15,14 @@
 #
 
 # Array to store additional ignore paths specified via the -i flag
+set -euo pipefail
+
+need() { command -v "$1" >/dev/null 2>&1 || { echo "Error: '$1' not found" >&2; exit 1; }; }
+
+need tree
+need git
+need realpath
+
 EXTRA_IGNORES=()
 
 # Parse command-line options: -i for additional paths to ignore
@@ -41,8 +49,12 @@ BASE_DIR="${1:-.}"
 # Function that uses "git check-ignore" to determine if a file or directory should be ignored
 is_ignored() {
   local relative_path="$1"
-  git -C "$BASE_DIR" check-ignore -q "$relative_path"
-  return $?
+  if git -C "$BASE_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git -C "$BASE_DIR" check-ignore -q "$relative_path"
+    return $?
+  else
+    return 1
+  fi
 }
 
 # Function to traverse the directory and process each entry
