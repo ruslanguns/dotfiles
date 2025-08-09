@@ -16,10 +16,12 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
   - [Example: Node Exporter](#example-node-exporter)
   - [Example: PVE Exporter](#example-pve-exporter)
   - [Example: Blackbox Exporter](#example-blackbox-exporter)
+- [Example: Prometheus](#example-prometheus)
 - [Available Roles](#available-roles)
   - [blackbox_exporter](#blackbox_exporter)
   - [node_exporter](#node_exporter)
   - [pve_exporter](#pve_exporter)
+  - [prometheus](#prometheus)
 - [Adding a New Role](#adding-a-new-role)
 
 ## Directory Structure
@@ -31,7 +33,7 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
 
 ## Usage
 
-All tasks are executed via the `Justfile` located in this directory. The primary argument is `HOSTS`, which should be a comma-separated list of SSH targets (e.g., `user@host1,user@host2`).
+All tasks are executed via the `Justfile` located in this directory. The primary argument is `HOSTS`, which should be a comma-separated list of hostnames or IP addresses (e.g., `192.168.1.10,server2,10.0.0.5`). The remote user can be specified with the `USER` parameter, which defaults to `rus` for most commands.
 
 The following examples demonstrate how to deploy the currently available roles.
 
@@ -42,40 +44,40 @@ Deploys `node_exporter` to expose system-level metrics.
 - **Deploy:**
 
   ```bash
-  # Usage: just node_exporter HOSTS="<user@ip>" [USER="rus"] [VERSION="v1.9.1"]
+  # Usage: just node_exporter HOSTS="<hostname>" [USER="rus"] [VERSION="v1.9.1"]
   just node_exporter HOSTS="192.168.1.10"
 
-  # Usage targeting  multiple hosts
+  # Usage targeting multiple hosts
   just node_exporter HOSTS="px1,px2,px3"
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_node_exporter HOSTS="<user@ip>"
-  just remove_node_exporter HOSTS="rus@192.168.1.10"
+  # Usage: just remove_node_exporter HOSTS="<hostname>" [USER="rus"]
+  just remove_node_exporter HOSTS="192.168.1.10"
   #  Usage targeting multiple hosts
   just remove_node_exporter HOSTS="px1,px2,px3"
   ```
 
 ### Example: PVE Exporter
 
-Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics.
+Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics. Note: This playbook often requires running as `root`.
 
 - **Deploy:**
 
   ```bash
-  # Usage: just pve_exporter HOSTS="<user@ip>" TOKEN="<api-token>" [API_URL="<url>"]
-  just pve_exporter HOSTS="root@pve-"host" TOKEN="my-secret-pve-token"
+  # Usage: just pve_exporter HOSTS="<hostname>" USER="<user>" TOKEN="<api-token>" [API_URL="<url>"]
+  just pve_exporter HOSTS="pve-host" USER="root" TOKEN="my-secret-pve-token"
   # Usage targeting multiple hosts
-  just pve_exporter HOSTS="px1,px2,px3"
+  just pve_exporter HOSTS="px1,px2,px3" USER="root" TOKEN="my-secret-pve-token"
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_pve_exporter HOSTS="<user@ip>"
-  just remove_pve_exporter HOSTS="root@pve-host"
+  # Usage: just remove_pve_exporter HOSTS="<hostname>" [USER="rus"]
+  just remove_pve_exporter HOSTS="pve-host" USER="root"
   # Usage targeting multiple hosts
-  just remove_pve_exporter HOSTS="px1,px2,px3"
+  just remove_pve_exporter HOSTS="px1,px2,px3" USER="root"
   ```
 
 ### Example: Blackbox Exporter
@@ -85,18 +87,35 @@ Deploys `blackbox_exporter` for black-box probing of endpoints.
 - **Deploy:**
 
   ```bash
-  # Usage: just blackbox_exporter HOSTS="<user@ip>" [VERSION="v0.27.0"]
-  just blackbox_exporter HOSTS="rus@192.168.1.20"
+  # Usage: just blackbox_exporter HOSTS="<hostname>" [USER="rus"] [VERSION="v0.27.0"]
+  just blackbox_exporter HOSTS="192.168.1.20"
   # Usage targeting multiple hosts
   just blackbox_exporter HOSTS="px1,px2,px3"
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_blackbox_exporter HOSTS="<user@ip>"
-  just remove_blackbox_exporter HOSTS="rus@192.168.1.20"
+  # Usage: just remove_blackbox_exporter HOSTS="<hostname>" [USER="rus"]
+  just remove_blackbox_exporter HOSTS="192.168.1.20"
   # Usage targeting multiple hosts
   just remove_blackbox_exporter HOSTS="px1,px2,px3"
+  ```
+
+### Example: Prometheus
+
+Deploys `Prometheus`, a powerful monitoring solution and time series database.
+
+- **Deploy:**
+
+  ```bash
+  # Usage: just prometheus HOSTS="<hostname>" [USER="rus"] [VERSION="v2.54.1"]
+  just prometheus HOSTS="192.168.1.30"
+  ```
+
+- **Remove:**
+  ```bash
+  # Usage: just remove_prometheus HOSTS="<hostname>" [USER="rus"]
+  just remove_prometheus HOSTS="192.168.1.30"
   ```
 
 ## Available Roles
@@ -139,6 +158,18 @@ Installs and configures the Prometheus PVE Exporter.
 | `pve_verify_ssl`         | `false`                    | Whether to verify the SSL certificate of the Proxmox API.           |
 | `pve_listen`             | `":9221"`                  | The address and port for the exporter to listen on.                 |
 | `pve_disable_collectors` | `[]`                       | A list of collectors to disable (e.g., `["cluster", "resources"]`). |
+
+### `prometheus`
+
+Installs and configures Prometheus.
+
+| Variable                  | Default Value           | Description                                          |
+| :------------------------ | :---------------------- | :--------------------------------------------------- |
+| `prometheus_version`      | `"v2.54.1"`             | The version to install.                              |
+| `prometheus_latest`       | `false`                 | If `true`, fetches the latest version from GitHub.   |
+| `prometheus_listen`       | `":9090"`               | The address and port for Prometheus to listen on.    |
+| `prometheus_data_dir`     | `"/var/lib/prometheus"` | The path for time series data storage.               |
+| `prometheus_flags`        | `""`                    | Extra command-line flags for the service.            |
 
 ## Adding a New Role
 

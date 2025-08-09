@@ -1,0 +1,27 @@
+---
+- name: Remove Prometheus
+  hosts: all
+  become: true
+  tasks:
+    - name: Stop and disable service
+      ansible.builtin.systemd:
+        name: prometheus
+        state: stopped
+        enabled: false
+
+    - name: Remove files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/bin/prometheus
+        - /usr/local/bin/promtool
+        - /etc/systemd/system/prometheus.service
+        - /etc/prometheus
+        - /var/lib/prometheus
+
+    - name: Remove user
+      ansible.builtin.user:
+        name: prometheus
+        state: absent
+        remove: true
