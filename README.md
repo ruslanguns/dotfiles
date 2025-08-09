@@ -29,6 +29,7 @@ The goal of this project is to create a **reproducible, declarative, and automat
   - [Neovim Setup](#neovim-setup)
   - [Tmux: The Preferred Multiplexer](#tmux-the-preferred-multiplexer)
   - [Fish Shell: Dynamic and Ensured Configuration](#fish-shell-dynamic-and-ensured-configuration)
+  - [Ansible Automation](#ansible-automation)
 - [Adapting for Your Own Use](#adapting-for-your-own-use)
 
 ## Key Features
@@ -50,6 +51,7 @@ The goal of this project is to create a **reproducible, declarative, and automat
   - `variables.json`: A map of arbitrary key-value pairs (constants) that can be accessed throughout the Nix configuration. This helps centralize values used in multiple places.
   - `secrets.yaml`: The `sops`-encrypted secrets file.
 - `/config/`: Non-Nix configuration files, such as for `nvim`.
+- `/ansible/`: Ansible playbooks and roles for automated infrastructure management.
 - `/scripts/`: Miscellaneous helper scripts.
 
 ## Getting Started
@@ -216,3 +218,27 @@ The Fish shell is configured for a productive environment, integrating tightly w
 | `gsl`   | `git stash list`                       | List all stashed changes.                                  |
 | `gsp`   | `git stash push -m`                    | Stash changes with a message.                              |
 | `gst`   | `git status`                           | Show the working tree status.                              |
+
+### Ansible Automation
+
+A collection of Ansible playbooks and roles for automated infrastructure management and service deployment.
+
+**Core Features:**
+
+- **Idempotent Operations:** All roles designed for safe repeated execution across multiple hosts.
+- **Just Integration:** Streamlined command interface through the `Justfile` for consistent operations.
+- **Multi-Architecture Support:** Automatic detection and deployment for various system architectures.
+- **Secure Automation:** Checksum verification, proper user isolation, and systemd service management.
+
+**Usage Examples:**
+
+```bash
+# Deploy services to single or multiple hosts
+just <service_name> 192.168.1.10
+just <service_name> "192.168.1.10,192.168.1.11,192.168.1.12"
+
+# Remove services cleanly
+just remove_<service_name> 192.168.1.10
+```
+
+For complete documentation and available services, see the [Ansible documentation](ansible/README.md).
