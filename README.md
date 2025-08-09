@@ -29,6 +29,7 @@ The goal of this project is to create a **reproducible, declarative, and automat
   - [Neovim Setup](#neovim-setup)
   - [Tmux: The Preferred Multiplexer](#tmux-the-preferred-multiplexer)
   - [Fish Shell: Dynamic and Ensured Configuration](#fish-shell-dynamic-and-ensured-configuration)
+- [Miscellaneous Configurations](#miscellaneous-configurations)
 - [Adapting for Your Own Use](#adapting-for-your-own-use)
 
 ## Key Features
@@ -127,13 +128,6 @@ Follow these steps to deploy this configuration on a new machine.
   just nix_format
   ```
 
-## Adapting for Your Own Use
-
-While this project is tailored for my personal use, it can be adapted by others.
-
-- **SOPS-free Environment**: If you don't need secret management, the `generic` host configuration is a good starting point, as it does not import the `sops` module.
-- **Using Your Own Secrets**: It is highly recommended to **fork** this project. This will allow you to configure `sops` with your own keys and manage your own `secrets.yaml` file securely.
-
 ## Core Components & Workflows
 
 ### Neovim Setup
@@ -218,3 +212,17 @@ The Fish shell is configured for a productive environment, integrating tightly w
 | `gsp`   | `git stash push -m`                   | Stash changes with a message.                               |
 | `gst`   | `git status`                          | Show the working tree status.                               |
 
+## Miscellaneous Configurations
+
+The `/misc` directory contains standalone utility files. Key files include:
+
+- **`cloud-init.yaml`**: A configuration for bootstrapping a hardened server.
+  - **Features**: Secure user/SSH setup, UFW firewall, `fail2ban`, and `tailscale`.
+  - **Compatibility**: Designed for **Ubuntu/Debian** systems (uses `apt`).
+
+## Adapting for Your Own Use
+
+While this project is tailored for my personal use, it can be adapted by others.
+
+- **SOPS-free Environment**: If you don't need secret management, the `generic` host configuration is a good starting point, as it does not import the `sops` module.
+- **Using Your Own Secrets**: It is highly recommended to **fork** this project. This will allow you to configure `sops` with your own keys and manage your own `secrets.yaml` file securely.
