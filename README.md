@@ -51,6 +51,7 @@ The goal of this project is to create a **reproducible, declarative, and automat
   - `secrets.yaml`: The `sops`-encrypted secrets file.
 - `/config/`: Non-Nix configuration files, such as for `nvim`.
 - `/scripts/`: Miscellaneous helper scripts.
+- `/ansible/`: Ansible playbooks and roles for deploying monitoring exporters.
 
 ## Getting Started
 
