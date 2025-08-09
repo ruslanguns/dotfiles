@@ -40,15 +40,21 @@ The following examples demonstrate how to deploy the currently available roles.
 Deploys `node_exporter` to expose system-level metrics.
 
 - **Deploy:**
+
   ```bash
   # Usage: just node_exporter HOSTS="<user@ip>" [USER="rus"] [VERSION="v1.9.1"]
-  just node_exporter HOSTS="rus@192.168.1.10"
+  just node_exporter HOSTS="192.168.1.10"
+
+  # Usage targeting  multiple hosts
+  just node_exporter HOSTS="px1,px2,px3"
   ```
 
 - **Remove:**
   ```bash
   # Usage: just remove_node_exporter HOSTS="<user@ip>"
   just remove_node_exporter HOSTS="rus@192.168.1.10"
+  #  Usage targeting multiple hosts
+  just remove_node_exporter HOSTS="px1,px2,px3"
   ```
 
 ### Example: PVE Exporter
@@ -56,15 +62,20 @@ Deploys `node_exporter` to expose system-level metrics.
 Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics.
 
 - **Deploy:**
+
   ```bash
   # Usage: just pve_exporter HOSTS="<user@ip>" TOKEN="<api-token>" [API_URL="<url>"]
-  just pve_exporter HOSTS="root@pve-host" TOKEN="my-secret-pve-token"
+  just pve_exporter HOSTS="root@pve-"host" TOKEN="my-secret-pve-token"
+  # Usage targeting multiple hosts
+  just pve_exporter HOSTS="px1,px2,px3"
   ```
 
 - **Remove:**
   ```bash
   # Usage: just remove_pve_exporter HOSTS="<user@ip>"
   just remove_pve_exporter HOSTS="root@pve-host"
+  # Usage targeting multiple hosts
+  just remove_pve_exporter HOSTS="px1,px2,px3"
   ```
 
 ### Example: Blackbox Exporter
@@ -72,15 +83,20 @@ Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics.
 Deploys `blackbox_exporter` for black-box probing of endpoints.
 
 - **Deploy:**
+
   ```bash
   # Usage: just blackbox_exporter HOSTS="<user@ip>" [VERSION="v0.27.0"]
   just blackbox_exporter HOSTS="rus@192.168.1.20"
+  # Usage targeting multiple hosts
+  just blackbox_exporter HOSTS="px1,px2,px3"
   ```
 
 - **Remove:**
   ```bash
   # Usage: just remove_blackbox_exporter HOSTS="<user@ip>"
   just remove_blackbox_exporter HOSTS="rus@192.168.1.20"
+  # Usage targeting multiple hosts
+  just remove_blackbox_exporter HOSTS="px1,px2,px3"
   ```
 
 ## Available Roles
@@ -91,38 +107,38 @@ The following roles are defined in this project. Their behavior can be customize
 
 Installs and configures the Prometheus Blackbox Exporter.
 
-| Variable                        | Default Value                               | Description                                                 |
-| :------------------------------ | :------------------------------------------ | :---------------------------------------------------------- |
-| `blackbox_exporter_version`     | `"v0.27.0"`                                 | The version to install.                                     |
-| `blackbox_exporter_latest`      | `false`                                     | If `true`, fetches the latest version from GitHub.          |
-| `blackbox_exporter_listen`      | `":9115"`                                   | The address and port for the exporter to listen on.         |
-| `blackbox_exporter_config_path` | `"/etc/blackbox.yml"`                       | Path to the configuration file on the target host.          |
-| `blackbox_exporter_flags`       | `"--config.file={{...}}"`                   | Extra command-line flags for the service.                   |
+| Variable                        | Default Value             | Description                                         |
+| :------------------------------ | :------------------------ | :-------------------------------------------------- |
+| `blackbox_exporter_version`     | `"v0.27.0"`               | The version to install.                             |
+| `blackbox_exporter_latest`      | `false`                   | If `true`, fetches the latest version from GitHub.  |
+| `blackbox_exporter_listen`      | `":9115"`                 | The address and port for the exporter to listen on. |
+| `blackbox_exporter_config_path` | `"/etc/blackbox.yml"`     | Path to the configuration file on the target host.  |
+| `blackbox_exporter_flags`       | `"--config.file={{...}}"` | Extra command-line flags for the service.           |
 
 ### `node_exporter`
 
 Installs and configures the Prometheus Node Exporter.
 
-| Variable                | Default Value | Description                                           |
-| :---------------------- | :------------ | :---------------------------------------------------- |
-| `node_exporter_version` | `"v1.9.1"`    | The version to install.                               |
-| `node_exporter_latest`  | `false`       | If `true`, fetches the latest version from GitHub.    |
-| `node_exporter_listen`  | `":9100"`     | The address and port for the exporter to listen on.   |
-| `node_exporter_flags`   | `""`          | Extra command-line flags for the service.             |
+| Variable                | Default Value | Description                                         |
+| :---------------------- | :------------ | :-------------------------------------------------- |
+| `node_exporter_version` | `"v1.9.1"`    | The version to install.                             |
+| `node_exporter_latest`  | `false`       | If `true`, fetches the latest version from GitHub.  |
+| `node_exporter_listen`  | `":9100"`     | The address and port for the exporter to listen on. |
+| `node_exporter_flags`   | `""`          | Extra command-line flags for the service.           |
 
 ### `pve_exporter`
 
 Installs and configures the Prometheus PVE Exporter.
 
-| Variable                  | Default Value              | Description                                                              |
-| :------------------------ | :------------------------- | :----------------------------------------------------------------------- |
-| `pve_api_url`             | `"https://localhost:8006"` | The URL of the Proxmox API.                                              |
-| `pve_user`                | `"root@pam"`               | The Proxmox user for the API token.                                      |
-| `pve_token_name`          | `"monitoring"`             | The name of the API token.                                               |
-| `pve_token_value`         | `""`                       | **Required.** The secret value of the API token.                         |
-| `pve_verify_ssl`          | `false`                    | Whether to verify the SSL certificate of the Proxmox API.                |
-| `pve_listen`              | `":9221"`                  | The address and port for the exporter to listen on.                      |
-| `pve_disable_collectors`  | `[]`                       | A list of collectors to disable (e.g., `["cluster", "resources"]`).      |
+| Variable                 | Default Value              | Description                                                         |
+| :----------------------- | :------------------------- | :------------------------------------------------------------------ |
+| `pve_api_url`            | `"https://localhost:8006"` | The URL of the Proxmox API.                                         |
+| `pve_user`               | `"root@pam"`               | The Proxmox user for the API token.                                 |
+| `pve_token_name`         | `"monitoring"`             | The name of the API token.                                          |
+| `pve_token_value`        | `""`                       | **Required.** The secret value of the API token.                    |
+| `pve_verify_ssl`         | `false`                    | Whether to verify the SSL certificate of the Proxmox API.           |
+| `pve_listen`             | `":9221"`                  | The address and port for the exporter to listen on.                 |
+| `pve_disable_collectors` | `[]`                       | A list of collectors to disable (e.g., `["cluster", "resources"]`). |
 
 ## Adding a New Role
 
