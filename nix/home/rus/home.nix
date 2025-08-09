@@ -51,6 +51,7 @@ let
     terragrunt
     terraform
     terraformer
+    ansible
 
     # Development
     biome

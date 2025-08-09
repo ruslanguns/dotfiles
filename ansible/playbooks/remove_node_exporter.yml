@@ -1,0 +1,30 @@
+- hosts: all
+  become: true
+  vars:
+    confirm_remove: false
+  tasks:
+    - ansible.builtin.service_facts:
+    - ansible.builtin.meta: end_play
+      when: not confirm_remove
+    - ansible.builtin.systemd:
+        name: node_exporter
+        state: stopped
+        enabled: false
+      when: "'node_exporter.service' in ansible_facts.services"
+      failed_when: false
+    - ansible.builtin.file:
+        path: /usr/local/bin/node_exporter
+        state: absent
+    - ansible.builtin.file:
+        path: /etc/systemd/system/node_exporter.service
+        state: absent
+    - ansible.builtin.user:
+        name: node_exporter
+        state: absent
+      failed_when: false
+    - ansible.builtin.group:
+        name: node_exporter
+        state: absent
+      failed_when: false
+    - ansible.builtin.systemd:
+        daemon_reload: true

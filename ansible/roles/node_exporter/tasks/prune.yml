@@ -1,0 +1,36 @@
+---
+- name: list installed versions
+  become: true
+  ansible.builtin.find:
+    paths: "{{ node_exporter_install_base }}"
+    file_type: directory
+    patterns: "v*"
+    use_regex: false
+  register: _versions
+  failed_when: false
+
+- name: build version list
+  ansible.builtin.set_fact:
+    _version_paths: "{{ (_versions.files | map(attribute='path') | list) | default([]) }}"
+
+- name: sort versions
+  ansible.builtin.set_fact:
+    _sorted_versions: "{{ _version_paths | map('basename') | sort | list }}"
+
+- name: compute keep set
+  ansible.builtin.set_fact:
+    _keep_set: "{{ ([resolved_version] + (_sorted_versions | difference([resolved_version]) | sort | last(node_exporter_keep_versions - 1))) | unique }}"
+  when: (_sorted_versions | length) > 0 and (node_exporter_keep_versions | int) > 0
+
+- name: compute delete set
+  ansible.builtin.set_fact:
+    _delete_set: "{{ _sorted_versions | difference(_keep_set | default([])) }}"
+  when: (_sorted_versions | length) > 0 and (_keep_set is defined)
+
+- name: remove old versions
+  become: true
+  ansible.builtin.file:
+    path: "{{ node_exporter_install_base }}/{{ item }}"
+    state: absent
+  loop: "{{ _delete_set | default([]) }}"
+  when: _delete_set is defined and (_delete_set | length) > 0

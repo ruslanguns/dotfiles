@@ -1,0 +1,6 @@
+---
+- name: restart blackbox_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: blackbox_exporter
+    state: restarted

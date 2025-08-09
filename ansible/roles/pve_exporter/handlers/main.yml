@@ -1,0 +1,5 @@
+- name: restart pve_exporter
+  become: true
+  ansible.builtin.systemd:
+    name: pve_exporter
+    state: restarted

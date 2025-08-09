@@ -1,0 +1,17 @@
+pve_api_url: "https://localhost:8006"
+pve_user: "root@pam"
+pve_token_name: "monitoring"
+pve_token_value: ""
+pve_verify_ssl: false
+pve_listen: ":9221"
+pve_config_path: "/etc/pve_exporter.yml"
+pve_service_path: "/etc/systemd/system/pve_exporter.service"
+pve_venv_path: "/opt/pve_exporter"
+pve_manage_acl: false
+pve_acl_paths:
+  - /
+  - /nodes
+  - /storage
+  - /pool
+pve_purge_legacy: true
+pve_disable_collectors: []

@@ -1,0 +1,138 @@
+- ansible.builtin.assert:
+    that:
+      - pve_token_value | length > 0
+    fail_msg: "pve_token_value is required"
+
+- ansible.builtin.package:
+    name: [python3, python3-venv]
+    state: present
+  become: true
+
+- ansible.builtin.systemd:
+    name: pve_exporter
+    state: stopped
+  become: true
+  failed_when: false
+
+- ansible.builtin.file:
+    path: /usr/local/bin/pve_exporter
+    state: absent
+  become: true
+  when: pve_purge_legacy | bool
+
+- ansible.builtin.file:
+    path: "{{ pve_venv_path }}"
+    state: directory
+    mode: "0755"
+  become: true
+
+- ansible.builtin.command:
+    cmd: "python3 -m venv {{ pve_venv_path }}"
+    creates: "{{ pve_venv_path }}/bin/activate"
+  become: true
+
+- ansible.builtin.pip:
+    name: prometheus-pve-exporter
+    state: latest
+    virtualenv: "{{ pve_venv_path }}"
+    virtualenv_python: python3
+  become: true
+  notify: restart pve_exporter
+
+- ansible.builtin.stat:
+    path: "{{ pve_venv_path }}/bin/pve_exporter"
+  register: pve_bin
+  become: true
+
+- ansible.builtin.assert:
+    that:
+      - pve_bin.stat.exists
+    fail_msg: "pve_exporter binary not found at {{ pve_venv_path }}/bin/pve_exporter"
+
+- ansible.builtin.template:
+    src: pve_exporter.yml.j2
+    dest: "{{ pve_config_path }}"
+    mode: "0640"
+    owner: root
+    group: root
+  become: true
+  notify: restart pve_exporter
+
+- ansible.builtin.set_fact:
+    pve_exec_cmd: >-
+      {{ pve_venv_path }}/bin/pve_exporter
+      --config.file {{ pve_config_path }}
+      --web.listen-address={{ pve_listen }}
+      {{ (pve_disable_collectors
+          | map('regex_replace','^(.*)$','--no-collector.\\1')
+          | join(' ')) if (pve_disable_collectors|length>0) else '' }}
+
+- ansible.builtin.template:
+    src: pve_exporter.service.j2
+    dest: "{{ pve_service_path }}"
+    mode: "0644"
+  become: true
+  notify: restart pve_exporter
+
+- ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- ansible.builtin.systemd:
+    name: pve_exporter
+    enabled: true
+    state: started
+  become: true
+
+- ansible.builtin.command:
+    cmd: pveum acl list
+  register: pve_acl_list
+  changed_when: false
+  become: true
+  when: pve_manage_acl | bool
+
+- ansible.builtin.command:
+    cmd: "pveum acl modify {{ item }} --tokens {{ pve_user }}!{{ pve_token_name }} --roles PVEAuditor"
+  loop: "{{ pve_acl_paths }}"
+  changed_when: "'{{ pve_user }}!{{ pve_token_name }}' not in pve_acl_list.stdout"
+  become: true
+  when: pve_manage_acl | bool
+
+- block:
+    - ansible.builtin.wait_for:
+        host: "127.0.0.1"
+        port: "{{ pve_listen.split(':')[-1] | int }}"
+        delay: 0
+        timeout: 25
+      become: true
+
+    - ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ pve_listen.split(':')[-1] }}/pve"
+        method: GET
+        return_content: false
+        status_code: 200
+      register: pve_probe
+      retries: 5
+      delay: 2
+      until: pve_probe.status == 200
+
+  rescue:
+    - ansible.builtin.command:
+        cmd: "systemctl status pve_exporter --no-pager"
+      become: true
+      register: pve_status
+      changed_when: false
+
+    - ansible.builtin.command:
+        cmd: "journalctl -u pve_exporter -n 120 --no-pager"
+      become: true
+      register: pve_logs
+      changed_when: false
+
+    - ansible.builtin.debug:
+        msg:
+          - "{{ pve_status.stdout }}"
+          - "{{ pve_logs.stdout }}"
+
+    - ansible.builtin.fail:
+        msg: "pve_exporter failed to start or bind to {{ pve_listen }}"

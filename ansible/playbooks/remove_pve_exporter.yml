@@ -1,0 +1,54 @@
+- hosts: all
+  become: true
+  vars:
+    confirm_remove: false
+    archive_before_remove: false
+    archive_dir: /root/exporters-archive
+    pve_service_path: /etc/systemd/system/pve_exporter.service
+    pve_config_path: /etc/pve_exporter.yml
+    pve_venv_path: /opt/pve_exporter
+  tasks:
+    - ansible.builtin.meta: end_play
+      when: not confirm_remove
+
+    - ansible.builtin.service_facts:
+
+    - ansible.builtin.systemd:
+        name: pve_exporter
+        state: stopped
+        enabled: false
+      when: "'pve_exporter.service' in ansible_facts.services"
+      failed_when: false
+
+    - ansible.builtin.file:
+        path: "{{ archive_dir }}"
+        state: directory
+        mode: "0700"
+      when: archive_before_remove
+
+    - ansible.builtin.copy:
+        src: "{{ pve_config_path }}"
+        dest: "{{ archive_dir }}/pve_exporter.yml.{{ ansible_date_time.iso8601_basic }}"
+        remote_src: true
+        mode: "0600"
+      when: archive_before_remove
+      failed_when: false
+
+    - ansible.builtin.file:
+        path: "{{ pve_config_path }}"
+        state: absent
+
+    - ansible.builtin.file:
+        path: "{{ pve_service_path }}"
+        state: absent
+
+    - ansible.builtin.file:
+        path: /usr/local/bin/pve_exporter
+        state: absent
+
+    - ansible.builtin.file:
+        path: "{{ pve_venv_path }}"
+        state: absent
+
+    - ansible.builtin.systemd:
+        daemon_reload: true

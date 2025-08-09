@@ -49,6 +49,7 @@ The goal of this project is to create a **reproducible, declarative, and automat
   - `modules/`: Reusable modules for configuring applications and services (e.g., `git.nix`, `tmux.nix`).
   - `variables.json`: A map of arbitrary key-value pairs (constants) that can be accessed throughout the Nix configuration. This helps centralize values used in multiple places.
   - `secrets.yaml`: The `sops`-encrypted secrets file.
+- `/ansible/`: Contains Ansible playbooks and roles for configuring services on non-NixOS machines. See the [Ansible README](./ansible/README.md) for details.
 - `/config/`: Non-Nix configuration files, such as for `nvim`.
 - `/scripts/`: Miscellaneous helper scripts.
 

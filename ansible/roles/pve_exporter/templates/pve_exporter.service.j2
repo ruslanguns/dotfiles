@@ -1,0 +1,15 @@
+[Unit]
+Description=Prometheus Proxmox VE Exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart={{ pve_exec_cmd }}
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

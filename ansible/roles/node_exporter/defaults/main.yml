@@ -1,0 +1,8 @@
+node_exporter_version: "v1.9.1"
+node_exporter_latest: false
+node_exporter_listen: ":9100"
+node_exporter_flags: ""
+node_exporter_install_base: "/opt/node_exporter"
+node_exporter_bin_link: "/usr/local/bin/node_exporter"
+node_exporter_service_path: "/etc/systemd/system/node_exporter.service"
+node_exporter_keep_versions: 2
