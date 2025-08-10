@@ -7,10 +7,6 @@ mod install 'install.just'
 mod remove 'remove.just'
 mod config 'config.just'
 
-# Generates a dynamic inventory string for Ansible.
-_node_inv HOSTS:
-	{ V="{{HOSTS}}"; case "$V" in *=*) V="${V#*=}";; esac; case "$V" in *","*) printf "%s\n" "$V";; "") echo "HOSTS is required" >&2; exit 2;; *) printf "%s\n" "${V},";; esac; }
-
 # Core engine to run any Ansible playbook.
 _run_playbook PLAYBOOK HOSTS *ARGS:
   { \
