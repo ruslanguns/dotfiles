@@ -3,18 +3,24 @@
   hosts: all
   become: true
   vars:
-    confirm_remove: true
+    confirm_remove: false
   tasks:
-    - ansible.builtin.service_facts:
-    - ansible.builtin.meta: end_play
+    - name: Check if service exists
+      ansible.builtin.service_facts:
+
+    - name: Fail if removal is not confirmed
+      ansible.builtin.meta: end_play
       when: not confirm_remove
+
     - name: Stop and disable service
       ansible.builtin.systemd:
         name: prometheus
         state: stopped
         enabled: false
+      when: "'prometheus.service' in ansible_facts.services"
+      failed_when: false
 
-    - name: Remove files
+    - name: Remove files and directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
@@ -25,8 +31,13 @@
         - /etc/prometheus
         - /var/lib/prometheus
 
-    - name: Remove user
-      ansmble.builtin.user:
+    - name: Remove user and group
+      ansible.builtin.user:
         name: prometheus
         state: absent
         remove: true
+      failed_when: false
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true

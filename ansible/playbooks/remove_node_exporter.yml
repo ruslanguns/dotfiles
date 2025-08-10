@@ -3,30 +3,38 @@
   hosts: all
   become: true
   vars:
-    confirm_remove: true
+    confirm_remove: false
   tasks:
-    - ansible.builtin.service_facts:
-    - ansible.builtin.meta: end_play
+    - name: Check if service exists
+      ansible.builtin.service_facts:
+
+    - name: Fail if removal is not confirmed
+      ansible.builtin.meta: end_play
       when: not confirm_remove
-    - ansible.builtin.systemd:
+
+    - name: Stop and disable service
+      ansible.builtin.systemd:
         name: node_exporter
         state: stopped
         enabled: false
       when: "'node_exporter.service' in ansible_facts.services"
       failed_when: false
-    - ansible.builtin.file:
-        path: /usr/local/bin/node_exporter
+
+    - name: Remove files
+      ansible.builtin.file:
+        path: "{{ item }}"
         state: absent
-    - ansible.builtin.file:
-        path: /etc/systemd/system/node_exporter.service
-        state: absent
-    - ansible.builtin.user:
+      loop:
+        - /usr/local/bin/node_exporter
+        - /etc/systemd/system/node_exporter.service
+
+    - name: Remove user and group
+      ansible.builtin.user:
         name: node_exporter
         state: absent
+        remove: true
       failed_when: false
-    - ansible.builtin.group:
-        name: node_exporter
-        state: absent
-      failed_when: false
-    - ansible.builtin.systemd:
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
         daemon_reload: true

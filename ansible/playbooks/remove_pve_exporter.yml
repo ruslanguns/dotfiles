@@ -1,44 +1,42 @@
-- hosts: all
+---
+- name: Remove PVE Exporter
+  hosts: all
   become: true
   vars:
     confirm_remove: false
-    pve_service_path: /etc/systemd/system/pve_exporter.service
-    pve_config_path: /etc/pve_exporter.yml
-    pve_venv_path: /opt/pve_exporter
   tasks:
-    - ansible.builtin.meta: end_play
+    - name: Check if service exists
+      ansible.builtin.service_facts:
+
+    - name: Fail if removal is not confirmed
+      ansible.builtin.meta: end_play
       when: not confirm_remove
 
-    - ansible.builtin.service_facts:
-
-    - ansible.builtin.systemd:
+    - name: Stop and disable service
+      ansible.builtin.systemd:
         name: pve_exporter
         state: stopped
         enabled: false
       when: "'pve_exporter.service' in ansible_facts.services"
       failed_when: false
 
-    - ansible.builtin.file:
-        path: "{{ pve_config_path }}"
+    - name: Remove files and directories
+      ansible.builtin.file:
+        path: "{{ item }}"
         state: absent
+      loop:
+        - /etc/pve_exporter.yml
+        - /etc/systemd/system/pve_exporter.service
+        - /usr/local/bin/pve_exporter
+        - /opt/pve_exporter
 
-    - ansible.builtin.file:
-        path: "{{ pve_service_path }}"
-        state: absent
-
-    - ansible.builtin.file:
-        path: /usr/local/bin/pve_exporter
-        state: absent
-
-    - ansible.builtin.file:
-        path: "{{ pve_venv_path }}"
-        state: absent
-
-    - ansible.builtin.systemd:
-        daemon_reload: true
-
-    - name: Remove user
-      ansmble.builtin.user:
+    - name: Remove user and group
+      ansible.builtin.user:
         name: pve_exporter
         state: absent
         remove: true
+      failed_when: false
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
