@@ -4,8 +4,8 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=root
-Group=root
+User=blackbox_exporter
+Group=blackbox_exporter
 Type=simple
 ExecStart=/usr/local/bin/blackbox_exporter --web.listen-address={{ blackbox_exporter_listen }} {{ blackbox_exporter_flags }}
 Restart=on-failure
