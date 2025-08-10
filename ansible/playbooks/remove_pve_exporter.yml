@@ -1,4 +1,3 @@
----
 - name: Remove PVE Exporter
   hosts: all
   become: true

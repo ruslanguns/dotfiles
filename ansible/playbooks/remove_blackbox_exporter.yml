@@ -1,4 +1,3 @@
----
 - name: Remove Blackbox Exporter
   hosts: all
   become: true
