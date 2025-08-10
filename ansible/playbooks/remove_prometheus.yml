@@ -2,7 +2,12 @@
 - name: Remove Prometheus
   hosts: all
   become: true
+  vars:
+    confirm_remove: true
   tasks:
+    - ansible.builtin.service_facts:
+    - ansible.builtin.meta: end_play
+      when: not confirm_remove
     - name: Stop and disable service
       ansible.builtin.systemd:
         name: prometheus
@@ -21,7 +26,7 @@
         - /var/lib/prometheus
 
     - name: Remove user
-      ansible.builtin.user:
+      ansmble.builtin.user:
         name: prometheus
         state: absent
         remove: true

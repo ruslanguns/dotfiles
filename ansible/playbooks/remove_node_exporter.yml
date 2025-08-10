@@ -1,7 +1,9 @@
-- hosts: all
+---
+- name: Remove Node Exporter
+  hosts: all
   become: true
   vars:
-    confirm_remove: false
+    confirm_remove: true
   tasks:
     - ansible.builtin.service_facts:
     - ansible.builtin.meta: end_play
