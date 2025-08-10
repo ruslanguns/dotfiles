@@ -2,7 +2,7 @@
 blackbox_exporter_version: "v0.27.0"
 blackbox_exporter_latest: false
 blackbox_exporter_listen: ":9115"
-blackbox_exporter_flags: "--config.file=/etc/blackbox.yml"
+blackbox_exporter_config_path: "/etc/blackbox.yml"
 blackbox_exporter_config:
   modules:
     http_2xx:
@@ -16,4 +16,3 @@ blackbox_exporter_config:
     tcp_connect:
       prober: tcp
       timeout: 5s
-

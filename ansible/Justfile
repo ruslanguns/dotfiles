@@ -15,11 +15,11 @@ _node_inv HOSTS:
 _run_playbook PLAYBOOK HOSTS *ARGS:
   { \
    B="{{justfile_directory()}}"; \
-   INV="$(just _node_inv "{{HOSTS}}")"; \
    ANSIBLE_CONFIG="$B/ansible.cfg" \
    ANSIBLE_ROLES_PATH="$B/roles" \
     ansible-playbook \
-      -i "$INV" \
+      -i "$B/inventory/hosts.yml" \
+      --limit "{{ HOSTS }}" \
       {{ARGS}} \
      "$B/playbooks/{{PLAYBOOK}}.yml"; \
   }

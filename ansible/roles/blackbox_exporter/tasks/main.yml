@@ -147,3 +147,4 @@
   loop:
     - "/tmp/{{ tarball }}"
     - "/tmp/blackbox_exporter-{{ resolved_version | regex_replace('^v','') }}.linux-{{ goarch }}"
+

@@ -12,3 +12,18 @@ firewall_rules:
     interface: tailscale0
     rule: allow
     comment: "Allow Node Exporter via Tailscale"
+blackbox_exporter_config:
+  modules:
+    http_2xx:
+      prober: http
+      timeout: 10s # Changed from 5s
+      http:
+        method: GET
+    icmp_lan: # Renamed from icmp
+      prober: icmp
+      timeout: 3s
+    ssh_banner: # New module
+      prober: tcp
+      tcp:
+        query_response:
+          - expect: "^SSH-2.0-"

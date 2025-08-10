@@ -7,7 +7,9 @@ After=network-online.target
 User=blackbox_exporter
 Group=blackbox_exporter
 Type=simple
-ExecStart=/usr/local/bin/blackbox_exporter --web.listen-address={{ blackbox_exporter_listen }} {{ blackbox_exporter_flags }}
+ExecStart=/usr/local/bin/blackbox_exporter \
+  --web.listen-address={{ blackbox_exporter_listen }} \
+  --config.file={{ blackbox_exporter_config_path }}
 Restart=on-failure
 RestartSec=2
 
