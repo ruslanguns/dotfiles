@@ -48,6 +48,7 @@ Connection parameters like user and port are now managed via Ansible's inventory
 Deploys `node_exporter` to expose system-level metrics.
 
 - **Deploy:**
+
   ```bash
   # Usage: just install node_exporter <HOSTS> [ARGS...]
   just install node_exporter 192.168.1.10
@@ -65,6 +66,7 @@ Deploys `node_exporter` to expose system-level metrics.
 Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics.
 
 - **Deploy:**
+
   ```bash
   # Usage: just install pve_exporter <HOSTS> [ARGS...]
   just install pve_exporter px1 -e pve_token_value="my-secret-pve-token"
@@ -81,6 +83,7 @@ Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics.
 Deploys `blackbox_exporter` for black-box probing of endpoints.
 
 - **Deploy:**
+
   ```bash
   # Usage: just install blackbox_exporter <HOSTS> [ARGS...]
   just install blackbox_exporter 192.168.1.20
@@ -97,6 +100,7 @@ Deploys `blackbox_exporter` for black-box probing of endpoints.
 Deploys `Prometheus`, a powerful monitoring solution and time series database.
 
 - **Deploy:**
+
   ```bash
   # Usage: just install prometheus <HOSTS> [ARGS...]
   just install prometheus 192.168.1.30
@@ -113,6 +117,7 @@ Deploys `Prometheus`, a powerful monitoring solution and time series database.
 Configures firewall rules declaratively using UFW or iptables.
 
 - **Configure:**
+
   ```bash
   # Usage: just configure firewall <HOSTS> [ARGS...]
   just configure firewall 192.168.1.101
@@ -208,6 +213,31 @@ Manages firewall rules declaratively with support for multiple backends.
 - `src`: Source IP/subnet (optional)
 - `interface`: Specific interface (optional)
 - `direction`: `in` or `out` (default: `in`)
+
+### `smokeping_prober`
+
+Installs and configures the Prometheus Smokeping Prober.
+
+| Variable                   | Default Value | Description                                                              |
+| :------------------------- | :------------ | :----------------------------------------------------------------------- |
+| `smokeping_prober_version` | `"0.10.0"`    | The version to install.                                                  |
+| `smokeping_prober_listen`  | `":9374"`     | The address and port for the exporter to listen on.                      |
+| `smokeping_prober_targets` | See defaults  | **Required.** The target configuration. Define this in your `host_vars`. |
+
+**Target Configuration Example (`host_vars/myhost.yml`):**
+
+```yaml
+smokeping_prober_targets:
+  targets:
+    - name: "Google-DNS"
+      hosts: [8.8.8.8, 8.8.4.4]
+      interval: 2s
+      protocol: icmp
+    - name: "Cloudflare-DNS"
+      hosts: [1.1.1.1, 1.0.0.1]
+      interval: 2s
+      protocol: icmp
+```
 
 ## Adding a New Role
 

@@ -19,3 +19,7 @@ blackbox_exporter HOSTS *ARGS:
 prometheus HOSTS *ARGS:
   @just _run_playbook "remove_prometheus" "{{HOSTS}}" {{ARGS}}
 
+# Removes smokeping_prober from specified hosts.
+smokeping_prober HOSTS *ARGS:
+  @just _run_playbook "remove_smokeping_prober" "{{HOSTS}}" {{ARGS}}
+

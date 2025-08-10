@@ -1,0 +1,10 @@
+---
+smokeping_prober_version: "0.10.0"
+smokeping_prober_user: "smokeping"
+smokeping_prober_listen_address: ":9374"
+smokeping_prober_targets:
+  targets:
+    - hosts: [1.1.1.1, 8.8.8.8]
+      name: "Default"
+      interval: 1s
+      protocol: icmp

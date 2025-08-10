@@ -19,3 +19,7 @@ blackbox_exporter HOSTS *ARGS:
 prometheus HOSTS *ARGS:
   @just _run_playbook "prometheus" "{{HOSTS}}" {{ARGS}}
 
+# Installs smokeping_prober to specified hosts.
+smokeping_prober HOSTS *ARGS:
+  @just _run_playbook "smokeping_prober" "{{HOSTS}}" {{ARGS}}
+

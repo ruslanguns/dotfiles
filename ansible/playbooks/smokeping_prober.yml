@@ -1,0 +1,6 @@
+---
+- name: Deploy Smokeping Prober
+  hosts: all
+  become: true
+  roles:
+    - role: smokeping_prober

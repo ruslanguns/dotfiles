@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus Smokeping Prober
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ smokeping_prober_user }}
+Group={{ smokeping_prober_user }}
+ExecStart=/usr/local/bin/smokeping_prober --config.file=/etc/smokeping_prober/smokeping_prober.yml --web.listen-address={{ smokeping_prober_listen_address }}
+AmbientCapabilities=CAP_NET_RAW
+NoNewPrivileges=true
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

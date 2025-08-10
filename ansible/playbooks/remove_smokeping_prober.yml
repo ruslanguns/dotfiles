@@ -1,0 +1,42 @@
+---
+- name: Remove Smokeping Prober
+  hosts: all
+  become: true
+  vars:
+    confirm_remove: false
+  tasks:
+    - name: Check if service exists
+      ansible.builtin.service_facts:
+
+    - name: Fail if removal is not confirmed
+      ansible.builtin.meta: end_play
+      when: not confirm_remove
+
+    - name: Stop and disable service
+      ansible.builtin.systemd:
+        name: smokeping_prober
+        state: stopped
+        enabled: false
+      when: "'smokeping_prober.service' in ansible_facts.services"
+      failed_when: false
+
+    - name: Remove files and directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /usr/local/bin/smokeping_prober
+        - /etc/smokeping_prober
+        - /var/lib/smokeping_prober
+        - /etc/systemd/system/smokeping_prober.service
+
+    - name: Remove user and group
+      ansible.builtin.user:
+        name: "smokeping"
+        state: absent
+        remove: true
+      failed_when: false
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
