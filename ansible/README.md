@@ -19,74 +19,61 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
   - [Example: Prometheus](#example-prometheus)
   - [Example: Firewall](#example-firewall)
 - [Available Roles](#available-roles)
-  - [blackbox_exporter](#blackbox_exporter)
-  - [node_exporter](#node_exporter)
-  - [pve_exporter](#pve_exporter)
-  - [prometheus](#prometheus)
-  - [firewall](#firewall)
 - [Adding a New Role](#adding-a-new-role)
 
 ## Directory Structure
 
-- `Justfile`: The main command runner for deploying and removing components. This is the intended entry point for all operations.
+- `Justfile`: The main command runner that loads functionality from submodules. This is the intended entry point for all operations.
+- `install.just`: Submodule containing all deployment-related recipes.
+- `remove.just`: Submodule containing all removal-related recipes.
+- `configure.just`: Submodule containing all configuration-related recipes.
 - `ansible.cfg`: Basic Ansible configuration file.
 - `playbooks/`: Contains the main playbooks for installing or removing each component.
 - `roles/`: Contains the core logic for each component, including tasks, templates, and default variables.
 
 ## Usage
 
-All tasks are executed via the `Justfile` located in this directory. The primary argument is `HOSTS`, which should be a comma-separated list of hostnames or IP addresses (e.g., `192.168.1.10,server2,10.0.0.5`). The remote user can be specified with the `USER` parameter, which defaults to `rus` for most commands.
+All tasks are executed via the `Justfile` using a modular structure. The general syntax is:
+`just <subcommand> <recipe> <HOSTS> [ARGS...]`
 
-The following examples demonstrate how to deploy the currently available roles.
+- **`<subcommand>`**: The action to perform: `install`, `remove`, or `configure`.
+- **`<recipe>`**: The name of the component to manage (e.g., `node_exporter`).
+- **`<HOSTS>`**: A single hostname or a comma-separated string of hosts (e.g., `"host1,host2"`).
+- **`[ARGS...]`**: Any additional arguments to be passed directly to `ansible-playbook` (e.g., `-e var=value`).
+
+Connection parameters like user and port are now managed via Ansible's inventory (`host_vars`), making the commands much cleaner.
 
 ### Example: Node Exporter
 
 Deploys `node_exporter` to expose system-level metrics.
 
 - **Deploy:**
-
   ```bash
-  # Usage: just node_exporter HOSTS="<hostname>" [USER="rus"] [*ARGS]
-  just node_exporter HOSTS="192.168.1.10"
-
-  # Usage targeting multiple hosts
-  just node_exporter HOSTS="px1,px2,px3"
-
-  # Usage with custom version
-  just node_exporter HOSTS="192.168.1.10" -- "-e node_exporter_version=v1.8.0"
+  # Usage: just install node_exporter <HOSTS> [ARGS...]
+  just install node_exporter 192.168.1.10
+  just install node_exporter "px1,px2,px3" -e node_exporter_version=v1.8.0
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_node_exporter HOSTS="<hostname>" [USER="rus"]
-  just remove_node_exporter HOSTS="192.168.1.10"
-  #  Usage targeting multiple hosts
-  just remove_node_exporter HOSTS="px1,px2,px3"
+  # Usage: just remove node_exporter <HOSTS> [ARGS...]
+  just remove node_exporter 192.168.1.10
   ```
 
 ### Example: PVE Exporter
 
-Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics. Note: This playbook often requires running as `root`.
+Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics.
 
 - **Deploy:**
-
   ```bash
-  # Usage: just pve_exporter HOSTS="<hostname>" TOKEN="<api-token>" [USER="root"] [*ARGS]
-  just pve_exporter HOSTS="pve-host" TOKEN="my-secret-pve-token"
-
-  # Usage targeting multiple hosts
-  just pve_exporter HOSTS="px1,px2,px3" TOKEN="my-secret-pve-token"
-
-  # Usage with custom API URL
-  just pve_exporter HOSTS="pve-host" TOKEN="my-secret-pve-token" -- "-e pve_api_url=https://pve.example.com:8006"
+  # Usage: just install pve_exporter <HOSTS> [ARGS...]
+  just install pve_exporter px1 -e pve_token_value="my-secret-pve-token"
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_pve_exporter HOSTS="<hostname>" [USER="rus"]
-  just remove_pve_exporter HOSTS="pve-host" USER="root"
-  # Usage targeting multiple hosts
-  just remove_pve_exporter HOSTS="px1,px2,px3" USER="root"
+  # Usage: just remove pve_exporter <HOSTS> [ARGS...]
+  just remove pve_exporter pve-host
   ```
 
 ### Example: Blackbox Exporter
@@ -94,24 +81,15 @@ Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics. Note: This playb
 Deploys `blackbox_exporter` for black-box probing of endpoints.
 
 - **Deploy:**
-
   ```bash
-  # Usage: just blackbox_exporter HOSTS="<hostname>" [USER="rus"] [*ARGS]
-  just blackbox_exporter HOSTS="192.168.1.20"
-
-  # Usage targeting multiple hosts
-  just blackbox_exporter HOSTS="px1,px2,px3"
-
-  # Usage with custom version and listen address
-  just blackbox_exporter HOSTS="192.168.1.20" -- "-e blackbox_exporter_version=v0.25.0 -e blackbox_exporter_listen=:9116"
+  # Usage: just install blackbox_exporter <HOSTS> [ARGS...]
+  just install blackbox_exporter 192.168.1.20
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_blackbox_exporter HOSTS="<hostname>" [USER="rus"]
-  just remove_blackbox_exporter HOSTS="192.168.1.20"
-  # Usage targeting multiple hosts
-  just remove_blackbox_exporter HOSTS="px1,px2,px3"
+  # Usage: just remove blackbox_exporter <HOSTS> [ARGS...]
+  just remove blackbox_exporter 192.168.1.20
   ```
 
 ### Example: Prometheus
@@ -119,36 +97,25 @@ Deploys `blackbox_exporter` for black-box probing of endpoints.
 Deploys `Prometheus`, a powerful monitoring solution and time series database.
 
 - **Deploy:**
-
   ```bash
-  # Usage: just prometheus HOSTS="<hostname>" [USER="rus"] [*ARGS]
-  just prometheus HOSTS="192.168.1.30"
-
-  # Usage with custom version and listen address
-  just prometheus HOSTS="192.168.1.30" -- "-e prometheus_version=v2.50.0 -e prometheus_listen=:9091"
+  # Usage: just install prometheus <HOSTS> [ARGS...]
+  just install prometheus 192.168.1.30
   ```
 
 - **Remove:**
   ```bash
-  # Usage: just remove_prometheus HOSTS="<hostname>" [USER="rus"]
-  just remove_prometheus HOSTS="192.168.1.30"
+  # Usage: just remove prometheus <HOSTS> [ARGS...]
+  just remove prometheus 192.168.1.30
   ```
 
 ### Example: Firewall
 
-Configures firewall rules declaratively using UFW or iptables. The firewall role manages rules in a completely declarative way - only the rules defined in `host_vars` will be active.
+Configures firewall rules declaratively using UFW or iptables.
 
 - **Configure:**
-
   ```bash
-  # Usage: just firewall HOSTS="<hostname>" [USER="rus"] [PORT="22"]
-  just firewall nbg-01 rus 2222
-
-  # Force reset (not needed with default firewall_reset: true)
-  just firewall nbg-01 rus 2222 "" -- "-e firewall_reset=true"
-
-  # Use iptables backend instead of UFW
-  just firewall nbg-01 rus 2222 "" -- "-e firewall_backend=iptables"
+  # Usage: just configure firewall <HOSTS> [ARGS...]
+  just configure firewall 192.168.1.101
   ```
 
 - **Host Configuration (inventory/host_vars/hostname.yml):**
@@ -158,13 +125,11 @@ Configures firewall rules declaratively using UFW or iptables. The firewall role
     - port: 2222
       proto: tcp
       rule: allow
-
     # HTTPS only via Tailscale
     - port: 443
       proto: tcp
       interface: tailscale0
       rule: allow
-
     # Deny everything else (zero trust)
     - rule: deny
       direction: in
@@ -172,7 +137,7 @@ Configures firewall rules declaratively using UFW or iptables. The firewall role
 
 ## Available Roles
 
-The following roles are defined in this project. Their behavior can be customized by passing variables via the `just` command using `-- "-e variable=value"` syntax (note the `--` separator to pass arguments to ansible-playbook).
+The following roles are defined in this project. Their behavior can be customized by passing variables via extra arguments.
 
 ### `blackbox_exporter`
 
@@ -250,5 +215,5 @@ To add a new component or service, follow the existing structure:
 
 1.  **Create the Role**: Add a new directory under `roles/` with the standard `tasks`, `templates`, `defaults`, and `handlers` subdirectories.
 2.  **Create the Playbook**: Add a simple playbook in `playbooks/` that includes the new role. Create a corresponding `remove_...` playbook if needed.
-3.  **Update the Justfile**: Add new recipes to the `Justfile` for deploying and removing the new component, following the existing patterns.
+3.  **Update the Justfile**: Add new recipes to the appropriate submodule (`install.just`, `remove.just`, etc.).
 4.  **Update this README**: Document the new role and its usage instructions here.
