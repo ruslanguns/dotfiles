@@ -70,6 +70,14 @@ in
             return 0 # Another check is already running, exit silently.
           end
 
+          function cleanup_lock
+            if test -d "$lock_dir"
+              rmdir "$lock_dir" >/dev/null 2>&1
+            end
+          end
+
+          trap cleanup_lock EXIT INT TERM
+
           begin
             echo "🚀 Starting background package check at $(date '+%Y-%m-%d %H:%M:%S')"
             echo "---"
@@ -84,7 +92,7 @@ in
             echo "✅ Background package check finished at $(date '+%Y-%m-%d %H:%M:%S')"
           end > "$log_file"
 
-          rmdir "$lock_dir"
+          cleanup_lock
         '';
         refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
         take = ''mkdir -p -- "$1" && cd -- "$1"'';
@@ -188,7 +196,7 @@ in
             markdown-toc \
             @biomejs/biome \
             @qwen-code/qwen-code \
-            @anthropic-ai/claude-cli
+            @anthropic-ai/claude-code
 
           set ignored_packages \
             npm \
