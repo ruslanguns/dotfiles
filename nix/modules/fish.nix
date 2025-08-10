@@ -186,7 +186,9 @@ in
           set required_packages \
             @google/gemini-cli \
             markdown-toc \
-            @biomejs/biome
+            @biomejs/biome \
+            @qwen-code/qwen-code \
+            @anthropic-ai/claude-cli
 
           set ignored_packages \
             npm \
