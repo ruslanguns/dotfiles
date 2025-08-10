@@ -1,7 +1,7 @@
 pve_api_url: "https://localhost:8006"
 pve_user: "root@pam"
 pve_token_name: "monitoring"
-pve_token_value: ""
+pve_token: ""
 pve_verify_ssl: false
 pve_listen: ":9221"
 pve_config_path: "/etc/pve_exporter.yml"

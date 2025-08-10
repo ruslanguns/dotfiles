@@ -1,7 +1,7 @@
 - ansible.builtin.assert:
     that:
-      - pve_token_value | length > 0
-    fail_msg: "pve_token_value is required"
+      - pve_token | length > 0
+    fail_msg: "pve_token is required"
 
 - name: ensure user
   become: true
