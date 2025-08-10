@@ -1,0 +1,141 @@
+- name: Install iptables persistence tools
+  package:
+    name: iptables-persistent
+    state: present
+  become: true
+
+- name: Define custom chain names
+  set_fact:
+    ipv4_chain: "ANSIBLE_INPUT_V4"
+    ipv6_chain: "ANSIBLE_INPUT_V6"
+
+#--------------------------------------------------
+# IPv4 Configuration
+#--------------------------------------------------
+- name: IPv4 | Start with a clean slate by flushing our old chain (using command)
+  command: /usr/sbin/iptables -F {{ ipv4_chain }}
+  become: true
+  changed_when: false
+  failed_when: false # Always succeed, even if chain doesn't exist
+
+
+- name: IPv4 | Create our brand new custom chain
+  ansible.builtin.iptables:
+    chain: "{{ ipv4_chain }}"
+    state: present
+  become: true
+
+- name: IPv4 | Set default policies
+  ansible.builtin.iptables:
+    chain: "{{ item.chain }}"
+    policy: "{{ item.policy }}"
+  become: true
+  loop:
+    - { chain: INPUT, policy: "{{ 'DROP' if firewall_policy == 'deny' else 'ACCEPT' }}" }
+    - { chain: FORWARD, policy: DROP }
+    - { chain: OUTPUT, policy: ACCEPT }
+  when: firewall_state == 'enabled'
+
+- name: IPv4 | Add base rules to custom chain
+  ansible.builtin.iptables:
+    chain: "{{ ipv4_chain }}"
+    jump: ACCEPT
+    in_interface: "{{ item.in_interface | default(omit) }}"
+    ctstate: "{{ item.ctstate | default(omit) }}"
+    comment: "{{ item.comment }}"
+  become: true
+  loop:
+    - { in_interface: lo, comment: "Allow loopback traffic" }
+    - { ctstate: ESTABLISHED,RELATED, comment: "Allow established and related connections" }
+  loop_control:
+    label: "{{ item.comment }}"
+
+- name: IPv4 | Add user-defined rules to custom chain
+  ansible.builtin.iptables:
+    chain: "{{ ipv4_chain }}"
+    protocol: "{{ item.proto | default('tcp') }}"
+    destination_port: "{{ item.port | default(omit) }}"
+    source: "{{ item.src | default(omit) }}"
+    in_interface: "{{ item.interface | default(omit) }}"
+    jump: "{{ 'ACCEPT' if item.rule | default('allow') == 'allow' else 'DROP' }}"
+    comment: "{{ item.comment | default('Managed by Ansible') }}"
+  become: true
+  loop: "{{ firewall_rules }}"
+  notify: save iptables rules
+
+- name: IPv4 | Ensure jump rule to custom chain exists
+  ansible.builtin.iptables:
+    chain: INPUT
+    jump: "{{ ipv4_chain }}"
+    state: present
+    comment: "Jump to Ansible managed rules"
+  become: true
+  notify: save iptables rules
+
+#--------------------------------------------------
+# IPv6 Configuration
+#--------------------------------------------------
+- name: IPv6 | Start with a clean slate by flushing our old chain (using command)
+  command: /usr/sbin/ip6tables -F {{ ipv6_chain }}
+  become: true
+  changed_when: false
+  failed_when: false # Always succeed, even if chain doesn't exist
+
+
+- name: IPv6 | Create our brand new custom chain
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    chain: "{{ ipv6_chain }}"
+    state: present
+  become: true
+
+- name: IPv6 | Set default policies
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    chain: "{{ item.chain }}"
+    policy: "{{ item.policy }}"
+  become: true
+  loop:
+    - { chain: INPUT, policy: "{{ 'DROP' if firewall_policy == 'deny' else 'ACCEPT' }}" }
+    - { chain: FORWARD, policy: DROP }
+    - { chain: OUTPUT, policy: ACCEPT }
+  when: firewall_state == 'enabled'
+
+- name: IPv6 | Add base rules to custom chain
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    chain: "{{ ipv6_chain }}"
+    jump: ACCEPT
+    in_interface: "{{ item.in_interface | default(omit) }}"
+    ctstate: "{{ item.ctstate | default(omit) }}"
+    comment: "{{ item.comment }}"
+  become: true
+  loop:
+    - { in_interface: lo, comment: "Allow loopback traffic" }
+    - { ctstate: ESTABLISHED,RELATED, comment: "Allow established and related connections" }
+  loop_control:
+    label: "{{ item.comment }}"
+
+- name: IPv6 | Add user-defined rules to custom chain
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    chain: "{{ ipv6_chain }}"
+    protocol: "{{ item.proto | default('tcp') }}"
+    destination_port: "{{ item.port | default(omit) }}"
+    source: "{{ item.src | default(omit) }}"
+    in_interface: "{{ item.interface | default(omit) }}"
+    jump: "{{ 'ACCEPT' if item.rule | default('allow') == 'allow' else 'DROP' }}"
+    comment: "{{ item.comment | default('Managed by Ansible') }}"
+  become: true
+  loop: "{{ firewall_rules }}"
+  notify: save ip6tables rules
+
+- name: IPv6 | Ensure jump rule to custom chain exists
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    chain: INPUT
+    jump: "{{ ipv6_chain }}"
+    state: present
+    comment: "Jump to Ansible managed rules"
+  become: true
+  notify: save ip6tables rules

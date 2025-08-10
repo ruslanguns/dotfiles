@@ -1,0 +1,7 @@
+firewall_backend: ufw
+firewall_state: enabled
+firewall_policy_direction: incoming
+firewall_policy: deny
+firewall_rules: []
+firewall_reset: true
+

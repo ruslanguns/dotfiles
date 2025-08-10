@@ -16,8 +16,8 @@ package_upgrade: true
 
 packages:
   - curl
-  - fail2ban
-  - ufw
+  # - fail2ban
+  # - ufw
 
 write_files:
   - path: /etc/motd
@@ -33,10 +33,10 @@ write_files:
       Welcome, Rus! 🚀
 
 runcmd:
-  - systemctl enable fail2ban
-  - ufw allow 2222/tcp
-  - ufw --force enable
-  - printf"[sshd]\nenabled = true\nbanaction = iptables-multiport\nport = 2222" > /etc/fail2ban/jail.local
+  # - systemctl enable fail2ban
+  # - ufw allow 2222/tcp
+  # - ufw --force enable
+  # - printf"[sshd]\nenabled = true\nbanaction = iptables-multiport\nport = 2222" > /etc/fail2ban/jail.local
   - sed -i -e '/^\(#\|\)Port/s/^.*$/Port 2222/' /etc/ssh/sshd_config
   - sed -i -e '/^\(#\|\)PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
   - sed -i -e '/^\(#\|\)PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config

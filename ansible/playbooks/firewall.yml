@@ -1,0 +1,5 @@
+- name: Configure firewall
+  hosts: all
+  become: true
+  roles:
+    - firewall

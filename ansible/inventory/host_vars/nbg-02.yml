@@ -1,0 +1,14 @@
+---
+ansible_port: 2222
+firewall_backend: iptables
+
+firewall_rules:
+  - port: 2222
+    proto: tcp
+    rule: allow
+    comment: "Allow SSH access"
+  - port: 9100
+    proto: tcp
+    interface: tailscale0
+    rule: allow
+    comment: "Allow Node Exporter via Tailscale"

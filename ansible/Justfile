@@ -6,7 +6,7 @@ default:
 _node_inv HOSTS:
 	{ V="{{HOSTS}}"; case "$V" in *=*) V="${V#*=}";; esac; case "$V" in *","*) printf "%s\n" "$V";; "") echo "HOSTS is required" >&2; exit 2;; *) printf "%s\n" "${V},";; esac; }
 
-node_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" VERSION="v1.9.1" LATEST="false" LISTEN=":9100" FLAGS="--collector.systemd":
+node_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
 	{ \
 	  B="{{justfile_directory()}}"; \
 	  INV="$(just _node_inv "{{HOSTS}}")"; \
@@ -17,10 +17,7 @@ node_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" VERSION="v1.9.1" LATEST="fa
 	    -i "$INV" \
 	    -u "$U" \
 	    --ssh-extra-args "-p $P $S" \
-	    -e node_exporter_version={{VERSION}} \
-	    -e node_exporter_latest={{LATEST}} \
-	    -e node_exporter_listen='{{LISTEN}}' \
-	    -e node_exporter_flags='{{FLAGS}}' \
+	    {{ARGS}} \
 	    "$B/playbooks/node_exporter.yml"; \
 	}
 
@@ -127,5 +124,20 @@ remove_prometheus HOSTS USER="rus" PORT="22" SSH_ARGS="":
     ansible-playbook -i "$INV" -u "$U" $BEC --ssh-extra-args "-p $P $S" \
       -e confirm_remove=true \
       "$B/playbooks/remove_prometheus.yml"; \
+  }
+
+firewall HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
+  { \
+    B="{{justfile_directory()}}"; \
+    U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
+    ANSIBLE_CONFIG="$B/ansible.cfg" \
+    ANSIBLE_ROLES_PATH="$B/roles" \
+    ansible-playbook \
+      -i "$B/inventory/hosts.yml" \
+      -u "$U" \
+      --ssh-extra-args "-p $P $S" \
+      --limit "{{HOSTS}}" \
+      {{ARGS}} \
+      "$B/playbooks/firewall.yml"; \
   }
 

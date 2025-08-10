@@ -1,0 +1,4 @@
+---
+- name: Configure firewall
+  include_tasks: "{{ firewall_backend }}.yml"
+  when: firewall_rules is defined and firewall_rules | length > 0

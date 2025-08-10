@@ -16,12 +16,14 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
   - [Example: Node Exporter](#example-node-exporter)
   - [Example: PVE Exporter](#example-pve-exporter)
   - [Example: Blackbox Exporter](#example-blackbox-exporter)
-- [Example: Prometheus](#example-prometheus)
+  - [Example: Prometheus](#example-prometheus)
+  - [Example: Firewall](#example-firewall)
 - [Available Roles](#available-roles)
   - [blackbox_exporter](#blackbox_exporter)
   - [node_exporter](#node_exporter)
   - [pve_exporter](#pve_exporter)
   - [prometheus](#prometheus)
+  - [firewall](#firewall)
 - [Adding a New Role](#adding-a-new-role)
 
 ## Directory Structure
@@ -118,6 +120,42 @@ Deploys `Prometheus`, a powerful monitoring solution and time series database.
   just remove_prometheus HOSTS="192.168.1.30"
   ```
 
+### Example: Firewall
+
+Configures firewall rules declaratively using UFW or iptables. The firewall role manages rules in a completely declarative way - only the rules defined in `host_vars` will be active.
+
+- **Configure:**
+
+  ```bash
+  # Usage: just firewall HOSTS="<hostname>" [USER="rus"] [PORT="22"]
+  just firewall nbg-01 rus 2222
+  
+  # Force reset (not needed with default firewall_reset: true)
+  just firewall nbg-01 rus 2222 "" "-e firewall_reset=true"
+  
+  # Use iptables backend instead of UFW
+  just firewall nbg-01 rus 2222 "" "-e firewall_backend=iptables"
+  ```
+
+- **Host Configuration (inventory/host_vars/hostname.yml):**
+  ```yaml
+  firewall_rules:
+    # SSH access from anywhere
+    - port: 2222
+      proto: tcp
+      rule: allow
+      
+    # HTTPS only via Tailscale
+    - port: 443
+      proto: tcp
+      interface: tailscale0
+      rule: allow
+      
+    # Deny everything else (zero trust)
+    - rule: deny
+      direction: in
+  ```
+
 ## Available Roles
 
 The following roles are defined in this project. Their behavior can be customized by passing variables via the `just` command using the `-e "variable=value"` syntax with `ansible-playbook`.
@@ -170,6 +208,26 @@ Installs and configures Prometheus.
 | `prometheus_listen`       | `":9090"`               | The address and port for Prometheus to listen on.    |
 | `prometheus_data_dir`     | `"/var/lib/prometheus"` | The path for time series data storage.               |
 | `prometheus_flags`        | `""`                    | Extra command-line flags for the service.            |
+
+### `firewall`
+
+Manages firewall rules declaratively with support for multiple backends.
+
+| Variable                | Default Value | Description                                               |
+| :---------------------- | :------------ | :-------------------------------------------------------- |
+| `firewall_backend`      | `"ufw"`       | Backend to use (`ufw` or `iptables`).                     |
+| `firewall_state`        | `"enabled"`   | State of the firewall (`enabled` or `disabled`).          |
+| `firewall_policy`       | `"deny"`      | Default policy for incoming traffic.                      |
+| `firewall_reset`        | `true`        | Reset all rules before applying (declarative mode).       |
+| `firewall_rules`        | `[]`          | **Required.** List of firewall rules (define in host_vars). |
+
+**Rule Parameters:**
+- `rule`: `allow` or `deny` (default: `allow`)  
+- `port`: Specific port number (optional)
+- `proto`: `tcp` or `udp` (default: `tcp`)
+- `src`: Source IP/subnet (optional)
+- `interface`: Specific interface (optional)
+- `direction`: `in` or `out` (default: `in`)
 
 ## Adding a New Role
 
