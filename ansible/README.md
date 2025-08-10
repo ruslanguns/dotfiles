@@ -18,7 +18,14 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
   - [Example: Blackbox Exporter](#example-blackbox-exporter)
   - [Example: Prometheus](#example-prometheus)
   - [Example: Firewall](#example-firewall)
+  - [Example: Smokeping Prober](#example-smokeping-prober)
 - [Available Roles](#available-roles)
+  - [blackbox_exporter](#blackbox_exporter)
+  - [node_exporter](#node_exporter)
+  - [pve_exporter](#pve_exporter)
+  - [prometheus](#prometheus)
+  - [firewall](#firewall)
+  - [smokeping_prober](#smokeping_prober)
 - [Adding a New Role](#adding-a-new-role)
 
 ## Directory Structure
@@ -139,6 +146,25 @@ Configures firewall rules declaratively using UFW or iptables.
     - rule: deny
       direction: in
   ```
+
+### Example: Smokeping Prober
+
+Deploys `smokeping_prober` to perform latency monitoring.
+
+- **Deploy:**
+  ```bash
+  # Usage: just install smokeping_prober <HOSTS> [ARGS...]
+  just install smokeping_prober 192.168.1.40
+  ```
+
+- **Remove:**
+  ```bash
+  # Usage: just remove smokeping_prober <HOSTS> [ARGS...]
+  just remove smokeping_prober 192.168.1.40 confirm_remove=true
+  ```
+
+- **Host Configuration (inventory/host_vars/hostname.yml):**
+  The targets for the prober are configured via the `smokeping_prober_targets` variable. See the `Available Roles` section for a detailed example.
 
 ## Available Roles
 
