@@ -1,6 +1,19 @@
+---
 blackbox_exporter_version: "v0.27.0"
 blackbox_exporter_latest: false
 blackbox_exporter_listen: ":9115"
-blackbox_exporter_config_path: "/etc/blackbox.yml"
-blackbox_exporter_flags: "--config.file={{ blackbox_exporter_config_path }}"
-blackbox_exporter_service_path: "/etc/systemd/system/blackbox_exporter.service"
+blackbox_exporter_flags: "--config.file=/etc/blackbox.yml"
+blackbox_exporter_config:
+  modules:
+    http_2xx:
+      prober: http
+      timeout: 5s
+      http:
+        method: GET
+    icmp:
+      prober: icmp
+      timeout: 5s
+    tcp_connect:
+      prober: tcp
+      timeout: 5s
+

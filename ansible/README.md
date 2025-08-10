@@ -172,15 +172,14 @@ The following roles are defined in this project. Their behavior can be customize
 
 ### `blackbox_exporter`
 
-Installs and configures the Prometheus Blackbox Exporter.
+Installs the Prometheus Blackbox Exporter. Configuration is managed via the `blackbox_exporter_config` variable.
 
-| Variable                        | Default Value             | Description                                         |
-| :------------------------------ | :------------------------ | :-------------------------------------------------- |
-| `blackbox_exporter_version`     | `"v0.27.0"`               | The version to install.                             |
-| `blackbox_exporter_latest`      | `false`                   | If `true`, fetches the latest version from GitHub.  |
-| `blackbox_exporter_listen`      | `":9115"`                 | The address and port for the exporter to listen on. |
-| `blackbox_exporter_config_path` | `"/etc/blackbox.yml"`     | Path to the configuration file on the target host.  |
-| `blackbox_exporter_flags`       | `"--config.file={{...}}"` | Extra command-line flags for the service.           |
+| Variable                   | Default Value | Description                                                              |
+| :------------------------- | :------------ | :----------------------------------------------------------------------- |
+| `blackbox_exporter_version`| `"v0.27.0"`   | The version to install.                                                  |
+| `blackbox_exporter_latest` | `false`       | If `true`, fetches the latest version from GitHub.                       |
+| `blackbox_exporter_listen` | `":9115"`     | The address and port for the exporter to listen on.                      |
+| `blackbox_exporter_config` | See defaults  | The configuration for the exporter. Define this in your `host_vars`.     |
 
 ### `node_exporter`
 
@@ -209,15 +208,14 @@ Installs and configures the Prometheus PVE Exporter.
 
 ### `prometheus`
 
-Installs and configures Prometheus.
+Installs Prometheus. Configuration is managed via the `prometheus_config` variable.
 
-| Variable              | Default Value           | Description                                        |
-| :-------------------- | :---------------------- | :------------------------------------------------- |
-| `prometheus_version`  | `"v2.54.1"`             | The version to install.                            |
-| `prometheus_latest`   | `false`                 | If `true`, fetches the latest version from GitHub. |
-| `prometheus_listen`   | `":9090"`               | The address and port for Prometheus to listen on.  |
-| `prometheus_data_dir` | `"/var/lib/prometheus"` | The path for time series data storage.             |
-| `prometheus_flags`    | `""`                    | Extra command-line flags for the service.          |
+| Variable             | Default Value           | Description                                                              |
+| :------------------- | :---------------------- | :----------------------------------------------------------------------- |
+| `prometheus_version` | `"v2.54.1"`             | The version to install.                                                  |
+| `prometheus_latest`  | `false`                 | If `true`, fetches the latest version from GitHub.                       |
+| `prometheus_listen`  | `":9090"`               | The address and port for Prometheus to listen on.                        |
+| `prometheus_config`  | See defaults            | The configuration for Prometheus. Define this in your `host_vars`.       |
 
 ### `firewall`
 
