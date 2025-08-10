@@ -105,7 +105,7 @@ in
           end
         '';
         kubectl = "kubecolor $argv";
-        justnix = "just -f ~/.dotfiles/Justfile $argv";
+        justnix = "just -f ~/.dotfiles/nix/Justfile $argv";
         ensure_luarocks_packages = ''
           set required_packages \
             tiktoken_core
@@ -348,7 +348,7 @@ in
         nrp = "nix run nixpkgs#";
         nrs = "sudo nixos-rebuild switch --flake ~/.dotfiles/nix/";
         gc = "nix-collect-garbage --delete-old";
-        jn = "justnix nix_rebuild";
+        jn = "justnix rebuild";
         pos = "posix-source";
         t = "take";
         tt = "ttake";

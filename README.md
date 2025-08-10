@@ -89,16 +89,16 @@ Follow these steps to deploy this configuration on a new machine.
 
 - **Apply to the local machine**:
   ```bash
-  just nix_rebuild
+  just nix rebuild
   ```
 - **Apply to a specific host**:
 
   ```bash
   # Example for WSL host
-  just nix_rebuild_wsl-01
+  just nix rebuild_wsl-01
 
   # Example for remote server
-  just nix_rebuild_px1-105
+  just nix rebuild_px1-105
   ```
 
 ### Managing Secrets
@@ -121,11 +121,11 @@ Follow these steps to deploy this configuration on a new machine.
 
 - **Check Nix code syntax**:
   ```bash
-  just nix_check
+  just nix check
   ```
 - **Format all Nix files**:
   ```bash
-  just nix_format
+  just nix format
   ```
 
 ## Core Components & Workflows
@@ -186,31 +186,31 @@ The Fish shell is configured for a productive environment, integrating tightly w
 
 **Git Shortcuts:**
 
-| Abbr    | Command                               | Description                                                 |
-| :------ | :------------------------------------ | :---------------------------------------------------------- |
-| `ga`    | `git add`                             | Add file contents to the index.                             |
-| `gaa`   | `git add --all`                       | Add all changes to the index.                               |
-| `gapa`  | `git add --patch`                     | Interactively stage hunks of code.                          |
-| `gc`    | `git commit`                          | Record changes to the repository.                           |
-| `gcmsg` | `git commit -m`                       | Commit with an inline message.                              |
-| `gca`   | `git commit --amend --no-edit`        | Amend the last commit without changing the message.         |
-| `gco`   | `git checkout`                        | Switch branches or restore working tree files.              |
-| `gcob`  | `git checkout -b`                     | Create and switch to a new branch.                          |
-| `gcom`  | `git checkout master`                 | Switch to the `master` branch.                              |
-| `gcod`  | `git checkout develop`                | Switch to the `develop` branch.                             |
-| `gdh`   | `git diff HEAD`                       | Show changes since the last commit.                         |
-| `glog`  | `git log --oneline --graph --decorate`| Display a compact, graphical log.                           |
-| `gp`    | `git push`                            | Update remote refs along with associated objects.           |
-| `gph`   | `git push -u origin HEAD`             | Push the current branch and set it as upstream.             |
-| `gpl`   | `git pull`                            | Fetch from and integrate with another repository.           |
-| `grpa`  | `git reset --patch`                   | Interactively unstage hunks of code.                        |
-| `grs1`  | `git reset --soft HEAD~`              | Uncommit changes, keeping them staged.                      |
-| `grm1`  | `git reset HEAD~`                     | Uncommit changes, leaving them in the working directory.    |
-| `grh1`  | `git reset --hard HEAD~`              | **Destructive:** Discard all changes from the last commit.  |
-| `gsa`   | `git stash apply stash^{/`            | Apply the most recent stash.                                |
-| `gsl`   | `git stash list`                      | List all stashed changes.                                   |
-| `gsp`   | `git stash push -m`                   | Stash changes with a message.                               |
-| `gst`   | `git status`                          | Show the working tree status.                               |
+| Abbr    | Command                                | Description                                                |
+| :------ | :------------------------------------- | :--------------------------------------------------------- |
+| `ga`    | `git add`                              | Add file contents to the index.                            |
+| `gaa`   | `git add --all`                        | Add all changes to the index.                              |
+| `gapa`  | `git add --patch`                      | Interactively stage hunks of code.                         |
+| `gc`    | `git commit`                           | Record changes to the repository.                          |
+| `gcmsg` | `git commit -m`                        | Commit with an inline message.                             |
+| `gca`   | `git commit --amend --no-edit`         | Amend the last commit without changing the message.        |
+| `gco`   | `git checkout`                         | Switch branches or restore working tree files.             |
+| `gcob`  | `git checkout -b`                      | Create and switch to a new branch.                         |
+| `gcom`  | `git checkout master`                  | Switch to the `master` branch.                             |
+| `gcod`  | `git checkout develop`                 | Switch to the `develop` branch.                            |
+| `gdh`   | `git diff HEAD`                        | Show changes since the last commit.                        |
+| `glog`  | `git log --oneline --graph --decorate` | Display a compact, graphical log.                          |
+| `gp`    | `git push`                             | Update remote refs along with associated objects.          |
+| `gph`   | `git push -u origin HEAD`              | Push the current branch and set it as upstream.            |
+| `gpl`   | `git pull`                             | Fetch from and integrate with another repository.          |
+| `grpa`  | `git reset --patch`                    | Interactively unstage hunks of code.                       |
+| `grs1`  | `git reset --soft HEAD~`               | Uncommit changes, keeping them staged.                     |
+| `grm1`  | `git reset HEAD~`                      | Uncommit changes, leaving them in the working directory.   |
+| `grh1`  | `git reset --hard HEAD~`               | **Destructive:** Discard all changes from the last commit. |
+| `gsa`   | `git stash apply stash^{/`             | Apply the most recent stash.                               |
+| `gsl`   | `git stash list`                       | List all stashed changes.                                  |
+| `gsp`   | `git stash push -m`                    | Stash changes with a message.                              |
+| `gst`   | `git status`                           | Show the working tree status.                              |
 
 ## Miscellaneous Configurations
 
@@ -226,3 +226,4 @@ While this project is tailored for my personal use, it can be adapted by others.
 
 - **SOPS-free Environment**: If you don't need secret management, the `generic` host configuration is a good starting point, as it does not import the `sops` module.
 - **Using Your Own Secrets**: It is highly recommended to **fork** this project. This will allow you to configure `sops` with your own keys and manage your own `secrets.yaml` file securely.
+

@@ -1,136 +1,25 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
-default:
-	@just --list
+_default:
+	@just --list 
 
+mod install 'install.just'
+mod remove 'remove.just'
+mod config 'config.just'
+
+# Generates a dynamic inventory string for Ansible.
 _node_inv HOSTS:
 	{ V="{{HOSTS}}"; case "$V" in *=*) V="${V#*=}";; esac; case "$V" in *","*) printf "%s\n" "$V";; "") echo "HOSTS is required" >&2; exit 2;; *) printf "%s\n" "${V},";; esac; }
 
-node_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
-	{ \
-	  B="{{justfile_directory()}}"; \
-	  INV="$(just _node_inv "{{HOSTS}}")"; \
-	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  ANSIBLE_CONFIG="$B/ansible.cfg" \
-	  ANSIBLE_ROLES_PATH="$B/roles" \
-	  ansible-playbook \
-	    -i "$INV" \
-	    -u "$U" \
-	    --ssh-extra-args "-p $P $S" \
-	    {{ARGS}} \
-	    "$B/playbooks/node_exporter.yml"; \
-	}
-
-pve_exporter HOSTS TOKEN USER="" PORT="22" SSH_ARGS="" *ARGS="":
-	{ \
-	  B="{{justfile_directory()}}"; \
-	  INV="$(just _node_inv "{{HOSTS}}")"; \
-	  T="{{TOKEN}}"; case "$T" in *=*) T="${T#*=}";; esac; [ -n "$T" ] || { echo "TOKEN is required" >&2; exit 2; }; \
-	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  UF=""; [ -n "$U" ] && UF="-u $U"; BEC=""; [ -n "$U" ] && [ "$U" != "root" ] && BEC="--become"; \
-	  ANSIBLE_CONFIG="$B/ansible.cfg" \
-	  ANSIBLE_ROLES_PATH="$B/roles" \
-	  ansible-playbook \
-	    -i "$INV" \
-	    $UF \
-	    $BEC \
-	    --ssh-extra-args "-p $P $S" \
-	    -e pve_token_value="$T" \
-	    {{ARGS}} \
-	    "$B/playbooks/pve_exporter.yml"; \
-	}
-
-blackbox_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
-	{ \
-	  B="{{justfile_directory()}}"; \
-	  INV="$(just _node_inv "{{HOSTS}}")"; \
-	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  ANSIBLE_CONFIG="$B/ansible.cfg" \
-	  ANSIBLE_ROLES_PATH="$B/roles" \
-	  ansible-playbook \
-	    -i "$INV" \
-	    -u "$U" \
-	    --ssh-extra-args "-p $P $S" \
-	    {{ARGS}} \
-	    "$B/playbooks/blackbox_exporter.yml"; \
-	}
-
-remove_node_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="":
-	{ \
-	  B="{{justfile_directory()}}"; \
-	  INV="$(just _node_inv "{{HOSTS}}")"; \
-	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  BEC=""; if [ "$U" != "root" ]; then BEC="--become"; fi; \
-	  ANSIBLE_CONFIG="$B/ansible.cfg" ANSIBLE_ROLES_PATH="$B/roles" \
-	  ansible-playbook -i "$INV" -u "$U" $BEC --ssh-extra-args "-p $P $S" \
-	    -e confirm_remove=true \
-	    "$B/playbooks/remove_node_exporter.yml"; \
-	}
-
-remove_blackbox_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="":
-	{ \
-	  B="{{justfile_directory()}}"; \
-	  INV="$(just _node_inv "{{HOSTS}}")"; \
-	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  BEC=""; if [ "$U" != "root" ]; then BEC="--become"; fi; \
-	  ANSIBLE_CONFIG="$B/ansible.cfg" ANSIBLE_ROLES_PATH="$B/roles" \
-	  ansible-playbook -i "$INV" -u "$U" $BEC --ssh-extra-args "-p $P $S" \
-	    -e confirm_remove=true \
-	    -e archive_before_remove=false \
-	    "$B/playbooks/remove_blackbox_exporter.yml"; \
-	}
-
-remove_pve_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="":
-	{ \
-	  B="{{justfile_directory()}}"; \
-	  INV="$(just _node_inv "{{HOSTS}}")"; \
-	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  BEC=""; if [ "$U" != "root" ]; then BEC="--become"; fi; \
-	  ANSIBLE_CONFIG="$B/ansible.cfg" ANSIBLE_ROLES_PATH="$B/roles" \
-	  ansible-playbook -i "$INV" -u "$U" $BEC --ssh-extra-args "-p $P $S" \
-	    -e confirm_remove=true \
-	    -e archive_before_remove=false \
-	    "$B/playbooks/remove_pve_exporter.yml"; \
-	}
-prometheus HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
+# Core engine to run any Ansible playbook.
+_run_playbook PLAYBOOK HOSTS *ARGS:
   { \
-    B="{{justfile_directory()}}"; \
-    INV="$(just _node_inv \"{{HOSTS}}\")"; \
-    U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-    ANSIBLE_CONFIG="$B/ansible.cfg" \
-    ANSIBLE_ROLES_PATH="$B/roles" \
+   B="{{justfile_directory()}}"; \
+   INV="$(just _node_inv "{{HOSTS}}")"; \
+   ANSIBLE_CONFIG="$B/ansible.cfg" \
+   ANSIBLE_ROLES_PATH="$B/roles" \
     ansible-playbook \
       -i "$INV" \
-      -u "$U" \
-      --ssh-extra-args "-p $P $S" \
       {{ARGS}} \
-      "$B/playbooks/prometheus.yml"; \
+     "$B/playbooks/{{PLAYBOOK}}.yml"; \
   }
-
-remove_prometheus HOSTS USER="rus" PORT="22" SSH_ARGS="":
-  { \
-    B="{{justfile_directory()}}"; \
-    INV="$(just _node_inv \"{{HOSTS}}\")"; \
-    U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-    BEC=""; if [ "$U" != "root" ]; then BEC="--become"; fi; \
-    ANSIBLE_CONFIG="$B/ansible.cfg" ANSIBLE_ROLES_PATH="$B/roles" \
-    ansible-playbook -i "$INV" -u "$U" $BEC --ssh-extra-args "-p $P $S" \
-      -e confirm_remove=true \
-      "$B/playbooks/remove_prometheus.yml"; \
-  }
-
-firewall HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
-  { \
-    B="{{justfile_directory()}}"; \
-    U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-    ANSIBLE_CONFIG="$B/ansible.cfg" \
-    ANSIBLE_ROLES_PATH="$B/roles" \
-    ansible-playbook \
-      -i "$B/inventory/hosts.yml" \
-      -u "$U" \
-      --ssh-extra-args "-p $P $S" \
-      --limit "{{HOSTS}}" \
-      {{ARGS}} \
-      "$B/playbooks/firewall.yml"; \
-  }
-
