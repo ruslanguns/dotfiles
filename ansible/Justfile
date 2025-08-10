@@ -21,17 +21,13 @@ node_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
 	    "$B/playbooks/node_exporter.yml"; \
 	}
 
-pve_exporter HOSTS TOKEN USER="" API_URL="" VERIFY_SSL="" LISTEN="" PORT="22" SSH_ARGS="":
+pve_exporter HOSTS TOKEN USER="" PORT="22" SSH_ARGS="" *ARGS="":
 	{ \
 	  B="{{justfile_directory()}}"; \
 	  INV="$(just _node_inv "{{HOSTS}}")"; \
 	  T="{{TOKEN}}"; case "$T" in *=*) T="${T#*=}";; esac; [ -n "$T" ] || { echo "TOKEN is required" >&2; exit 2; }; \
-	  U="{{USER}}"; A="{{API_URL}}"; VS="{{VERIFY_SSL}}"; L="{{LISTEN}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
+	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
 	  UF=""; [ -n "$U" ] && UF="-u $U"; BEC=""; [ -n "$U" ] && [ "$U" != "root" ] && BEC="--become"; \
-	  EX="-e pve_token_value='$T'"; \
-	  [ -n "$A" ]  && EX="$EX -e pve_api_url='$A'"; \
-	  [ -n "$VS" ] && EX="$EX -e pve_verify_ssl=$VS"; \
-	  [ -n "$L" ]  && EX="$EX -e pve_listen='$L'"; \
 	  ANSIBLE_CONFIG="$B/ansible.cfg" \
 	  ANSIBLE_ROLES_PATH="$B/roles" \
 	  ansible-playbook \
@@ -39,24 +35,23 @@ pve_exporter HOSTS TOKEN USER="" API_URL="" VERIFY_SSL="" LISTEN="" PORT="22" SS
 	    $UF \
 	    $BEC \
 	    --ssh-extra-args "-p $P $S" \
-	    $EX \
+	    -e pve_token_value="$T" \
+	    {{ARGS}} \
 	    "$B/playbooks/pve_exporter.yml"; \
 	}
 
-blackbox_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" VERSION="v0.27.0" LATEST="false" LISTEN=":9115" FLAGS="" CONFIG="/etc/blackbox.yml":
+blackbox_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
 	{ \
 	  B="{{justfile_directory()}}"; \
 	  INV="$(just _node_inv "{{HOSTS}}")"; \
 	  U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-	  EX="-e blackbox_exporter_version={{VERSION}} -e blackbox_exporter_latest={{LATEST}} -e blackbox_exporter_listen='{{LISTEN}}' -e blackbox_exporter_config_path='{{CONFIG}}'"; \
-	  if [ -n "{{FLAGS}}" ]; then EX="$EX -e blackbox_exporter_flags='{{FLAGS}}'"; fi; \
 	  ANSIBLE_CONFIG="$B/ansible.cfg" \
 	  ANSIBLE_ROLES_PATH="$B/roles" \
 	  ansible-playbook \
 	    -i "$INV" \
 	    -u "$U" \
 	    --ssh-extra-args "-p $P $S" \
-	    $EX \
+	    {{ARGS}} \
 	    "$B/playbooks/blackbox_exporter.yml"; \
 	}
 
@@ -97,20 +92,18 @@ remove_pve_exporter HOSTS USER="rus" PORT="22" SSH_ARGS="":
 	    -e archive_before_remove=false \
 	    "$B/playbooks/remove_pve_exporter.yml"; \
 	}
-prometheus HOSTS USER="rus" PORT="22" SSH_ARGS="" VERSION="v3.5.0" LATEST="false" LISTEN=":9090" FLAGS="":
+prometheus HOSTS USER="rus" PORT="22" SSH_ARGS="" *ARGS="":
   { \
     B="{{justfile_directory()}}"; \
     INV="$(just _node_inv \"{{HOSTS}}\")"; \
     U="{{USER}}"; P="{{PORT}}"; S="{{SSH_ARGS}}"; \
-    EX="-e prometheus_version={{VERSION}} -e prometheus_latest={{LATEST}} -e prometheus_listen='{{LISTEN}}'"; \
-    if [ -n "{{FLAGS}}" ]; then EX="$EX -e prometheus_flags='{{FLAGS}}'"; fi; \
     ANSIBLE_CONFIG="$B/ansible.cfg" \
     ANSIBLE_ROLES_PATH="$B/roles" \
     ansible-playbook \
       -i "$INV" \
       -u "$U" \
       --ssh-extra-args "-p $P $S" \
-      $EX \
+      {{ARGS}} \
       "$B/playbooks/prometheus.yml"; \
   }
 

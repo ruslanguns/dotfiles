@@ -46,11 +46,14 @@ Deploys `node_exporter` to expose system-level metrics.
 - **Deploy:**
 
   ```bash
-  # Usage: just node_exporter HOSTS="<hostname>" [USER="rus"] [VERSION="v1.9.1"]
+  # Usage: just node_exporter HOSTS="<hostname>" [USER="rus"] [*ARGS]
   just node_exporter HOSTS="192.168.1.10"
 
   # Usage targeting multiple hosts
   just node_exporter HOSTS="px1,px2,px3"
+
+  # Usage with custom version
+  just node_exporter HOSTS="192.168.1.10" -- "-e node_exporter_version=v1.8.0"
   ```
 
 - **Remove:**
@@ -68,10 +71,14 @@ Deploys `prometheus-pve-exporter` to expose Proxmox VE metrics. Note: This playb
 - **Deploy:**
 
   ```bash
-  # Usage: just pve_exporter HOSTS="<hostname>" USER="<user>" TOKEN="<api-token>" [API_URL="<url>"]
-  just pve_exporter HOSTS="pve-host" USER="root" TOKEN="my-secret-pve-token"
+  # Usage: just pve_exporter HOSTS="<hostname>" TOKEN="<api-token>" [USER="root"] [*ARGS]
+  just pve_exporter HOSTS="pve-host" TOKEN="my-secret-pve-token"
+
   # Usage targeting multiple hosts
-  just pve_exporter HOSTS="px1,px2,px3" USER="root" TOKEN="my-secret-pve-token"
+  just pve_exporter HOSTS="px1,px2,px3" TOKEN="my-secret-pve-token"
+
+  # Usage with custom API URL
+  just pve_exporter HOSTS="pve-host" TOKEN="my-secret-pve-token" -- "-e pve_api_url=https://pve.example.com:8006"
   ```
 
 - **Remove:**
@@ -89,10 +96,14 @@ Deploys `blackbox_exporter` for black-box probing of endpoints.
 - **Deploy:**
 
   ```bash
-  # Usage: just blackbox_exporter HOSTS="<hostname>" [USER="rus"] [VERSION="v0.27.0"]
+  # Usage: just blackbox_exporter HOSTS="<hostname>" [USER="rus"] [*ARGS]
   just blackbox_exporter HOSTS="192.168.1.20"
+
   # Usage targeting multiple hosts
   just blackbox_exporter HOSTS="px1,px2,px3"
+
+  # Usage with custom version and listen address
+  just blackbox_exporter HOSTS="192.168.1.20" -- "-e blackbox_exporter_version=v0.25.0 -e blackbox_exporter_listen=:9116"
   ```
 
 - **Remove:**
@@ -110,8 +121,11 @@ Deploys `Prometheus`, a powerful monitoring solution and time series database.
 - **Deploy:**
 
   ```bash
-  # Usage: just prometheus HOSTS="<hostname>" [USER="rus"] [VERSION="v2.54.1"]
+  # Usage: just prometheus HOSTS="<hostname>" [USER="rus"] [*ARGS]
   just prometheus HOSTS="192.168.1.30"
+
+  # Usage with custom version and listen address
+  just prometheus HOSTS="192.168.1.30" -- "-e prometheus_version=v2.50.0 -e prometheus_listen=:9091"
   ```
 
 - **Remove:**
@@ -129,12 +143,12 @@ Configures firewall rules declaratively using UFW or iptables. The firewall role
   ```bash
   # Usage: just firewall HOSTS="<hostname>" [USER="rus"] [PORT="22"]
   just firewall nbg-01 rus 2222
-  
+
   # Force reset (not needed with default firewall_reset: true)
-  just firewall nbg-01 rus 2222 "" "-e firewall_reset=true"
-  
+  just firewall nbg-01 rus 2222 "" -- "-e firewall_reset=true"
+
   # Use iptables backend instead of UFW
-  just firewall nbg-01 rus 2222 "" "-e firewall_backend=iptables"
+  just firewall nbg-01 rus 2222 "" -- "-e firewall_backend=iptables"
   ```
 
 - **Host Configuration (inventory/host_vars/hostname.yml):**
@@ -144,13 +158,13 @@ Configures firewall rules declaratively using UFW or iptables. The firewall role
     - port: 2222
       proto: tcp
       rule: allow
-      
+
     # HTTPS only via Tailscale
     - port: 443
       proto: tcp
       interface: tailscale0
       rule: allow
-      
+
     # Deny everything else (zero trust)
     - rule: deny
       direction: in
@@ -158,7 +172,7 @@ Configures firewall rules declaratively using UFW or iptables. The firewall role
 
 ## Available Roles
 
-The following roles are defined in this project. Their behavior can be customized by passing variables via the `just` command using the `-e "variable=value"` syntax with `ansible-playbook`.
+The following roles are defined in this project. Their behavior can be customized by passing variables via the `just` command using `-- "-e variable=value"` syntax (note the `--` separator to pass arguments to ansible-playbook).
 
 ### `blackbox_exporter`
 
@@ -201,28 +215,29 @@ Installs and configures the Prometheus PVE Exporter.
 
 Installs and configures Prometheus.
 
-| Variable                  | Default Value           | Description                                          |
-| :------------------------ | :---------------------- | :--------------------------------------------------- |
-| `prometheus_version`      | `"v2.54.1"`             | The version to install.                              |
-| `prometheus_latest`       | `false`                 | If `true`, fetches the latest version from GitHub.   |
-| `prometheus_listen`       | `":9090"`               | The address and port for Prometheus to listen on.    |
-| `prometheus_data_dir`     | `"/var/lib/prometheus"` | The path for time series data storage.               |
-| `prometheus_flags`        | `""`                    | Extra command-line flags for the service.            |
+| Variable              | Default Value           | Description                                        |
+| :-------------------- | :---------------------- | :------------------------------------------------- |
+| `prometheus_version`  | `"v2.54.1"`             | The version to install.                            |
+| `prometheus_latest`   | `false`                 | If `true`, fetches the latest version from GitHub. |
+| `prometheus_listen`   | `":9090"`               | The address and port for Prometheus to listen on.  |
+| `prometheus_data_dir` | `"/var/lib/prometheus"` | The path for time series data storage.             |
+| `prometheus_flags`    | `""`                    | Extra command-line flags for the service.          |
 
 ### `firewall`
 
 Manages firewall rules declaratively with support for multiple backends.
 
-| Variable                | Default Value | Description                                               |
-| :---------------------- | :------------ | :-------------------------------------------------------- |
-| `firewall_backend`      | `"ufw"`       | Backend to use (`ufw` or `iptables`).                     |
-| `firewall_state`        | `"enabled"`   | State of the firewall (`enabled` or `disabled`).          |
-| `firewall_policy`       | `"deny"`      | Default policy for incoming traffic.                      |
-| `firewall_reset`        | `true`        | Reset all rules before applying (declarative mode).       |
-| `firewall_rules`        | `[]`          | **Required.** List of firewall rules (define in host_vars). |
+| Variable           | Default Value | Description                                                 |
+| :----------------- | :------------ | :---------------------------------------------------------- |
+| `firewall_backend` | `"ufw"`       | Backend to use (`ufw` or `iptables`).                       |
+| `firewall_state`   | `"enabled"`   | State of the firewall (`enabled` or `disabled`).            |
+| `firewall_policy`  | `"deny"`      | Default policy for incoming traffic.                        |
+| `firewall_reset`   | `true`        | Reset all rules before applying (declarative mode).         |
+| `firewall_rules`   | `[]`          | **Required.** List of firewall rules (define in host_vars). |
 
 **Rule Parameters:**
-- `rule`: `allow` or `deny` (default: `allow`)  
+
+- `rule`: `allow` or `deny` (default: `allow`)
 - `port`: Specific port number (optional)
 - `proto`: `tcp` or `udp` (default: `tcp`)
 - `src`: Source IP/subnet (optional)
