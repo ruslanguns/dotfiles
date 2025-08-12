@@ -1,5 +1,4 @@
 ---
-test: 123
 ansible_port: 2222
 
 firewall_rules:

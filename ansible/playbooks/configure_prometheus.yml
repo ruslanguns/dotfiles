@@ -1,0 +1,14 @@
+- name: Configure Prometheus
+  hosts: all
+  become: true
+  tasks:
+    - name: Create config file
+      ansible.builtin.template:
+        src: ../roles/prometheus/templates/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+        mode: "0644"
+
+    - name: Reload prometheus
+      ansible.builtin.systemd:
+        name: prometheus
+        state: reloaded
