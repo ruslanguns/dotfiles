@@ -1,0 +1,10 @@
+keys:
+  - &users
+    - &rus01 age1mwsp9vznduxqxwsvva45htct25wartlsj707qyuz3fydt9tjnqdq5zfucs
+    - &rus02 age1q0slmzl2tt9pv44f3pq5j5j3vnvgm2u5df3gzcrmsp77r69arpaskfz83s
+creation_rules:
+  - path_regex: ^inventory/(group_vars|host_vars)/.*/.*\.sops\.ya?ml$
+    key_groups:
+      - age:
+          - *rus01
+          - *rus02
