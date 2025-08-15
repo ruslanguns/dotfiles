@@ -1,0 +1,29 @@
+firewall_rules:
+  # SSH access from anywhere
+  - port: 2222
+    proto: tcp
+    rule: allow
+  # HTTPS only via Tailscale
+  - port: 443
+    proto: tcp
+    interface: tailscale0
+    rule: allow
+  # Prometheus only via Tailscale
+  - port: 9090
+    proto: tcp
+    interface: tailscale0
+    rule: allow
+  # Node exporter only via Tailscale
+  - port: 9100
+    proto: tcp
+    interface: tailscale0
+    rule: allow
+  # Tailscale direct aaccess
+  - port: 41641
+    proto: udp
+    rule: allow
+  # Blackbox exporter only via Tailscale
+  - port: 9115
+    proto: tcp
+    interface: tailscale0
+    rule: allow
