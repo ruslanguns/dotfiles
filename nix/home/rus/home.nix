@@ -38,7 +38,9 @@ let
     cilium-cli
     fluxcd
     k9s
+    istioctl
     kind
+    cloud-provider-kind
     kubebuilder
     kubecolor
     kubectl
