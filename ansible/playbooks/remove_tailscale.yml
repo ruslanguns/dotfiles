@@ -1,0 +1,5 @@
+- name: Remove Tailscale
+  hosts: all
+  tasks:
+    - name: Import remove tasks
+      ansible.builtin.import_tasks: ../roles/tailscale/tasks/remove.yml

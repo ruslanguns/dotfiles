@@ -1,0 +1,5 @@
+firewall_rules:
+  # SSH access from anywhere
+  - port: 22
+    proto: tcp
+    rule: allow

@@ -27,3 +27,7 @@ smokeping_prober HOSTS *ARGS:
 docker HOSTS *ARGS:
   @just _run_playbook "remove_docker" "{{HOSTS}}" {{ARGS}}
 
+# Removes tailscale from specified hosts.
+tailscale HOSTS *ARGS:
+  @just _run_playbook "remove_tailscale" "{{HOSTS}}" {{ARGS}}
+

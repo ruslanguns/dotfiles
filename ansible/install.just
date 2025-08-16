@@ -26,3 +26,7 @@ smokeping_prober HOSTS *ARGS:
 # Install docker
 docker HOSTS *ARGS:
   @just _run_playbook "docker" "{{HOSTS}}" {{ARGS}}
+
+# Install tailscale
+tailscale HOSTS *ARGS:
+  @just _run_playbook "tailscale" "{{HOSTS}}" {{ARGS}}

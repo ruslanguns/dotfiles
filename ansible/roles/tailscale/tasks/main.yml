@@ -1,0 +1,44 @@
+- name: Install prerequisites for Tailscale
+  become: true
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+    state: present
+- name: Add Tailscale GPG key
+  become: true
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_lsb.codename }}.noarmor.gpg"
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    mode: '0644'
+    force: true
+- name: Add Tailscale repository
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_lsb.codename }} main"
+    state: present
+    filename: tailscale
+- name: Install Tailscale
+  become: true
+  ansible.builtin.apt:
+    name: tailscale
+    state: present
+    update_cache: true
+- name: Check if tailscale is already up
+  become: true
+  ansible.builtin.command: tailscale status
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+- name: Run tailscale up
+  become: true
+  vars:
+    ts_up_argv:
+      - tailscale
+      - up
+      - --authkey={{ tailscale_auth_key }}
+  ansible.builtin.command:
+    argv: "{{ ts_up_argv + (['--ssh'] if tailscale_expose_ssh else []) + (['--advertise-exit-node'] if tailscale_is_exit_node else []) }}"
+  when: "tailscale_auth_key | length > 0 and 'Logged out' in tailscale_status.stdout"
+  register: tailscale_up_result
+  changed_when: "'Success' in tailscale_up_result.stdout"

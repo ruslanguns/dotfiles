@@ -1,0 +1,22 @@
+- name: Stop tailscaled service
+  become: true
+  ansible.builtin.service:
+    name: tailscaled
+    state: stopped
+- name: Remove Tailscale package
+  become: true
+  ansible.builtin.apt:
+    name: tailscale
+    state: absent
+    purge: true
+    autoremove: true
+- name: Remove Tailscale repository file
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/tailscale.list
+    state: absent
+- name: Remove Tailscale GPG key
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    state: absent
