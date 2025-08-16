@@ -1,17 +1,4 @@
----
 # Docker apps configuration
 docker_apps_base_dir: "/opt/docker-apps"
-tsdproxy_config_dir: "/opt/tsdproxy"
-tsdproxy_data_dir: "/opt/tsdproxy/data"
-
-# TSDProxy configuration
-tsdproxy_image: "almeidapaulopt/tsdproxy:1.4.7"
-tsdproxy_http_port: 8080
-tsdproxy_target_hostname: "172.31.0.1"
-tsdproxy_control_url: "https://controlplane.tailscale.com"
-tsdproxy_log_level: "info"
-tsdproxy_log_json: false
-tsdproxy_proxy_access_log: true
-
 # Applications to deploy
 docker_apps: []

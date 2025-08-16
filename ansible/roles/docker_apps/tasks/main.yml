@@ -1,43 +1,15 @@
----
-- name: Create TSDProxy directories
-  become: true
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  loop:
-    - "{{ tsdproxy_config_dir }}"
-    - "{{ tsdproxy_data_dir }}"
-
-- name: Create TSDProxy config file
-  become: true
-  ansible.builtin.template:
-    src: tsdproxy-config.yml.j2
-    dest: "{{ tsdproxy_config_dir }}/config.yml"
-    mode: '0644'
-  notify: restart tsdproxy
-
-- name: Create TSDProxy docker-compose.yml
-  become: true
-  ansible.builtin.template:
-    src: tsdproxy-compose.yml.j2
-    dest: "{{ tsdproxy_config_dir }}/docker-compose.yml"
-    mode: '0644'
-  notify: restart tsdproxy
-
-- name: Start TSDProxy service
-  become: true
-  community.docker.docker_compose_v2:
-    project_src: "{{ tsdproxy_config_dir }}"
-    state: present
-
 - name: Create docker apps base directory
   become: true
   ansible.builtin.file:
     path: "{{ docker_apps_base_dir }}"
     state: directory
     mode: '0755'
-
+- name: Get existing app directories
+  become: true
+  ansible.builtin.find:
+    paths: "{{ docker_apps_base_dir }}"
+    file_type: directory
+  register: existing_apps
 - name: Create directories for each app
   become: true
   ansible.builtin.file:
@@ -46,24 +18,50 @@
     mode: '0755'
   loop: "{{ docker_apps }}"
   when: item.enabled | default(true)
-
+  no_log: true
+- name: Check if app directories exist
+  become: true
+  ansible.builtin.stat:
+    path: "{{ docker_apps_base_dir }}/{{ item.name }}/docker-compose.yml"
+  loop: "{{ docker_apps }}"
+  when: item.enabled | default(true)
+  register: app_status
+  no_log: true
 - name: Deploy docker-compose files for apps
   become: true
   ansible.builtin.copy:
-    content: "{{ item.compose_content }}"
+    content: "{{ item.compose_content | to_nice_yaml }}"
     dest: "{{ docker_apps_base_dir }}/{{ item.name }}/docker-compose.yml"
     mode: '0644'
   loop: "{{ docker_apps }}"
+  loop_control:
+    label: "{{ item.name }}"
   when: item.enabled | default(true)
   register: compose_files
-
 - name: Deploy docker apps
   become: true
   community.docker.docker_compose_v2:
     project_src: "{{ docker_apps_base_dir }}/{{ item.item.name }}"
     state: present
   loop: "{{ compose_files.results }}"
-  when: 
+  loop_control:
+    label: "{{ item.item.name }}"
+  when:
     - not item.skipped | default(false)
     - item.item.enabled | default(true)
     - item.changed
+- name: Stop undefined apps
+  become: true
+  ansible.builtin.shell: |
+    cd "{{ item.path }}" && docker compose down --remove-orphans
+  loop: "{{ existing_apps.files }}"
+  when: item.path | basename not in (docker_apps | selectattr('enabled', 'equalto', true) | map(attribute='name') | list)
+  register: stop_result
+  changed_when: stop_result.rc == 0
+- name: Remove undefined app directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ existing_apps.files }}"
+  when: item.path | basename not in (docker_apps | selectattr('enabled', 'equalto', true) | map(attribute='name') | list)
