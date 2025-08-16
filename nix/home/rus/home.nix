@@ -164,6 +164,7 @@ let
     yamlfmt
     biome
     yamllint
+    ansible-lint
 
     # Kubernetes
     kubeseal
