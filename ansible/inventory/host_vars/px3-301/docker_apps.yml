@@ -2,4 +2,4 @@ docker_apps:
   - name: "whoami"
     enabled: true
   - name: "nginx-example"
-    enabled: true
+    enabled: false
