@@ -1,6 +1,5 @@
-- name: Deploy Docker applications with TSDProxy
+- name: Deploy Docker applications
   hosts: all
   become: true
   roles:
     - docker_apps
-
