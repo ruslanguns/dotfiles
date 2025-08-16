@@ -1,0 +1,37 @@
+---
+- name: Stop docker service
+  become: true
+  ansible.builtin.service:
+    name: docker
+    state: stopped
+
+- name: Remove Docker packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: absent
+    purge: true
+    autoremove: true
+
+- name: Remove Docker repository
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/docker.list
+    state: absent
+
+- name: Remove Docker GPG key
+  become: true
+  ansible.builtin.file:
+    path: /etc/apt/trusted.gpg.d/docker.asc
+    state: absent
+
+- name: Remove docker group
+  become: true
+  ansible.builtin.group:
+    name: docker
+    state: absent

@@ -1,0 +1,6 @@
+---
+- name: Remove Docker
+  hosts: all
+  tasks:
+    - name: Import remove tasks
+      ansible.builtin.import_tasks: ../roles/docker/tasks/remove.yml

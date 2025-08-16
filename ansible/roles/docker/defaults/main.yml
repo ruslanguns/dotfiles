@@ -1,0 +1,3 @@
+---
+# Defaults for docker role
+docker_users: []

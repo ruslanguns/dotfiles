@@ -23,3 +23,7 @@ prometheus HOSTS *ARGS:
 smokeping_prober HOSTS *ARGS:
   @just _run_playbook "remove_smokeping_prober" "{{HOSTS}}" {{ARGS}}
 
+# Removes docker from specified hosts.
+docker HOSTS *ARGS:
+  @just _run_playbook "remove_docker" "{{HOSTS}}" {{ARGS}}
+

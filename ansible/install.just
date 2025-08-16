@@ -23,3 +23,6 @@ prometheus HOSTS *ARGS:
 smokeping_prober HOSTS *ARGS:
   @just _run_playbook "smokeping_prober" "{{HOSTS}}" {{ARGS}}
 
+# Install docker
+docker HOSTS *ARGS:
+  @just _run_playbook "docker" "{{HOSTS}}" {{ARGS}}
