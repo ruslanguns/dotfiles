@@ -1,0 +1,69 @@
+---
+- name: Create TSDProxy directories
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ tsdproxy_config_dir }}"
+    - "{{ tsdproxy_data_dir }}"
+
+- name: Create TSDProxy config file
+  become: true
+  ansible.builtin.template:
+    src: tsdproxy-config.yml.j2
+    dest: "{{ tsdproxy_config_dir }}/config.yml"
+    mode: '0644'
+  notify: restart tsdproxy
+
+- name: Create TSDProxy docker-compose.yml
+  become: true
+  ansible.builtin.template:
+    src: tsdproxy-compose.yml.j2
+    dest: "{{ tsdproxy_config_dir }}/docker-compose.yml"
+    mode: '0644'
+  notify: restart tsdproxy
+
+- name: Start TSDProxy service
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ tsdproxy_config_dir }}"
+    state: present
+
+- name: Create docker apps base directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ docker_apps_base_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Create directories for each app
+  become: true
+  ansible.builtin.file:
+    path: "{{ docker_apps_base_dir }}/{{ item.name }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ docker_apps }}"
+  when: item.enabled | default(true)
+
+- name: Deploy docker-compose files for apps
+  become: true
+  ansible.builtin.copy:
+    content: "{{ item.compose_content }}"
+    dest: "{{ docker_apps_base_dir }}/{{ item.name }}/docker-compose.yml"
+    mode: '0644'
+  loop: "{{ docker_apps }}"
+  when: item.enabled | default(true)
+  register: compose_files
+
+- name: Deploy docker apps
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_apps_base_dir }}/{{ item.item.name }}"
+    state: present
+  loop: "{{ compose_files.results }}"
+  when: 
+    - not item.skipped | default(false)
+    - item.item.enabled | default(true)
+    - item.changed

@@ -30,3 +30,7 @@ docker HOSTS *ARGS:
 # Install tailscale
 tailscale HOSTS *ARGS:
   @just _run_playbook "tailscale" "{{HOSTS}}" {{ARGS}}
+
+# Deploy docker applications with TSDProxy
+docker_apps HOSTS *ARGS:
+  @just _run_playbook "docker_apps" "{{HOSTS}}" {{ARGS}}

@@ -1,0 +1,14 @@
+services:
+  tsdproxy:
+    image: {{ tsdproxy_image }}
+    container_name: tsdproxy
+    environment:
+      - TS_AUTHKEY={{ tailscale_auth_key }}
+      - TS_ENABLE_METRICS={{ tsdproxy_enable_metrics | lower }}
+    ports:
+      - "{{ tsdproxy_http_port }}:{{ tsdproxy_http_port }}"
+    volumes:
+      - {{ tsdproxy_config_dir }}/config.yml:/config/config.yml:ro
+      - {{ tsdproxy_data_dir }}:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped

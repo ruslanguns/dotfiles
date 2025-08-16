@@ -1,0 +1,32 @@
+tsdproxy_enable_metrics: true
+docker_apps:
+  - name: "whoami"
+    enabled: true
+    compose_content: |
+      services:
+        whoami:
+          image: traefik/whoami:latest
+          container_name: whoami
+          labels:
+            - "tsdproxy.enable=true"
+            - "tsdproxy.name=whoami-px3"
+            - "tsdproxy.ephemeral=true"
+            - "tsdproxy.dash.label=Who Am I"
+            - "tsdproxy.dash.icon=si/docker"
+            - "tsdproxy.webclient=true"
+          restart: unless-stopped
+  - name: "nginx-example"
+    enabled: false
+    compose_content: |-
+      services:
+        nginx:
+          image: nginx:latest
+          container_name: nginx-example
+          labels:
+            - "tsdproxy.enable=true"
+            - "tsdproxy.name=nginx"
+            - "tsdproxy.ephemeral=true"
+            - "tsdproxy.container_port=80"
+            - "tsdproxy.dash.label=Nginx Example"
+            - "tsdproxy.dash.icon=si/nginx"
+          restart: unless-stopped
