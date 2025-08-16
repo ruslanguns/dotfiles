@@ -75,6 +75,7 @@ let
     # Build Tools
     cmake
     ninja
+    atuin
 
     # Hardware & Embedded
     esptool

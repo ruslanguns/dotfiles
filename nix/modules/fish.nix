@@ -52,6 +52,9 @@ in
       # argc based script completion
       argc --argc-completions fish oauth2 | source
 
+      # atuin for history management
+      atuin init fish | source
+
       function run_package_check_once --on-event fish_prompt
           if not set -q __fish_package_check_started
               set -g __fish_package_check_started
