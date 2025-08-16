@@ -235,7 +235,6 @@ in
       runtimeInputs = [
         pkgs.tmux
         pkgs.zoxide
-        pkgs.coreutils
       ];
       text = ''
         PRJ="$(zoxide query -i)"
@@ -243,11 +242,22 @@ in
           echo "No project selected."
           exit 1
         fi
-        echo "Launching tmux for $PRJ"
-        # Create a unique, safe socket path based on the project directory's hash.
-        SOCKET_PATH="/tmp/tmux-$(echo -n "$PRJ" | md5sum | cut -d' ' -f1)"
-        # Attach to the session, creating it if it doesn't exist.
-        cd "$PRJ" && exec tmux -S "$SOCKET_PATH" new-session -A -s "$(basename "$PRJ")"
+
+        # Sanitize the project name to be used as a valid tmux session name (replace dots).
+        SESSION_NAME="$(basename "$PRJ" | tr '.' '_')"
+
+        echo "Launching tmux for project: $SESSION_NAME"
+
+        # Change to the project directory before starting/attaching to tmux.
+        # The `|| exit` ensures the script stops if the directory can't be entered.
+        cd "$PRJ" || exit
+
+        # Use the default tmux server.
+        # -A: Attach to session if it exists, resizing clients.
+        # -s: Specify session name.
+        # If the session doesn't exist, a new one is created in the current directory ($PRJ).
+        # `exec` replaces the current shell process, providing a seamless experience.
+        exec tmux new-session -A -s "$SESSION_NAME"
       '';
     })
   ];
