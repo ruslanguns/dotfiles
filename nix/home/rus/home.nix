@@ -47,6 +47,7 @@ let
     kustomize
     kubeval
     kubernetes-helm
+    helmfile
     krew
     operator-sdk
     opentofu
