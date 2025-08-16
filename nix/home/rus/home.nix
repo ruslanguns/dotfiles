@@ -56,7 +56,6 @@ let
     ansible
 
     # Development
-    biome
     bun
     deno
     fnm
@@ -160,6 +159,9 @@ let
     sqlfluff
     statix
     stylua
+    yamlfmt
+    biome
+    yamllint
 
     # Kubernetes
     kubeseal
