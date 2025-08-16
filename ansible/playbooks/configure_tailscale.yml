@@ -1,0 +1,16 @@
+- name: Configure Tailscale
+  hosts: all
+  vars:
+    tailscale_expose_ssh: true
+    tailscale_is_exit_node: false
+  tasks:
+    - name: Apply tailscale settings
+      become: true
+      vars:
+        ts_set_argv:
+          - tailscale
+          - set
+      ansible.builtin.command:
+        argv: "{{ ts_set_argv + (['--ssh'] if tailscale_expose_ssh else []) + (['--advertise-exit-node'] if tailscale_is_exit_node else []) }}"
+      changed_when: true
+

@@ -1,3 +1,4 @@
 tailscale_auth_key: ""
+tailscale_hostname: "{{ ansible_hostname }}"
 tailscale_expose_ssh: true
 tailscale_is_exit_node: false

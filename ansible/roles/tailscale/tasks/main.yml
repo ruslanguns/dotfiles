@@ -37,6 +37,7 @@
       - tailscale
       - up
       - --authkey={{ tailscale_auth_key }}
+      - --hostname={{ tailscale_hostname }}
   ansible.builtin.command:
     argv: "{{ ts_up_argv + (['--ssh'] if tailscale_expose_ssh else []) + (['--advertise-exit-node'] if tailscale_is_exit_node else []) }}"
   when: "tailscale_auth_key | length > 0 and 'Logged out' in tailscale_status.stdout"

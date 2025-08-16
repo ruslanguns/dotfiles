@@ -1,0 +1,2 @@
+tailscale_hostname: "px3-301"
+tailscale_is_exit_node: true

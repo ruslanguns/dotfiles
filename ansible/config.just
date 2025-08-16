@@ -10,3 +10,7 @@ firewall HOSTS *ARGS:
 # Applies configuration for prometheus without restarting the service.
 prometheus HOSTS *ARGS:
   @just _run_playbook "configure_prometheus" "{{HOSTS}}" {{ARGS}}
+
+# Configures tailscale on specified hosts.
+tailscale HOSTS *ARGS:
+  @just _run_playbook "configure_tailscale" "{{HOSTS}}" {{ARGS}}
