@@ -19,6 +19,9 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
   - [Example: Prometheus](#example-prometheus)
   - [Example: Firewall](#example-firewall)
   - [Example: Smokeping Prober](#example-smokeping-prober)
+  - [Example: Docker](#example-docker)
+  - [Example: Docker Apps](#example-docker-apps)
+  - [Example: Tailscale](#example-tailscale)
 - [Available Roles](#available-roles)
   - [blackbox_exporter](#blackbox_exporter)
   - [node_exporter](#node_exporter)
@@ -26,7 +29,11 @@ The goal of this configuration is to provide a simple, idempotent, and reusable 
   - [prometheus](#prometheus)
   - [firewall](#firewall)
   - [smokeping_prober](#smokeping_prober)
+  - [docker](#docker)
+  - [docker_apps](#docker_apps)
+  - [tailscale](#tailscale)
 - [Adding a New Role](#adding-a-new-role)
+- [Secrets Management (SOPS)](#secrets-management-sops)
 
 ## Directory Structure
 
@@ -263,6 +270,120 @@ smokeping_prober_targets:
       protocol: icmp
 ```
 
+### Example: Docker
+
+Installs Docker Engine on target hosts.
+
+- **Install:**
+  ```bash
+  # Usage: just install docker <HOSTS> [ARGS...]
+  just install docker px3-301
+  ```
+
+- **Remove:**
+  ```bash
+  # Usage: just remove docker <HOSTS> [ARGS...]
+  just remove docker px3-301
+  ```
+
+### Example: Docker Apps
+
+Deploys containerized applications using Docker Compose with flexible configuration management.
+
+- **Deploy:**
+  ```bash
+  # Usage: just install docker_apps <HOSTS> [ARGS...]
+  just install docker_apps px3-301
+  ```
+
+- **Host Configuration (`inventory/host_vars/hostname/docker_apps.yml`):**
+  ```yaml
+  docker_apps:
+    - name: "whoami"
+      enabled: true
+    - name: "nginx-example"
+      enabled: false
+  ```
+
+- **Group Configuration (`inventory/group_vars/docker_hosts/docker_compose/app-name.yml`):**
+  ```yaml
+  services:
+    nginx:
+      image: nginx:latest
+      container_name: nginx-example
+      restart: unless-stopped
+  ```
+
+- **Host-Specific Overrides (`inventory/host_vars/hostname/docker_compose/app-name.yml`):**
+  ```yaml
+  services:
+    nginx:
+      ports:
+        - "8080:80"
+  ```
+
+### Example: Tailscale
+
+Installs and configures Tailscale VPN.
+
+- **Install:**
+  ```bash
+  # Usage: just install tailscale <HOSTS> [ARGS...]
+  just install tailscale px3-301
+  ```
+
+- **Configure:**
+  ```bash
+  # Usage: just configure tailscale <HOSTS> [ARGS...]
+  just configure tailscale px3-301
+  ```
+
+- **Remove:**
+  ```bash
+  # Usage: just remove tailscale <HOSTS> [ARGS...]
+  just remove tailscale px3-301
+  ```
+
+### `docker`
+
+Installs Docker Engine on target hosts.
+
+| Variable      | Default Value | Description                                              |
+| :------------ | :------------ | :------------------------------------------------------- |
+| `docker_users` | `[]`         | List of users to add to the docker group for non-root access. |
+
+### `docker_apps`
+
+Deploys containerized applications using Docker Compose with flexible configuration management.
+
+| Variable             | Default Value      | Description                                                           |
+| :------------------- | :----------------- | :-------------------------------------------------------------------- |
+| `docker_apps_base_dir` | `"/opt/docker-apps"` | Base directory where Docker Compose projects are deployed.            |
+| `docker_apps`        | `[]`               | **Required.** List of applications to deploy (define in host_vars).   |
+
+**Configuration Structure:**
+- **Group configs**: `group_vars/docker_hosts/docker_compose/app-name.yml` (reusable base configurations)
+- **Host configs**: `host_vars/hostname/docker_compose/app-name.yml` (host-specific overrides)
+- **App list**: `host_vars/hostname/docker_apps.yml` (which apps are enabled per host)
+
+Configurations are merged recursively, allowing host-specific customizations of group-defined services.
+
+### `tailscale`
+
+Installs and configures Tailscale VPN for secure mesh networking.
+
+| Variable             | Default Value        | Description                                                    |
+| :------------------- | :------------------- | :------------------------------------------------------------- |
+| `tailscale_auth_key`   | `""`               | **Required.** Tailscale auth key for device registration.      |
+| `tailscale_hostname`   | `"{{ ansible_hostname }}"` | Hostname to use for the Tailscale node.                   |
+| `tailscale_expose_ssh` | `true`             | Whether to expose SSH through Tailscale.                       |
+| `tailscale_is_exit_node` | `false`          | Whether to configure this node as an exit node.                |
+
+**Host Configuration (`inventory/host_vars/hostname/secrets.sops.yml`):**
+```yaml
+tailscale_auth_key: "tskey-auth-xxxxxxxxxxxx"
+```
+
 ## Adding a New Role
 
 To add a new component or service, follow the existing structure:
@@ -271,3 +392,44 @@ To add a new component or service, follow the existing structure:
 2.  **Create the Playbook**: Add a simple playbook in `playbooks/` that includes the new role. Create a corresponding `remove_...` playbook if needed.
 3.  **Update the Justfile**: Add new recipes to the appropriate submodule (`install.just`, `remove.just`, etc.).
 4.  **Update this README**: Document the new role and its usage instructions here.
+
+## Secrets Management (SOPS)
+
+This project uses [SOPS](https://github.com/getsops/sops) with [age](https://github.com/FiloSottile/age) encryption for managing sensitive data like API keys, tokens, and passwords.
+
+### Configuration
+
+SOPS is configured via `.sops.yaml` in the project root:
+
+- **Encryption Keys**: Two age keys (`rus01`, `rus02`) are configured for redundancy
+- **File Pattern**: Only files matching `inventory/(group_vars|host_vars)/.*/.*\.sops\.ya?ml$` are encrypted
+- **Auto-encryption**: Files with `.sops.yml` extension are automatically encrypted when edited
+
+### Encrypted Files
+
+Current encrypted files in the project:
+- `inventory/host_vars/px3-301/secrets.sops.yml` - Contains `tailscale_auth_key` and other host secrets
+
+### Usage
+
+**Edit encrypted files:**
+```bash
+sops inventory/host_vars/px3-301/secrets.sops.yml
+```
+
+**Create new encrypted file:**
+```bash
+sops inventory/host_vars/new-host/secrets.sops.yml
+```
+
+**View encrypted file:**
+```bash
+sops -d inventory/host_vars/px3-301/secrets.sops.yml
+```
+
+### Best Practices
+
+- Store all sensitive variables in `secrets.sops.yml` files
+- Use descriptive variable names (e.g., `tailscale_auth_key`, `api_token`)
+- Keep non-sensitive config in regular YAML files
+- Never commit unencrypted secrets to the repository
