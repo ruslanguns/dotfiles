@@ -30,7 +30,7 @@
 - name: Deploy docker-compose files for apps
   become: true
   ansible.builtin.copy:
-    content: "{{ item.compose_content | to_nice_yaml }}"
+    content: "{{ lookup('file', inventory_dir + '/group_vars/docker_hosts/docker_compose/' + item.name + '.yml') }}"
     dest: "{{ docker_apps_base_dir }}/{{ item.name }}/docker-compose.yml"
     mode: '0644'
   loop: "{{ docker_apps }}"

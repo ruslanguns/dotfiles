@@ -1,33 +1,5 @@
 docker_apps:
   - name: "whoami"
     enabled: true
-    compose_content:
-      services:
-        whoami-ts:
-          image: tailscale/tailscale:latest
-          container_name: whoami-ts
-          hostname: whoami
-          volumes:
-            - ${PWD}/tailscale/state:/var/lib/tailscale
-            - /dev/net/tun:/dev/net/tun
-          cap_add:
-            - NET_ADMIN
-            - NET_RAW
-          environment:
-            - TS_AUTHKEY={{ tailscale_auth_key }}
-            - TS_STATE_DIR=/var/lib/tailscale
-            - TS_ENABLE_METRICS=true
-          restart: unless-stopped
-        whoami:
-          container_name: whoami
-          image: traefik/whoami:latest
-          restart: unless-stopped
-          network_mode: "service:whoami-ts"
   - name: "nginx-example"
-    enabled: false
-    compose_content:
-      services:
-        nginx:
-          image: nginx:latest
-          container_name: nginx-example
-          restart: unless-stopped
+    enabled: true
