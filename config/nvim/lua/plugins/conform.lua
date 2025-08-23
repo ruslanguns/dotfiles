@@ -11,13 +11,13 @@ return {
       -- For YAML and others
       opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
         sql = { "sql_formatter" },
-        yaml = { "yamlfmt" },
-        yml = { "yamlfmt" },
-        ["yaml.ansible"] = { "yamlfmt" },
-        ["yaml.gitlab"] = { "yamlfmt" },
-        ["yaml.docker-compose"] = { "yamlfmt" },
-        dockercompose = { "yamlfmt" },
-        ["gitlab-ci"] = { "yamlfmt" },
+        yaml = { "biome" },
+        yml = { "biome" },
+        ["yaml.ansible"] = { "biome" },
+        ["yaml.gitlab"] = { "biome" },
+        ["yaml.docker-compose"] = { "biome" },
+        dockercompose = { "biome" },
+        ["gitlab-ci"] = { "biome" },
       })
     end,
   },
