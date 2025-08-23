@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cloudflare-ddns
+  namespace: kube-system
+spec:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cloudflare-ddns
+              image: favonia/cloudflare-ddns:latest
+              env:
+                - name: CLOUDFLARE_API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: cloudflare-api-token
+                      key: CLOUDFLARE_API_TOKEN
+                - name: DOMAINS
+                  value: "ddns.ruso.dev"
+                - name: PROXIED
+                  value: "false"
+                - name: UPDATE_CRON
+                  value: "@once"
+          restartPolicy: OnFailure

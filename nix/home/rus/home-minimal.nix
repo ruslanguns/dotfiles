@@ -31,6 +31,7 @@ let
     nmap
     kubernetes-helm
     cilium-cli
+    helmfile
   ];
 in
 {
