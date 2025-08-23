@@ -199,7 +199,8 @@ in
             markdown-toc \
             @biomejs/biome \
             @qwen-code/qwen-code \
-            @anthropic-ai/claude-code
+            @anthropic-ai/claude-code \
+            @openai/codex
 
           set ignored_packages \
             npm \
