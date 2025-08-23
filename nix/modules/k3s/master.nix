@@ -3,8 +3,43 @@
   tokenFile,
   ...
 }:
+let
+  infra = pkgs.stdenv.mkDerivation {
+    name = "infra";
+    src = ../k8s;
+    installPhase = ''
+      mkdir -p $out
+      cp -r * $out/
+    '';
+  };
+in
 {
   imports = [ ./common.nix ];
+
+  systemd.services.bootstrap-install = {
+    description = "Install Kubernetes Bootstrap Infrastructure (CNI)";
+    after = [ "k3s.service" ];
+    path = [
+      pkgs.kubernetes-helm
+      pkgs.kubectl
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "install-infrastructure" ''
+        set -e
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+        TEMP_DIR=$(mktemp -d)
+        cp -r ${infra}/* $TEMP_DIR/
+        cd $TEMP_DIR
+
+        helmfile apply -f $TEMP_DIR/helmfile.yaml
+
+        rm -rf $TEMP_DIR
+      '';
+    };
+  };
 
   services.k3s = {
     enable = true;
@@ -19,42 +54,5 @@
       "--disable=traefik"
       "--disable=servicelb"
     ];
-    manifests = {
-      cilium = {
-        enable = true; # First time must be installed manually
-        target = "cilium.yaml";
-        source = ./manifests/cilium.yaml;
-      };
-      longhorn = {
-        enable = true;
-        target = "longhorn.yaml";
-        source = ./manifests/longhorn.yaml;
-      };
-      kyverno = {
-        enable = true;
-        target = "kyverno.yaml";
-        source = ./manifests/kyverno.yaml;
-      };
-      sealedSecrets = {
-        enable = true;
-        target = "sealed-secrets.yaml";
-        source = ./manifests/sealed-secrets.yaml;
-      };
-      kubeVip = {
-        enable = true;
-        target = "kube-vip.yaml";
-        source = ./manifests/kube-vip.yaml;
-      };
-      ddns = {
-        enable = true;
-        target = "ddns.yaml";
-        source = ./manifests/ddns.yaml;
-      };
-      ingress = {
-        enable = true;
-        target = "ingress.yaml";
-        source = ./manifests/ingress.yaml;
-      };
-    };
   };
 }

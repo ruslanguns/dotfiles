@@ -1,0 +1,125 @@
+helmDefaults:
+  wait: true
+  timeout: 600
+  atomic: true
+
+repositories:
+  - name: cilium
+    url: https://helm.cilium.io
+  - name: kyverno
+    url: https://kyverno.github.io/kyverno/
+  - name: sealed-secrets
+    url: https://bitnami-labs.github.io/sealed-secrets/
+  - name: longhorn
+    url: https://charts.longhorn.io/
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx/
+  - name: kube-vip
+    url: https://kube-vip.github.io/helm-charts/
+
+releases:
+  - name: cilium
+    namespace: kube-system
+    createNamespace: false
+    chart: cilium/cilium
+    version: 1.18.1
+    values:
+      - kubeProxyReplacement: true
+        ipam:
+          operator:
+            clusterPoolIPv4PodCIDRList: 10.42.0.0/16
+        socketLB:
+          enabled: false
+        envoy:
+          enabled: false
+        externalIPs:
+          enabled: false
+        gatewayAPI:
+          enabled: false
+          # secretsNamespace:
+          #   create: false
+          #   name: kube-system
+        hubble:
+          relay:
+            enabled: false
+          ui:
+            enabled: false
+        nodePort:
+          enabled: true
+        # envoyConfig:
+        #   secretsNamespace:
+        #     create: false
+        #     name: kube-system
+        # bgpControlPlane:
+        #   secretsNamespace:
+        #     create: false
+        #     name: kube-system
+        # tls:
+        #   secretsNamespace:
+        #     name: kube-system
+        # ingressController:
+        #   defaultSecretNamespace: kube-system
+
+  - name: kyverno
+    namespace: kyverno
+    createNamespace: true
+    chart: kyverno/kyverno
+    version: 3.3.7
+    needs: [kube-system/cilium]
+    values:
+      - replicaCount: 1
+
+  - name: sealed-secrets
+    namespace: kube-system
+    createNamespace: false
+    chart: sealed-secrets/sealed-secrets
+    version: 2.17.1
+    needs: [kube-system/cilium]
+    values:
+      - nameOverride: sealed-secrets-controller
+
+  - name: longhorn
+    namespace: longhorn-system
+    createNamespace: true
+    chart: longhorn/longhorn
+    version: 1.8.1
+    needs: [kube-system/cilium]
+    values:
+      - defaultSettings:
+          defaultDataPath: /var/lib/longhorn
+
+  - name: ingress-nginx
+    namespace: kube-system
+    createNamespace: false
+    chart: ingress-nginx/ingress-nginx
+    version: 4.12.0
+    needs: [kube-system/cilium]
+    values:
+      - controller:
+          kind: DaemonSet
+          metrics:
+            enabled: true
+
+  - name: kube-vip
+    namespace: kube-system
+    createNamespace: false
+    chart: kube-vip/kube-vip
+    version: 0.6.6
+    needs: [kube-system/cilium]
+    values:
+      - config:
+          address: 192.168.1.224
+        env:
+          vip_interface: ens18
+          vip_arp: true
+          lb_enable: true
+          lb_port: 6443
+          vip_cidr: 32
+          cp_enable: true
+          svc_enable: true
+          svc_election: true
+          vip_leaderelection: false
+
+  # Kustomize extras (Kyverno policy, SealedSecret+CronJob, LB pool)
+  # Apply separately once the above are ready:
+  #   kubectl apply -k nix/modules/k8s/kustomize/infra-extras
