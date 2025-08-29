@@ -200,7 +200,8 @@ in
             @biomejs/biome \
             @qwen-code/qwen-code \
             @anthropic-ai/claude-code \
-            @openai/codex
+            @openai/codex \
+            @charmland/crush
 
           set ignored_packages \
             npm \
