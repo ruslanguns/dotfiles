@@ -48,6 +48,7 @@ in
       # fnm
       set PATH "/home/${username}/.local/share/fnm" $PATH
       fnm env | source
+      set -gx NODE_OPTIONS "--max-old-space-size=256"
 
       # argc based script completion
       argc --argc-completions fish oauth2 | source
@@ -204,7 +205,8 @@ in
             @qwen-code/qwen-code \
             @anthropic-ai/claude-code \
             @openai/codex \
-            @charmland/crush
+            @charmland/crush \
+            opencode-ai
 
           set ignored_packages \
             npm \
