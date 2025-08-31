@@ -9,7 +9,7 @@ return {
         floats = "transparent",
       },
       on_highlights = function(hl, c)
-        hl.FloatBorder = { fg = c.blue, bg = "none" }
+        hl.FloatBorder = { fg = c.blue, bg = "none" } -- border color for floating windows
         hl.WinSeparator = { fg = c.lightblue } -- border color for vertical split
       end,
     },

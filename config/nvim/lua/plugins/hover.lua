@@ -1,29 +1,36 @@
+-- Disabled
 if true then
   return {}
 end
+
 return {
   {
     "lewis6991/hover.nvim",
-    config = function()
-      require("hover").setup({})
-      local gid = vim.api.nvim_create_augroup("hover_plugin_mouse", { clear = true })
-      vim.o.mouse = "a"
+    event = { "LspAttach" },
+    opts = {
+      init = function()
+        require("hover.providers.lsp")
+      end,
+      preview_opts = { border = "single" },
+      preview_window = false,
+      title = true,
+      mouse_providers = { "LSP" },
+      mouse_delay = 1000,
+    },
+    config = function(_, opts)
+      require("hover").setup(opts)
+      vim.keymap.set("n", "K", require("hover").hover, { desc = "hover.nvim" })
+      vim.keymap.set("n", "gK", require("hover").hover_select, { desc = "hover.nvim (select)" })
+      vim.keymap.set("n", "<C-p>", function()
+        local pos = vim.api.nvim_win_get_cursor(0)
+        require("hover").hover_switch("previous", { bufnr = 0, pos = { line = pos[1], col = pos[2] } })
+      end, { desc = "hover.nvim (previous source)" })
+      vim.keymap.set("n", "<C-n>", function()
+        local pos = vim.api.nvim_win_get_cursor(0)
+        require("hover").hover_switch("next", { bufnr = 0, pos = { line = pos[1], col = pos[2] } })
+      end, { desc = "hover.nvim (next source)" })
+      vim.keymap.set("n", "<MouseMove>", require("hover").hover_mouse, { desc = "hover.nvim (mouse)" })
       vim.o.mousemoveevent = true
-      local timer = vim.loop.new_timer()
-      local waiting = false
-      local function debounced()
-        if waiting then
-          return
-        end
-        waiting = true
-        timer:start(200, 0, function()
-          waiting = false
-          vim.schedule(function()
-            pcall(require("hover").hover)
-          end)
-        end)
-      end
-      vim.api.nvim_create_autocmd("MouseMove", { group = gid, pattern = "*", callback = debounced })
     end,
   },
 }
