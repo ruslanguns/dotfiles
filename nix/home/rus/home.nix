@@ -70,7 +70,6 @@ let
     python313Packages.pylatexenc
     lua51Packages.luarocks-nix
     lua51Packages.tiktoken_core
-    lua51Packages.lua
 
     # Build Tools
     cmake
@@ -144,8 +143,17 @@ let
     marksman
     nil
     nodePackages.vscode-langservers-extracted
-    nodePackages.yaml-language-server
     tree-sitter
+    lua-language-server
+    terraform-ls
+    gopls
+    vtsls
+    pyright
+    helm-ls
+    yaml-language-server
+    ansible-language-server
+    taplo
+    ruff
     # Formatters & Linters
     alejandra
     ast-grep
