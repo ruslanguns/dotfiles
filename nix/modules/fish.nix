@@ -52,6 +52,9 @@ in
       # argc based script completion
       argc --argc-completions fish oauth2 | source
 
+      # crush completion
+      crush completion fish | source
+
       # atuin for history management
       atuin init fish | source
 
