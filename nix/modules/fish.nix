@@ -101,7 +101,7 @@ in
           cleanup_lock
         '';
         refresh = "history --save; source $HOME/.config/fish/config.fish; echo '✨ Fish config reloaded successfully! 🚀'; exec fish";
-        take = ''mkdir -p -- "$1" && cd -- "$1"'';
+        take = ''mkdir -p -- "$argv[1]" && cd -- "$argv[1]"'';
         ttake = "cd $(mktemp -d)";
         show_path = "echo $PATH | tr ' ' '\n'";
         posix-source = ''
