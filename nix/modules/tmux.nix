@@ -185,6 +185,18 @@ in
         extraConfig = ''
           set -g @catppuccin_flavour 'mocha'
           set -g @catppuccin_window_status_style 'rounded'
+
+          # Enable transparency
+          set -g @catppuccin_transparency 'enabled'
+          set -g @catppuccin_window_transparency 'enabled'
+          set -g @catppuccin_pane_transparency 'enabled'
+
+          # Ensure status bar uses transparent background
+          set -g status-style bg=default
+          set -g window-status-style bg=default
+          set -g pane-border-style bg=default
+          set -g pane-active-border-style bg=default
+
           set -g status-right-length 100
           set -g status-left-length 100
           set -g status-left ""
