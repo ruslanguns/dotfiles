@@ -37,7 +37,6 @@ let
     # Kubernetes & Cloud
     cilium-cli
     fluxcd
-    k9s
     istioctl
     kind
     cloud-provider-kind
@@ -227,6 +226,7 @@ in
     ../../modules/tmux.nix
     ../../modules/git.nix
     ../../modules/fish.nix
+    ../../modules/k9s.nix
   ];
 
   home.stateVersion = "25.05";
@@ -259,4 +259,8 @@ in
     direnv.nix-direnv.enable = true;
   };
 
+  services.k9s = {
+    enable = true;
+    theme = "monokai";
+  };
 }
