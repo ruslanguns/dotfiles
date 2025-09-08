@@ -17,6 +17,13 @@
   home-manager.users.${username} = {
     imports = [
       ../../home/${username}/home.nix
+      (
+        { config, ... }:
+        {
+          home.file.".config/nvim".source =
+            config.lib.file.mkOutOfStoreSymlink "/home/${username}/.dotfiles/config/nvim";
+        }
+      )
     ];
   };
 
