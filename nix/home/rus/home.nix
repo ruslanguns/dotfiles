@@ -19,7 +19,6 @@ let
     fzf
     git
     git-crypt
-    htop
     jq
     killall
     mosh
@@ -257,6 +256,50 @@ in
     broot.enableFishIntegration = true;
     direnv.enable = true;
     direnv.nix-direnv.enable = true;
+
+    htop = {
+      enable = true;
+      package = pkgs.unstable.htop;
+      settings = {
+        hide_kernel_threads = true;
+        hide_userland_threads = true;
+        shadow_other_users = true;
+        show_program_path = false;
+        tree_view = false;
+        sort_key = "PERCENT_CPU";
+      };
+    };
+
+    btop = {
+      enable = true;
+      settings = {
+        theme_background = false;
+        color_scheme = "monokai";
+        rounded_corners = true;
+        vim_keys = true;
+        proc_tree = true;
+      };
+    };
+
+    lazygit = {
+      enable = true;
+      settings = {
+        gui = {
+          nerdFontsVersion = "3";
+          disableStartupPopups = true;
+          showRandomTip = false;
+          border = "rounded";
+          mouseEvents = true;
+          theme = {
+            lightTheme = false;
+          };
+        };
+        git = {
+          parseEmoji = true;
+          autoFetch = false;
+        };
+      };
+    };
   };
 
   services.k9s = {
