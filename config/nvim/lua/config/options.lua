@@ -6,11 +6,16 @@
 vim.g.lazyvim_python_lsp = "pyright"
 vim.g.lazyvim_python_ruff = "ruff"
 vim.opt.wrap = true
-vim.opt.fileformat = "unix"
+-- Set default fileformat for new buffers only
+vim.opt_global.fileformat = "unix"
 vim.opt.fileformats = { "unix", "dos" }
+
+-- Strip CRLF only for modifiable file buffers
 vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*",
-    callback = function()
-        vim.cmd([[%s/\r$//e]])
-    end,
+  pattern = "*",
+  callback = function()
+    if vim.bo.buftype == "" and vim.bo.modifiable then
+      vim.cmd([[%s/\r$//e]])
+    end
+  end,
 })
