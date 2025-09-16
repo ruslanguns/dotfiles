@@ -45,6 +45,12 @@ prometheus_config:
             environment: "personal"
             customer: "ruso.dev"
             service: "windows"
+        - targets:
+            - "rus-win.bombay-tuna.ts.net"
+          labels:
+            environment: "personal"
+            customer: "ruso.dev"
+            service: "windows"
     - job_name: "blackbox_exporter"
       static_configs:
         - targets: ["nbg-01:9115"]
