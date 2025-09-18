@@ -124,6 +124,7 @@ let
     which
     yq-go
     zstd
+    hl-log-viewer
 
     # Development
     # Languages
