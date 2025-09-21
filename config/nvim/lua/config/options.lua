@@ -3,6 +3,8 @@
 -- Add any additional options here
 -- vim.g.lazyvim_prettier_needs_config = true
 -- opts.rocks.hererocks = false;
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 vim.g.lazyvim_python_lsp = "pyright"
 vim.g.lazyvim_python_ruff = "ruff"
 vim.opt.wrap = true
