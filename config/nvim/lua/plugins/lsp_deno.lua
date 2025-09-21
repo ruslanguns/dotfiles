@@ -4,7 +4,7 @@ return {
   dependencies = {
     -- Automatically install LSPs to stdpath for neovim
     {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       config = true,
       opts = {
         ensure_installed = {
@@ -16,7 +16,7 @@ return {
         automatic_installation = true,
       },
     },
-    "williamboman/mason-lspconfig.nvim", -- Useful status updates for LSP
+    "mason-org/mason-lspconfig.nvim", -- Useful status updates for LSP
     -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
     { "j-hui/fidget.nvim", tag = "legacy", opts = {} },
   },
