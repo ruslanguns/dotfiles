@@ -413,6 +413,7 @@ in
         xcopy = "xclip -selection clipboard";
         xpaste = "xclip -o -selection clipboard";
         explorer = "/mnt/c/Windows/explorer.exe";
+        "docker.exe" = "/mnt/c/Program\\ Files/Docker/Docker/resources/bin/docker.exe";
       })
       (lib.mkIf isLinux {
         xcopy = "xclip -selection clipboard";
