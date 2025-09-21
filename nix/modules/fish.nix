@@ -56,6 +56,10 @@ in
       # crush completion
       crush completion fish | source
 
+      # stern completions
+      kubectl stern --completion fish | source
+      stern --completion fish | source
+
       # atuin for history management
       atuin init fish | source
 
