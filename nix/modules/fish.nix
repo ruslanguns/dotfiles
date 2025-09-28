@@ -210,7 +210,8 @@ in
             @anthropic-ai/claude-code \
             @openai/codex \
             @charmland/crush \
-            opencode-ai
+            opencode-ai \
+            @github/copilot
 
           set ignored_packages \
             npm \
