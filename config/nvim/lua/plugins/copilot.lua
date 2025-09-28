@@ -1,5 +1,4 @@
 local prefix = "<Leader>a"
-local prefix = "<Leader>a"
 return {
   {
     "zbirenbaum/copilot.lua",
