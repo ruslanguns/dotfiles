@@ -260,16 +260,17 @@ in
 
         echo "Launching tmux for project: $SESSION_NAME"
 
-        # Change to the project directory before starting/attaching to tmux.
-        # The `|| exit` ensures the script stops if the directory can't be entered.
-        cd "$PRJ" || exit
-
-        # Use the default tmux server.
-        # -A: Attach to session if it exists, resizing clients.
-        # -s: Specify session name.
-        # If the session doesn't exist, a new one is created in the current directory ($PRJ).
-        # `exec` replaces the current shell process, providing a seamless experience.
-        exec tmux new-session -A -s "$SESSION_NAME"
+        if [ -n "''${TMUX:-}" ]; then
+          # Already inside tmux: create the session in the background if needed and switch to it.
+          if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+            tmux new-session -d -s "$SESSION_NAME" -c "$PRJ"
+          fi
+          tmux switch-client -t "$SESSION_NAME"
+        else
+          # Standalone shell: enter the project directory and attach or create the session.
+          cd "$PRJ" || exit
+          exec tmux new-session -A -s "$SESSION_NAME"
+        fi
       '';
     })
   ];
