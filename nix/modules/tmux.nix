@@ -249,7 +249,15 @@ in
         pkgs.zoxide
       ];
       text = ''
-        PRJ="$(zoxide query -i)"
+        QUERY="$*"
+
+        if [ -n "$QUERY" ]; then
+          if ! PRJ="$(zoxide query "$QUERY" 2>/dev/null)"; then
+            PRJ="$(FZF_DEFAULT_QUERY="$QUERY" zoxide query -i)"
+          fi
+        else
+          PRJ="$(zoxide query -i)"
+        fi
         if [ -z "$PRJ" ]; then
           echo "No project selected."
           exit 1
